@@ -60,8 +60,9 @@ Output: Preference score in + (larger value indicates greater preference)
 - Generation of recommendation lists ls when a user arrivces
 
 
-- Allocation Phase: determines which fairness agents will be active in responding to a gioven recommendation opportunity.
+- Allocation Phase: determines which fairness agents will be active in responding to a given recommendation opportunity. This phase addresses an online and dynamic allocation problem.
 
+Input: history of agent allocations; generated recommendation lists from past interactions with users; how fair the set of agents believes this history to be
 Output: set of non-negative weights , summing to 1, over the set of fairness agents
 (indicates the extent of each fairness agent)
 ii
