@@ -1,2 +1,5 @@
 # scruf_d
-Implementation of the SCRUF-D architecture with the OpenBanditPipeline
+1. Implementation of the SCRUF-D architecture
+2. Experimentations:
+    a) Bossy Users
+

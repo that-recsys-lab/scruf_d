@@ -1,0 +1,10 @@
+count,userId,fairnessAgentsName,fairnessAgentsId,protected_items
+1,1,fairnessOne,100,4
+2,1,fairnessTwo,101,3
+3,1,fairnessThree,102,0
+4,2,fairnessOne,100,3
+5,2,fairnessTwo,101,2
+6,2,fairnessThree,102,4
+7,3,fairnessOne,100,5
+8,3,fairnessTwo,101,0
+9,3,fairnessThree,102,4
