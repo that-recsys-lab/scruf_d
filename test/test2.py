@@ -28,7 +28,7 @@ class Test2:
 
         n =  len(c100_pi)
 
-        for i in range(n -20):
+        for i in range(n - 20):
             sum100 = sum(c100_pi[i: i+20])
             sum101 = sum(c101_pi[i: i+20])
             sum102 = sum(c102_pi[i: i+20])
@@ -50,4 +50,4 @@ class Test2:
 ts = Test2()
 #ts = ts.test2()
 ts.test3()
-ts.generate_rnadom_number()
+# ts.generate_rnadom_number()

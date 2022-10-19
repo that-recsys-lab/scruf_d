@@ -1,6 +1,6 @@
 from fairness_agents import *
 
-class Experiments:
+class baseExeriment:
     fa = SimpleFairnessAgent()
     a = AllocationMechanism()
     c = ChoiceMechanism()
@@ -12,3 +12,6 @@ class Experiments:
         c.func0()
 
 
+#Define base experiment class
+#Base experiment class will have the following methods:
+#1. Boosted Ratings: 
