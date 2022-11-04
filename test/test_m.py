@@ -3,6 +3,9 @@ import numpy as np
 
 df = pd.read_csv('test/test_m.csv')
 # print(df)
+df_m = pd.read_csv('test/export_pi.csv')
+# print(df_m)
+df_c = pd.DataFrame()
 
 def calculate_fpi_sum(df):
     t = 100 #total possible number of protected items for 20 users if per user per agent is 5
@@ -39,27 +42,33 @@ def calculate_fpi_sum(df):
     df2 = df2.assign(sum_102 = sum102)
     # print(df2)
 
-    df2.to_csv ('test/export_pi.csv', index = False, header = True)
-
-    # df = df.assign(m_100 = lambda x: (1+(sum_100/t) - ((t - sum_100)/t)))
-    # # df2 = df.assign(m_101 = lambda x: (1+(sum_101/t) - ((t - sum_101)/t)))
-    # # df2 = df.assign(m_102 = lambda x: (1+(sum_102/t) - ((t - sum_102)/t)))
+    # df2.to_csv ('test/export_pi.csv', index = False, header = True)
+    return(df2)
 
 def calculate_m():
-    df = pd.read_csv('test/export_pi.csv')
-    print(df)
+    # df = pd.read_csv('test/export_pi.csv')
+    # print(df)
     t = 100 #total possible number of protected items for 20 users if per user per agent is 5
 
     for x in range(100, 103):
-        df['m_'+str(x)] = (1+(df['sum_'+str(x)]/t) - ((t - df['sum_'+str(x)])/t))
-    print(df)
+        df_m['m_'+str(x)] = (1+(df_m['sum_'+str(x)]/t) - ((t - df_m['sum_'+str(x)])/t))
+    return(df_m)
+    # print(df_m)
 
-    df.to_csv ('test/export_m.csv', index = False, header = True)
+    # df.to_csv ('test/export_m.csv', index = False, header = True)
+def calculate_c(df_m):
+    for x in range (100, 103):
+        df_c = df_m.assign('c_'+str(x) == np.random.choice([0, 1], size=len(df), p=[0.7, 0.3]))
+    return df_c
 
-
-
-calculate_fpi_sum(df)
 calculate_m()
+calculate_c(df_m)
+print(df_m)
+print(df_c)
+
+# calculate_fpi_sum(df)
+
+# calculate_c(df_m)
 
    
 
