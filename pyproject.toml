@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "scruf"
+version = "0.1.0"
+description = ""
+authors = ["Robin Burke <rburke2233@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+toml = "*"
+icecream = "*"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

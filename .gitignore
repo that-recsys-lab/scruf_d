@@ -55,18 +55,6 @@ coverage.xml
 *.mo
 *.pot
 
-# Django stuff:
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-
-# Flask stuff:
-instance/
-.webassets-cache
-
-# Scrapy stuff:
-.scrapy
 
 # Sphinx documentation
 docs/_build/
@@ -74,12 +62,9 @@ docs/_build/
 # PyBuilder
 target/
 
-# Jupyter Notebook
-.ipynb_checkpoints
+# IDE
+.idea
 
-# IPython
-profile_default/
-ipython_config.py
 
 # pyenv
 .python-version
@@ -98,8 +83,6 @@ __pypackages__/
 celerybeat-schedule
 celerybeat.pid
 
-# SageMath parsed files
-*.sage.py
 
 # Environments
 .env
@@ -130,3 +113,5 @@ dmypy.json
 
 #additions
  .DS_Store
+ .vscode
+.DS_Store
