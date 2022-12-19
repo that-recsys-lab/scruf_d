@@ -1,5 +1,6 @@
 import itertools
-from collections import deque, namedtuple, Counter
+from collections import deque, namedtuple
+from scruf.util.errors import HistoryEmptyError
 
 TimedEntry = namedtuple('TimedEntry', ['time', 'item'])
 
@@ -20,8 +21,17 @@ class HistoryCollection:
         for item in items:
             self.add_item(item)
 
+    def get_most_recent(self):
+        if len(self.collection) > 0:
+            return self.collection[0].item
+        else:
+            raise HistoryEmptyError()
+
     # -1 means return everything
     def get_recent(self, k):
+        if len(self.collection) == 0:
+            raise HistoryEmptyError()
+
         if k == -1:
             entries = self.collection
         else:
@@ -30,6 +40,9 @@ class HistoryCollection:
         return [entry.item for entry in entries]
 
     def get_from_time(self, t):
+        if len(self.collection) == 0:
+            raise HistoryEmptyError()
+
         current_time = self.collection[0].time
         if t > current_time:
             return None

@@ -62,9 +62,6 @@ docs/_build/
 # PyBuilder
 target/
 
-# IDE
-.idea
-
 
 # pyenv
 .python-version
@@ -113,5 +110,10 @@ dmypy.json
 
 #additions
  .DS_Store
+ .vscode
+ # IDE
+ .idea
+ poetry.lock
+ =======
  .vscode
 .DS_Store

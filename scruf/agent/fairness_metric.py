@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from scruf.util import PropertyMismatchError, InvalidFairnessMetric, UnregisteredFairnessMetric
+from scruf.util import PropertyMismatchError, InvalidFairnessMetricError, UnregisteredFairnessMetricError
 
 
 class FairnessMetric (ABC):
@@ -85,7 +85,7 @@ class FairnessMetricFactory:
     @classmethod
     def register_fairness_metric(cls, metric_type, metric_class):
         if not issubclass(metric_class, FairnessMetric):
-            raise InvalidFairnessMetric(metric_class)
+            raise InvalidFairnessMetricError(metric_class)
         cls._fairness_metrics[metric_type] = metric_class
 
     @classmethod
@@ -97,7 +97,7 @@ class FairnessMetricFactory:
     def create_fairness_metric(cls, metric_type):
         metric_class = cls._fairness_metrics.get(metric_type)
         if metric_class is None:
-            raise UnregisteredFairnessMetric(metric_type)
+            raise UnregisteredFairnessMetricError(metric_type)
         return metric_class()
 
 # Register the metrics created above

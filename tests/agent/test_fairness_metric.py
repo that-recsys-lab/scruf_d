@@ -1,7 +1,7 @@
 import unittest
 
 from scruf.agent import ItemFeatureFairnessMetric, FairnessMetricFactory, ProportionalItemFM
-from scruf.util import PropertyMismatchError, UnregisteredFairnessMetric, InvalidFairnessMetric
+from scruf.util import PropertyMismatchError, UnregisteredFairnessMetricError, InvalidFairnessMetricError
 
 ITEM_FEATURE_PROPERTIES = \
 {
@@ -45,10 +45,10 @@ class FairnessMetricTestCase(unittest.TestCase):
         metric = FairnessMetricFactory.create_fairness_metric('proportional_item')
         self.assertEqual(metric.__class__, ProportionalItemFM)
 
-        with self.assertRaises(UnregisteredFairnessMetric):
+        with self.assertRaises(UnregisteredFairnessMetricError):
             metric = FairnessMetricFactory.create_fairness_metric('foo')
 
-        with self.assertRaises(InvalidFairnessMetric):
+        with self.assertRaises(InvalidFairnessMetricError):
             FairnessMetricFactory.register_fairness_metric('wrong', PropertyMismatchError)
 
 if __name__ == '__main__':
