@@ -113,7 +113,5 @@ dmypy.json
  .vscode
  # IDE
  .idea
+ .idea/
  poetry.lock
- =======
- .vscode
-.DS_Store
