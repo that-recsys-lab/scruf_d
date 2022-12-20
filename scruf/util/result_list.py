@@ -1,9 +1,5 @@
 from collections import namedtuple
 
-ResultEntry = namedtuple('ResultEntry', ['user', 'item', 'score', 'rank',
-                                         'old_scores', 'old_ranks'],
-                         defaults=[None, None, float('nan'), -1, [], []])
-
 class ResultEntry:
 
     def __init__(self, user=None, item=None, score=float('nan'),

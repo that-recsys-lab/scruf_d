@@ -1,4 +1,6 @@
 from . import FairnessMetricFactory
+from scruf.util.config_util import check_keys
+from scruf.util.errors import ConfigKeyMissingError, ConfigNoAgentsError
 
 class FairnessAgent:
 
@@ -21,11 +23,21 @@ class FairnessAgent:
 
 class AgentCollection:
 
+    @classmethod
+    def check_config(cls, config):
+        if not check_keys(config, [['agent']]):
+            raise ConfigKeyMissingError('agent')
+        if len(config['agent']) == 0:
+            raise ConfigNoAgentsError()
+
+
     def __init__(self):
         self.agents = []
         self.history = None
 
     def setup(self, config, fairness_history):
+        AgentCollection.check_config(config)
+
         self.history = fairness_history
         # TODO: Create the agents, collect them in the list
         # Relevant part of the config file: 'agent': tables within

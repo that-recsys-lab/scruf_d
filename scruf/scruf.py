@@ -1,13 +1,13 @@
 import toml
 from history import ScrufHistory
 from agent import AgentCollection
-
+from icecream import ic
 
 class Scruf:
 
     def __init__(self, config):
         self.config = config
-        print(toml.dumps(config))
+        ic(toml.dumps(config))
         self.history = ScrufHistory()
         self.agents = AgentCollection()
         self.allocation_mechanism = None
@@ -19,14 +19,14 @@ class Scruf:
         self.cleanup_experiment()
 
     def setup_experiment(self):
+        # TODO Setup data sources
         self.history.setup(self.config)
         self.agents.setup(self.config)
-        # Setup allocation mechanism
-        # Setup choice mechanism
-        pass
+        # TODO Setup allocation mechanism
+        # TODO Setup choice mechanism
 
     def run_loop(self):
         pass
 
     def cleanup_experiment(self):
-        pass
+        self.history.cleanup()

@@ -7,6 +7,7 @@ TimedEntry = namedtuple('TimedEntry', ['time', 'item'])
 class HistoryCollection:
 
     def __init__(self, window_size=None):
+        self.window_size = window_size
         self.collection = deque(maxlen=window_size)
         self.time = 0
 
