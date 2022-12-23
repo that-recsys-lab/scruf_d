@@ -25,6 +25,14 @@ class Scruf:
         # TODO Setup allocation mechanism
         # TODO Setup choice mechanism
 
+    # Get next user
+    # Calculate fairness and compatibility
+    # Run allocation mechanism
+    # Get recommendations
+    # Run choice mechanism
+    # Produce final recommendation list
+    # Update the history log
+    # Loop
     def run_loop(self):
         pass
 
