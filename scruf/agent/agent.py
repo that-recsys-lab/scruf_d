@@ -1,4 +1,5 @@
 from . import FairnessMetricFactory
+from . import CompatibilityMetricFactory
 from scruf.util.config_util import check_keys
 from scruf.util.errors import ConfigKeyMissingError, ConfigNoAgentsError
 
@@ -19,7 +20,14 @@ class FairnessAgent:
         else:
             self.fairness_metric.setup(dict())
 
-        # TODO: Set up compatibility metric
+        # Set up compatibility metric
+        compatibility_metric_name = properties['metric_class']
+        self.compatibility_metric = CompatibilityMetricFactory.create_compatibility_metric(compatibility_metric_name)
+
+        if 'metric' in properties:
+            self.compatibility_metric.setup(properties['metric'])
+        else:
+            self.compatibility_metric.setup(dict())
 
 class AgentCollection:
 

@@ -85,4 +85,23 @@ class CompatibilityMetricFactory:
     def register_compatibility_metric(cls, metric_type, metric_class):
         if not issubclass(metric_class, CompatibilityMetric):
             raise InvalidCompatibilityMetricError(metric_class)
-        cls._compatibility_metrics[metric_type
+        cls._compatibility_metrics[metric_type] = metric_class
+
+    @classmethod
+    def register_compatibility_metrics(cls, metric_specs):
+        for metric_type, metric_class in metric_specs:
+            cls.register_compatibility_metric(metric_type, metric_class)
+
+    @classmethod
+    def create_compatibility_metric(cls, metric_type):
+        metric_class = cls._fairness_metrics.get(metric_type)
+        if metric_class is None:
+            raise UnregisteredCompatibilityMetricError(metric_type)
+        return metric_class()
+
+# Register the metrics created above
+metric_specs = [("always_one", AlwaysOneCompatibilityMetric),
+                ("always_zero", AlwaysZeroCompatibilityMetric)]
+
+CompatibilityMetricFactory.register_compatibility_metrics(metric_specs)
+

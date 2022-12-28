@@ -2,12 +2,18 @@
 
 ## Agents
 
-* Implement the compatibility metric class, similar to the fairness metric. Just the ability to create different classes and maybe some basic baselines: Always compatible, never compatible. Use a factory to make it configurable
+* Implement the compatibility metric class, similar to the fairness metric. Just the ability to create different classes and maybe some basic baselines: Always compatible, never compatible. Use a factory to make it configurable - DONE
 * Add compatibility to the fairness agent implementation
 
 ## Mechanisms
 * Implement the allocation mechanism class. 
 * Implement the choice mechanism class.
+
+## Unit Tests
+* Implement unit tests for compatibility metric.
+* Implement unit tests for allocation mechanism.
+* Implement unit tests for choice mechanism. 
+
 
 ## Data handling
 * Implement the history class. Basically an updatable set of tables of the inputs and outputs of each part of the system.
