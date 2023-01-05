@@ -7,14 +7,16 @@
 * Add user_agent_compatibility?
 
 ## Mechanisms
-* Implement the allocation mechanism class. 
-* Implement the choice mechanism class.
+* Implement the allocation mechanism class. - DONE
+* Implement the choice mechanism class. -DONE
 
 ## Unit Tests
 * Implement unit tests for compatibility metric.
 * Implement unit tests for allocation mechanism.
-* Implement unit tests for choice mechanism. 
+* Implement unit tests for choice mechanism.
 
+## Util
+* Update Util 
 
 ## Data handling
 * Implement the history class. Basically an updatable set of tables of the inputs and outputs of each part of the system.

@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from scruf.util import PropertyMismatchError
+from scruf.util import PropertyMismatchError, InvalidAllocationMechanismError, UnregisteredAllocationMechanismError
 
 class AllocationMechanism(ABC):
     """
@@ -68,44 +68,44 @@ class AllocationMechanism(ABC):
     def compute_allocation_probabilities(self, agents, history):
         pass
     
-    class RandomAllocationMechanism(AllocationMechanism):
-        
-        def compute_allocation_probabilities(self, agents, history):
-            """
-            Computes the allocation probabilities for a collection of FairnessAgents based on their fairness
-            and compatibility scores, and normalizes the values to ensure that they sum to 1.
-            :param agents: a list of FairnessAgent objects
-            :param history: a system History object
-            :return: a dictionary mapping agent names to allocation probabilities
-            """
-            # Compute the fairness and compatibility scores for each agent
-            scores = {}
-            for agent in agents:
-                fairness_score = self.fairness_metric.compute_fairness(history)
-                compatibility_score = self.compatibility_metric.compute_compatibility(history)
-                scores[agent.name] = 1 - (fairness_score * compatibility_score)
-
-            # Normalize the scores to sum to 1
-            total_score = sum(scores.values())
-            normalized_scores = {k: v / total_score for k, v in scores.items()}
-            return normalized_scores
-
-    class LeastFair(AllocationMechanism):
+class RandomAllocationMechanism(AllocationMechanism):
+    
+    def compute_allocation_probabilities(self, agents, history):
         """
-        The LeastFair allocation mechanism allocates to the agent with the lowest fairness score.
+        Computes the allocation probabilities for a collection of FairnessAgents based on their fairness
+        and compatibility scores, and normalizes the values to ensure that they sum to 1.
+        :param agents: a list of FairnessAgent objects
+        :param history: a system History object
+        :return: a dictionary mapping agent names to allocation probabilities
         """
+        # Compute the fairness and compatibility scores for each agent
+        scores = {}
+        for agent in agents:
+            fairness_score = self.fairness_metric.compute_fairness(history)
+            compatibility_score = self.compatibility_metric.compute_compatibility(history)
+            scores[agent.name] = 1 - (fairness_score * compatibility_score)
 
-        def compute_allocation_probabilities(self, agents, history):
-            # Compute the fairness scores for each agent
-            for agent in agents:
-                fairness_score = self.fairness_metric.compute_fairness(history)
-                agent.fairness_score = fairness_score
-            allocation_probabilities = [0] * len(agents)  # Initialize probabilities to 0 for all agents
-            if agents:  # If there are agents
-                # Find the index of the agent with the lowest fairness score
-                min_index = min(range(len(agents)), key=lambda i: agents[i].fairness_score)
-                allocation_probabilities[min_index] = 1  # Allocate 1 to the agent with the lowest fairness score
-            return allocation_probabilities
+        # Normalize the scores to sum to 1
+        total_score = sum(scores.values())
+        normalized_scores = {k: v / total_score for k, v in scores.items()}
+        return normalized_scores
+
+class LeastFair(AllocationMechanism):
+    """
+    The LeastFair allocation mechanism allocates to the agent with the lowest fairness score.
+    """
+
+    def compute_allocation_probabilities(self, agents, history):
+        # Compute the fairness scores for each agent
+        for agent in agents:
+            fairness_score = self.fairness_metric.compute_fairness(history)
+            agent.fairness_score = fairness_score
+        allocation_probabilities = [0] * len(agents)  # Initialize probabilities to 0 for all agents
+        if agents:  # If there are agents
+            # Find the index of the agent with the lowest fairness score
+            min_index = min(range(len(agents)), key=lambda i: agents[i].fairness_score)
+            allocation_probabilities[min_index] = 1  # Allocate 1 to the agent with the lowest fairness score
+        return allocation_probabilities
 
 class MostCompatible(AllocationMechanism):
     """
@@ -143,37 +143,38 @@ class MostCompatible(AllocationMechanism):
             allocation_probabilities[max_index] = 1  # Allocate 1 to the agent with the highest compatibility score
         return allocation_probabilities
 
-    class AllocationMechanismFactory:
-        """
-        A factory class for creating AllocationMechanism objects.
-        """
+class AllocationMechanismFactory:
+    """
+    A factory class for creating AllocationMechanism objects.
+    """
 
-        _allocation_mechanism = {}
+    _allocation_mechanism = {}
 
-        @classmethod
-        def register_allocation_mechanism(cls, mechanism_type, mechanism_class):
-            if not issubclass(metric_class, FairnessMetric):
-                raise InvalidFairnessMetricError(metric_class)
-            cls._fairness_metrics[metric_type] = metric_class
+    @classmethod
+    def register_allocation_mechanism(cls, mechanism_type, mechanism_class):
+        if not issubclass(mechanism_class, AllocationMechanism):
+            raise InvalidAllocationMechanismError(mechanism_class)
+        cls._allocation_mechanism[mechanism_type] = mechanism_class
 
-        @classmethod
-        def register_fairness_metrics(cls, metric_specs):
-            for metric_type, metric_class in metric_specs:
-                cls.register_fairness_metric(metric_type, metric_class)
+    @classmethod
+    def register_allocation_mechanism(cls, mechanism_specs):
+        for mechanism_type, mechanism_class in mechanism_specs:
+            cls.register_allocation_mechanism(mechanism_type, mechanism_class)
 
-        @classmethod
-        def create_fairness_metric(cls, metric_type):
-            metric_class = cls._fairness_metrics.get(metric_type)
-            if metric_class is None:
-                raise UnregisteredFairnessMetricError(metric_type)
-            return metric_class()
+    @classmethod
+    def create_allocation_mechanism(cls, mechanism_type):
+        mechanism_class = cls._allocation_mechanism.get(mechanism_type)
+        if mechanism_class is None:
+            raise UnregisteredAllocationMechanismError(mechanism_type)
+        return mechanism_class()
 
-    # Register the metrics created above
-    metric_specs = [("always_one", AlwaysOneFairnessMetric),
-                    ("always_zero", AlwaysZeroFairnessMetric)]
+# Register the mechanisms created above
+mechanism_specs = [("random_allocation", RandomAllocationMechanism),
+                ("least_fair", LeastFair),
+                ("most_compatible", MostCompatible)]
 
-    FairnessMetricFactory.register_fairness_metrics(metric_specs)
+AllocationMechanismFactory.register_allocation_mechanism(mechanism_specs)
 
 
-            
+        
 

@@ -43,3 +43,25 @@ class ConfigNoAgentsError(ScrufError):
     def __init__(self):
         self.message = f'Error in configuration file. No fairness agents were specified.'
         super().__init__(self.message)
+
+class InvalidAllocationMechanismError(ScrufError):
+    def __init__(self, name):
+        self.message = f'Cannot create allocation mechanism: Class {name} is not a subclass of AllocationMechanism.'
+        super().__init__(self.message)
+
+
+class UnregisteredAllocationMechanismError(ScrufError):
+    def __init__(self, name):
+        self.message = f'Cannot create allocation mechanism: Class {name} is not registered and may not exist.'
+        super().__init__(self.message)
+
+class InvalidChoiceMechanismError(ScrufError):
+    def __init__(self, name):
+        self.message = f'Cannot create choice mechanism: Class {name} is not a subclass of ChoiceMechanism.'
+        super().__init__(self.message)
+
+
+class UnregisteredChoiceMechanismError(ScrufError):
+    def __init__(self, name):
+        self.message = f'Cannot create choice mechanism: Class {name} is not registered and may not exist.'
+        super().__init__(self.message)
