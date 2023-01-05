@@ -1,5 +1,6 @@
 from . import CompatibilityMetric, CompatibilityMetricFactory
 
+#need explanation of what this does?
 class UserAgentCompatibilityMetric(CompatibilityMetric):
     """
     A UserAgentCompatibilityMetric is a metric where users are associated with the compatibility between a user and

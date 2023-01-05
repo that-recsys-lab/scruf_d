@@ -3,7 +3,8 @@
 ## Agents
 
 * Implement the compatibility metric class, similar to the fairness metric. Just the ability to create different classes and maybe some basic baselines: Always compatible, never compatible. Use a factory to make it configurable - DONE
-* Add compatibility to the fairness agent implementation
+* Add compatibility to the fairness agent implementation -DONE
+* Add user_agent_compatibility?
 
 ## Mechanisms
 * Implement the allocation mechanism class. 

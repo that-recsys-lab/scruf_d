@@ -21,10 +21,10 @@ class FairnessAgent:
             self.fairness_metric.setup(dict())
 
         # Set up compatibility metric
-        compatibility_metric_name = properties['metric_class']
+        compatibility_metric_name = properties['metric_class'] 
         self.compatibility_metric = CompatibilityMetricFactory.create_compatibility_metric(compatibility_metric_name)
 
-        if 'metric' in properties:
+        if 'metric' in properties: #If the metric key is present in the properties dictionary, the setup() method of the fairness metric object is called with the value of the metric key as the parameter. Does the metric key have multiple values? 
             self.compatibility_metric.setup(properties['metric'])
         else:
             self.compatibility_metric.setup(dict())
