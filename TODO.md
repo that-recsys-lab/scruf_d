@@ -5,10 +5,13 @@
 * Implement the compatibility metric class, similar to the fairness metric. Just the ability to create different classes and maybe some basic baselines: Always compatible, never compatible. Use a factory to make it configurable - DONE
 * Add compatibility to the fairness agent implementation -DONE
 * Add user_agent_compatibility?
+* Move fairness metric execution to AgentCollection class
+* Move compatibility metric execution to AgentCollection class
 
 ## Mechanisms
 * Implement the allocation mechanism class. - DONE
-* Implement the choice mechanism class. -DONE
+* Implement the choice mechanism class. Not complete. Need a decision 
+on how choice is implemented at the agent level.
 
 ## Unit Tests
 * Implement unit tests for compatibility metric.

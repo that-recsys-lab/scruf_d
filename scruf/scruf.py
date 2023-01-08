@@ -1,6 +1,7 @@
 import toml
 from history import ScrufHistory
 from agent import AgentCollection
+from allocation import AllocationMechanismFactory
 from icecream import ic
 
 class Scruf:
@@ -10,7 +11,8 @@ class Scruf:
         ic(toml.dumps(config))
         self.history = ScrufHistory()
         self.agents = AgentCollection()
-        self.allocation_mechanism = None
+        self.allocation_mechanism = \
+            AllocationMechanismFactory.create_allocation_mechanism(config['allocation_class'])
         self.choice_mechanism = None
 
     def run_experiment(self):

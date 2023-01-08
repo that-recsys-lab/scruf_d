@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from scruf.util import PropertyMismatchError, InvalidCompatibilityMetricError, UnregisteredCompatibilityMetricError
+from scruf.util import InvalidCompatibilityMetricError, UnregisteredCompatibilityMetricError, PropertyCollection
 
 class CompatibilityMetric (ABC):
     """
@@ -10,51 +10,21 @@ class CompatibilityMetric (ABC):
     """
 
     def __init__(self):
-        self.property_names = []
-        self.properties = {}
+        self.prop_coll = PropertyCollection()
 
-    @abstractmethod
-    # Only in this method are the property names set. The property name list is built up
-    # through calls to super().
-    def setup_property_names(self, names):
-        self.property_names = names
+    def setup(self, input_properties: dict, names=None):
+        if names is None:
+            names = []
+        self.prop_coll.setup(input_properties, names)
 
     def get_property_names(self):
-        return self.property_names
+        return self.prop_coll.get_property_names()
 
     def get_properties(self):
-        return self.properties
+        return self.prop_coll.get_properties()
 
     def get_property(self, property_name):
-        return self.properties[property_name]
-
-    def setup(self, input_properties: dict):
-        """
-        Checks the properties provided with those expected by the object
-        :param input_properties:
-        :return:
-        """
-        self.setup_property_names()
-
-        self.properties = {}
-        input_property_names = input_properties.keys()
-
-        self._check_properties(self.property_names, input_property_names)
-
-        for key in input_property_names:
-            self.properties[key] = input_properties[key]
-
-    def _check_properties(self, my_properties, input_properties):
-        set_my_properties = set(my_properties)
-        set_input_properties = set(input_properties)
-
-        diff_left = set_my_properties - set_input_properties
-        diff_right = set_input_properties - set_my_properties
-
-        if len(diff_left) == 0 and len(diff_right) == 0:
-            return
-        else:
-            raise PropertyMismatchError(self, list(diff_left), list(diff_right))
+        return self.prop_coll.get_property(property_name)
 
     @abstractmethod
     def compute_compatibility(self, history):
@@ -94,7 +64,7 @@ class CompatibilityMetricFactory:
 
     @classmethod
     def create_compatibility_metric(cls, metric_type):
-        metric_class = cls._fairness_metrics.get(metric_type)
+        metric_class = cls._compatibility_metrics.get(metric_type)
         if metric_class is None:
             raise UnregisteredCompatibilityMetricError(metric_type)
         return metric_class()

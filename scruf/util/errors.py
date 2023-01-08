@@ -21,6 +21,17 @@ class UnregisteredFairnessMetricError(ScrufError):
         self.message = f'Cannot create fairness metric: Class {name} is not registered and may not exist.'
         super().__init__(self.message)
 
+class InvalidCompatibilityMetricError(ScrufError):
+    def __init__(self, name):
+        self.message = f'Cannot create compatibility metric: Class {name} is not a subclass of CompatibilityMetric.'
+        super().__init__(self.message)
+
+
+class UnregisteredCompatibilityMetricError(ScrufError):
+    def __init__(self, name):
+        self.message = f'Cannot create compatibility metric: Class {name} is not registered and may not exist.'
+        super().__init__(self.message)
+
 
 class HistoryEmptyError(ScrufError):
     def __init__(self, name):

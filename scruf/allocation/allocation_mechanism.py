@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
-from scruf.util import PropertyMismatchError, InvalidAllocationMechanismError, UnregisteredAllocationMechanismError
+from scruf.util import PropertyCollection, InvalidAllocationMechanismError, UnregisteredAllocationMechanismError
+from scruf.agent import AgentCollection
+import random
 
 class AllocationMechanism(ABC):
     """
@@ -10,80 +12,53 @@ class AllocationMechanism(ABC):
     """
 
     def __init__(self):
-        self.property_names = []
-        self.properties = {}
-        self.fairness_metric = None
-        self.compatibility_metric = None
+        self.prop_coll = PropertyCollection()
 
-    @abstractmethod
-    # Only in this method are the property names set. The property name list is built up
-    # through calls to super().
-    def setup_property_names(self, names):
-        self.property_names = names
+    def setup(self, input_properties: dict, names=None):
+        if names is None:
+            names = []
+        self.prop_coll.setup(input_properties, names)
 
     def get_property_names(self):
-        return self.property_names
+        return self.prop_coll.get_property_names()
 
     def get_properties(self):
-        return self.properties
+        return self.prop_coll.get_properties()
 
     def get_property(self, property_name):
-        return self.properties[property_name]
-
-    def setup(self, input_properties: dict, fairness_metric, compatibility_metric):
-        """
-        Checks the properties provided with those expected by the object, sets up the fairness
-        and compatibility metrics, and stores them as instance variables.
-        :param input_properties:
-        :param fairness_metric: an instance of a FairnessMetric
-        :param compatibility_metric: an instance of a CompatibilityMetric
-        :return:
-        """
-        self.setup_property_names()
-
-        self.properties = {}
-        input_property_names = input_properties.keys()
-
-        self._check_properties(self.property_names, input_property_names)
-
-        for key in input_property_names:
-            self.properties[key] = input_properties[key]
-
-        self.fairness_metric = fairness_metric
-        self.compatibility_metric = compatibility_metric
-
-    def _check_properties(self, my_properties, input_properties):
-        set_my_properties = set(my_properties)
-        set_input_properties = set(input_properties)
-
-        diff_left = set_my_properties - set_input_properties
-        diff_right = set_input_properties - set_my_properties
-
-        if len(diff_left) == 0 and len(diff_right) == 0:
-            return
-        else:
-            raise PropertyMismatchError(self, list(diff_left), list(diff_right))
+        return self.prop_coll.get_property(property_name)
 
     @abstractmethod
-    def compute_allocation_probabilities(self, agents, history):
+    def compute_allocation_probabilities(self, agents, history, context):
         pass
-    
+
+
 class RandomAllocationMechanism(AllocationMechanism):
+
+    def compute_allocation_propabilities(self, agents, history, context):
+        if agents:
+            allocation_probabilities = [0] * len(agents)
+            selected = random.randint(0, len(agents))
+            allocation_probabilities[selected] = 1
+
+
+class ProductAllocationMechanism(AllocationMechanism):
     
-    def compute_allocation_probabilities(self, agents, history):
+    def compute_allocation_probabilities(self, agents, history, context):
         """
         Computes the allocation probabilities for a collection of FairnessAgents based on their fairness
         and compatibility scores, and normalizes the values to ensure that they sum to 1.
         :param agents: a list of FairnessAgent objects
         :param history: a system History object
+        :param context: a Context objedct
         :return: a dictionary mapping agent names to allocation probabilities
         """
         # Compute the fairness and compatibility scores for each agent
         scores = {}
         for agent in agents:
-            fairness_score = self.fairness_metric.compute_fairness(history)
-            compatibility_score = self.compatibility_metric.compute_compatibility(history)
-            scores[agent.name] = 1 - (fairness_score * compatibility_score)
+            fairness_score = agent.compute_fairness(history)
+            compatibility_score = agent.compute_compatibility(context)
+            scores[agent.name] = (1 - fairness_score) * compatibility_score
 
         # Normalize the scores to sum to 1
         total_score = sum(scores.values())
@@ -95,33 +70,25 @@ class LeastFair(AllocationMechanism):
     The LeastFair allocation mechanism allocates to the agent with the lowest fairness score.
     """
 
-    def compute_allocation_probabilities(self, agents, history):
-        # Compute the fairness scores for each agent
-        for agent in agents:
-            fairness_score = self.fairness_metric.compute_fairness(history)
-            agent.fairness_score = fairness_score
-        allocation_probabilities = [0] * len(agents)  # Initialize probabilities to 0 for all agents
+    def compute_allocation_probabilities(self, agents, history, context):
         if agents:  # If there are agents
-            # Find the index of the agent with the lowest fairness score
-            min_index = min(range(len(agents)), key=lambda i: agents[i].fairness_score)
+            # Compute the fairness scores for each agent
+            scores = [agent.compute_fairness(history) for agent in agents]
+
+            allocation_probabilities = [0] * len(agents)  # Initialize probabilities to 0 for all agents
+
+            min_index = scores.index(min(scores))
             allocation_probabilities[min_index] = 1  # Allocate 1 to the agent with the lowest fairness score
-        return allocation_probabilities
+            return allocation_probabilities
+        else:
+            return None
 
 class MostCompatible(AllocationMechanism):
     """
     The MostCompatible allocation mechanism allocates to the agent with the highest compatibility score.
     """
 
-    def __init__(self, compatibility_metric):
-        """
-        Initializes the MostCompatible allocation mechanism with a compatibility metric.
-        
-        Parameters:
-        - compatibility_metric: An instance of a CompatibilityMetric class that is used to compute the compatibility scores of the agents.
-        """
-        self.compatibility_metric = compatibility_metric
-
-    def compute_allocation_probabilities(self, agents, history):
+    def compute_allocation_probabilities(self, agents, history, context):
         """
         Computes the allocation probabilities for the agents based on their compatibility scores.
         
@@ -132,16 +99,16 @@ class MostCompatible(AllocationMechanism):
         Returns:
         A list of allocation probabilities for the agents.
         """
-        allocation_probabilities = [0] * len(agents)  # Initialize probabilities to 0 for all agents
         if agents:  # If there are agents
+            allocation_probabilities = [0] * len(agents)  # Initialize probabilities to 0 for all agents
             # Compute the compatibility scores for each agent
-            for agent in agents:
-                compatibility_score = self.compatibility_metric.compute_compatibility(history)
-                agent.compatibility_score = compatibility_score  # Update the compatibility score of the agent
+            scores = [agent.compute_compatibility(context) for agent in agents]
             # Find the index of the agent with the highest compatibility score
-            max_index = max(range(len(agents)), key=lambda i: agents[i].compatibility_score)
+            max_index = scores.index(scores.max())
             allocation_probabilities[max_index] = 1  # Allocate 1 to the agent with the highest compatibility score
-        return allocation_probabilities
+            return allocation_probabilities
+        else:
+            return None
 
 class AllocationMechanismFactory:
     """
@@ -157,7 +124,7 @@ class AllocationMechanismFactory:
         cls._allocation_mechanism[mechanism_type] = mechanism_class
 
     @classmethod
-    def register_allocation_mechanism(cls, mechanism_specs):
+    def register_allocation_mechanisms(cls, mechanism_specs):
         for mechanism_type, mechanism_class in mechanism_specs:
             cls.register_allocation_mechanism(mechanism_type, mechanism_class)
 
@@ -168,13 +135,11 @@ class AllocationMechanismFactory:
             raise UnregisteredAllocationMechanismError(mechanism_type)
         return mechanism_class()
 
+
 # Register the mechanisms created above
-mechanism_specs = [("random_allocation", RandomAllocationMechanism),
+mechanism_specs = [("random_allocation", ProductAllocationMechanism),
                 ("least_fair", LeastFair),
                 ("most_compatible", MostCompatible)]
 
 AllocationMechanismFactory.register_allocation_mechanism(mechanism_specs)
-
-
-        
 

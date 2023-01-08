@@ -9,62 +9,21 @@ class ChoiceMechanism:
     """
 
     def __init__(self):
-        self.property_names = []
-        self.properties = {}
-        self.allocation_probabilities = []
-        self.recommended_items = []
-        self.agents = []
+        self.prop_coll = PropertyCollection()
 
-    @abstractmethod
-    # Only in this method are the property names set. The property name list is built up
-    # through calls to super().
-    def setup_property_names(self, names):
-        self.property_names = names
+    def setup(self, input_properties: dict, names=None):
+        if names is None:
+            names = []
+        self.prop_coll.setup(input_properties, names)
 
     def get_property_names(self):
-        return self.property_names
+        return self.prop_coll.get_property_names()
 
     def get_properties(self):
-        return self.properties
+        return self.prop_coll.get_properties()
 
     def get_property(self, property_name):
-        return self.properties[property_name]
-
-    def setup(self, input_properties: dict, allocation_probabilities, recommended_items, agents):
-        """
-        Checks the properties provided with those expected by the object, sets up the allocation probabilities, 
-        recommended items, and agents for the ChoiceMechanism.
-        :param input_properties:
-        :param allocation_probabilities: a list of allocation probabilities for the agents
-        :param recommended_items: a list of recommended items for each agent
-        :param agents: a list of Agent objects
-        :return:
-        """
-        self.setup_property_names()
-
-        self.properties = {}
-        input_property_names = input_properties.keys()
-
-        self._check_properties(self.property_names, input_property_names)
-
-        for key in input_property_names:
-            self.properties[key] = input_properties[key]
-
-        self.allocation_probabilities = allocation_probabilities
-        self.recommended_items = recommended_items
-        self.agents = agents
-
-    def _check_properties(self, my_properties, input_properties):
-        set_my_properties = set(my_properties)
-        set_input_properties = set(input_properties)
-
-        diff_left = set_my_properties - set_input_properties
-        diff_right = set_input_properties - set_my_properties
-
-        if len(diff_left) == 0 and len(diff_right) == 0:
-            return
-        else:
-            raise PropertyMismatchError(self, list(diff_left), list(diff_right))
+        return self.prop_coll.get_property(property_name)
 
     @abstractmethod
     def compute_choice(self, agents, allocation_probabilities, recommended_items):

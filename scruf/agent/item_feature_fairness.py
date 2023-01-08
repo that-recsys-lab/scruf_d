@@ -11,13 +11,14 @@ class ItemFeatureFairnessMetric(FairnessMetric):
         super().__init__()
 
     def __str__(self):
-        return f"ItemFeatureFairnessMetric: feature = {self.properties['protected_feature']}"
+        return f"ItemFeatureFairnessMetric: feature = {self.get_property('protected_feature')}"
 
-    def setup_property_names(self, names=None):
+    def setup(self, input_properties: dict, names=None):
         if names is None:
-            names = []
-
-        super().setup_property_names(names + ItemFeatureFairnessMetric._PROPERTY_NAMES)
+            names = ItemFeatureFairnessMetric._PROPERTY_NAMES
+        else:
+            names = ItemFeatureFairnessMetric._PROPERTY_NAMES + names
+        super().setup(input_properties, names)
 
     def compute_fairness(self, history):
         return float('nan')
@@ -36,16 +37,18 @@ class ProportionalItemFM(ItemFeatureFairnessMetric):
         super().__init__()
 
     def __str__(self):
-        return f"ProporationalItemFM: feature = {self.properties['protected_feature']}"
+        return f"ProportionalItemFM: feature = {self.get_propery('protected_feature')}"
 
-    def setup_property_names(self, names=None):
+    def setup(self, input_properties: dict, names=None):
         if names is None:
-            names = []
-
-        super().setup_property_names(names + ProportionalItemFM._PROPERTY_NAMES)
+            names = ProportionalItemFM._PROPERTY_NAMES
+        else:
+            names = ProportionalItemFM._PROPERTY_NAMES + names
+        super().setup(input_properties, names)
 
     def compute_fairness(self, history):
         return float('nan')
+
 
 # Register the metrics created above
 metric_specs = [("proportional_item", ProportionalItemFM),

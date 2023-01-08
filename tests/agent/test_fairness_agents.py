@@ -8,7 +8,7 @@ CONFIG_DOCUMENT = """
 [agent.country]
 name = "Country"
 metric_class = "proportional_item"
-compatibility = "entropy"
+compatibility_class = "always_one"
 [agent.country.metric]
 protected_feature = "country"
 protected_values = ["ug", "th", "ke", "ha"]
@@ -17,7 +17,7 @@ proportion = 0.2
 [agent.sector]
 name = "Sector"
 metric_class = "list_exposure"
-compatibility = "entropy"
+compatibility_class = "always_zero"
 
 [agent.sector.metric]
 protected_feature = "sector"
