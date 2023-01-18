@@ -46,8 +46,8 @@ class ProductAllocationMechanism(AllocationMechanism):
     
     def compute_allocation_probabilities(self, agents, history, context):
         """
-        Computes the allocation probabilities for a collection of FairnessAgents based on their fairness
-        and compatibility scores, and normalizes the values to ensure that they sum to 1.
+        Computes the allocation probabilities for a collection of FairnessAgents based on the product of
+        their fairness and compatibility scores, and normalizes the values to ensure that they sum to 1.
         :param agents: a list of FairnessAgent objects
         :param history: a system History object
         :param context: a Context objedct
@@ -58,6 +58,7 @@ class ProductAllocationMechanism(AllocationMechanism):
         for agent in agents:
             fairness_score = agent.compute_fairness(history)
             compatibility_score = agent.compute_compatibility(context)
+            # Remember that 0 is maximally UNFAIR
             scores[agent.name] = (1 - fairness_score) * compatibility_score
 
         # Normalize the scores to sum to 1
