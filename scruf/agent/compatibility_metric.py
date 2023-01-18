@@ -32,13 +32,13 @@ class CompatibilityMetric (ABC):
 
 class AlwaysOneCompatibilityMetric(CompatibilityMetric):
 
-    def compute_compatibility(self, history):
+    def compute_compatibility(self, context):
         return 1.0
 
 
 class AlwaysZeroCompatibilityMetric(CompatibilityMetric):
 
-    def compute_compatibility(self, history):
+    def compute_compatibility(self, context):
         return 0.0
 
 
