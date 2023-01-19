@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from scruf.util import PropertyCollection, InvalidAllocationMechanismError, UnregisteredAllocationMechanismError
+from scruf.util import PropertyCollection, InvalidAllocationMechanismError, UnregisteredAllocationMechanismError, \
+    normalize_score_dict
 from scruf.agent import AgentCollection
 import random
 
@@ -36,15 +37,20 @@ class AllocationMechanism(ABC):
 class RandomAllocationMechanism(AllocationMechanism):
 
     def compute_allocation_propabilities(self, agents, history, context):
-        if agents:
-            allocation_probabilities = [0] * len(agents)
-            selected = random.randint(0, len(agents))
-            allocation_probabilities[selected] = 1
+        # ignored
+        del history, context
+        allocation_probabilities = agents.agent_value_pairs()
+        selected = random.choice(agents.agent_names())
+        allocation_probabilities[selected] = 1
 
 
 class ProductAllocationMechanism(AllocationMechanism):
+
+    @classmethod
+    def _product_score(self, agent_name, fairness_values, compatibility_values):
+        return (1.0 - fairness_values[agent_name]) * compatibility_values[agent_name]
     
-    def compute_allocation_probabilities(self, agents, history, context):
+    def compute_allocation_probabilities(self, agents: AgentCollection, history, context):
         """
         Computes the allocation probabilities for a collection of FairnessAgents based on the product of
         their fairness and compatibility scores, and normalizes the values to ensure that they sum to 1.
@@ -54,17 +60,14 @@ class ProductAllocationMechanism(AllocationMechanism):
         :return: a dictionary mapping agent names to allocation probabilities
         """
         # Compute the fairness and compatibility scores for each agent
-        scores = {}
-        for agent in agents:
-            fairness_score = agent.compute_fairness(history)
-            compatibility_score = agent.compute_compatibility(context)
-            # Remember that 0 is maximally UNFAIR
-            scores[agent.name] = (1 - fairness_score) * compatibility_score
+        fairness_values = agents.compute_fairness(history)
+        compat_values = agents.compute_compatibility(context)
+        scores = {agent_name: self._product_score(agent_name, fairness_values, compat_values) \
+                    for agent_name in agents.agent_names()}
 
         # Normalize the scores to sum to 1
-        total_score = sum(scores.values())
-        normalized_scores = {k: v / total_score for k, v in scores.items()}
-        return normalized_scores
+        scores = normalize_score_dict(scores, inplace=True)
+        return scores
 
 class LeastFair(AllocationMechanism):
     """
@@ -72,17 +75,15 @@ class LeastFair(AllocationMechanism):
     """
 
     def compute_allocation_probabilities(self, agents, history, context):
-        if agents:  # If there are agents
-            # Compute the fairness scores for each agent
-            scores = [agent.compute_fairness(history) for agent in agents]
-
-            allocation_probabilities = [0] * len(agents)  # Initialize probabilities to 0 for all agents
-
-            min_index = scores.index(min(scores))
-            allocation_probabilities[min_index] = 1  # Allocate 1 to the agent with the lowest fairness score
-            return allocation_probabilities
-        else:
-            return None
+        # Compute the fairness scores for each agent
+        scores = agents.compute_fairness(history)
+        # Find lowest fairness
+        lowest_agent = min(scores, key=scores.get)
+        # Create empty probability vector
+        probs = agents.agent_value_pairs(default=0.0)
+        # Set selected agent probability to 1.0
+        probs[lowest_agent] = 1.0
+        return probs
 
 class MostCompatible(AllocationMechanism):
     """
@@ -100,16 +101,15 @@ class MostCompatible(AllocationMechanism):
         Returns:
         A list of allocation probabilities for the agents.
         """
-        if agents:  # If there are agents
-            allocation_probabilities = [0] * len(agents)  # Initialize probabilities to 0 for all agents
-            # Compute the compatibility scores for each agent
-            scores = [agent.compute_compatibility(context) for agent in agents]
-            # Find the index of the agent with the highest compatibility score
-            max_index = scores.index(scores.max())
-            allocation_probabilities[max_index] = 1  # Allocate 1 to the agent with the highest compatibility score
-            return allocation_probabilities
-        else:
-            return None
+        # Compute the fairness scores for each agent
+        scores = agents.compute_compatibility(history)
+        # Find highest compatibility
+        highest_agent = max(scores, key=scores.get)
+        # Create empty probability vector
+        probs = agents.agent_value_pairs(default=0.0)
+        # Set selected agent probability to 1.0
+        probs[highest_agent] = 1.0
+        return probs
 
 class AllocationMechanismFactory:
     """
