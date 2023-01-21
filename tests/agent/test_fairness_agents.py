@@ -1,6 +1,6 @@
 import unittest
 import toml
-from scruf.agent import FairnessAgent, ProportionalItemFM
+from scruf.agent import FairnessAgent, ProportionalItemFM, AgentCollection
 
 # This is just the agent part
 CONFIG_DOCUMENT = """
@@ -35,6 +35,11 @@ class AgentTestCase(unittest.TestCase):
 
         self.assertEqual(metric.__class__, ProportionalItemFM)
         self.assertAlmostEqual(metric.get_property('proportion'), 0.2)
+
+    def test_multi_agent_creation(self):
+        config = toml.loads(CONFIG_DOCUMENT)
+        agent_coll = AgentCollection()
+        agent_coll.setup(config, None)
 
 
 if __name__ == '__main__':

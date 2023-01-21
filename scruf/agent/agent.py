@@ -2,7 +2,7 @@ from .fairness_metric import FairnessMetricFactory
 from .compatibility_metric import CompatibilityMetricFactory
 from scruf.util.config_util import check_keys
 from scruf.util.errors import ConfigKeyMissingError, ConfigNoAgentsError
-import icecream as ic
+from icecream import ic
 
 class FairnessAgent:
 
@@ -49,13 +49,23 @@ class AgentCollection:
     def agent_value_pairs(self, default=0.0):
         return {name:default for name in self.agent_names()}
 
+    # Note: Overwrites the agent list
     def setup(self, config, fairness_history):
+
         AgentCollection.check_config(config)
 
         self.history = fairness_history
-        # ic(config['agent'])
-        # TODO: Create the agents, collect them in the list
-        # Relevant part of the config file: 'agent': tables within
+        agent_coll_config = config['agent']
+
+        agent_list = []
+
+        for agent_key in agent_coll_config.keys():
+            agent_config = agent_coll_config[agent_key]
+            agent = FairnessAgent(agent_config['name'])
+            agent.setup(agent_config)
+            agent_list.append(agent)
+
+        self.agents = agent_list
 
     def compute_fairness(self, history):
         return {agent.name: agent.fairness_metric.compute_fairness(history) \

@@ -36,6 +36,9 @@ class AllocationMechanism(ABC):
 
 class RandomAllocationMechanism(AllocationMechanism):
 
+    def __init__(self):
+        super().__init__()
+
     def compute_allocation_propabilities(self, agents, history, context):
         # ignored
         del history, context
@@ -43,13 +46,15 @@ class RandomAllocationMechanism(AllocationMechanism):
         selected = random.choice(agents.agent_names())
         allocation_probabilities[selected] = 1
 
+class ScoredAllocationMechanism(AllocationMechanism):
 
-class ProductAllocationMechanism(AllocationMechanism):
+    def __init__(self):
+        super().__init__()
 
-    @classmethod
-    def _product_score(self, agent_name, fairness_values, compatibility_values):
-        return (1.0 - fairness_values[agent_name]) * compatibility_values[agent_name]
-    
+    @abstractmethod
+    def score(self, agent_name, fairness_values, compatibility_values):
+        pass
+
     def compute_allocation_probabilities(self, agents: AgentCollection, history, context):
         """
         Computes the allocation probabilities for a collection of FairnessAgents based on the product of
@@ -62,17 +67,54 @@ class ProductAllocationMechanism(AllocationMechanism):
         # Compute the fairness and compatibility scores for each agent
         fairness_values = agents.compute_fairness(history)
         compat_values = agents.compute_compatibility(context)
-        scores = {agent_name: self._product_score(agent_name, fairness_values, compat_values) \
+        scores = {agent_name: self.score(agent_name, fairness_values, compat_values) \
                     for agent_name in agents.agent_names()}
 
         # Normalize the scores to sum to 1
         scores = normalize_score_dict(scores, inplace=True)
         return scores
 
-class LeastFair(AllocationMechanism):
+
+class ProductAllocationMechanism(ScoredAllocationMechanism):
+
+    def __init__(self):
+        super().__init__()
+
+    def score(self, agent_name, fairness_values, compatibility_values):
+        return (1.0 - fairness_values[agent_name]) * compatibility_values[agent_name]
+
+
+class WeightedProductAllocationMechanism(ScoredAllocationMechanism):
+
+    _PROPERTY_NAMES = ['fairness_exponent', 'compatibility_exponent']
+
+    def __init__(self):
+        super().__init__()
+
+    def __str__(self):
+        return f"WeightedProductAllocation: fairness = {self.get_propery('fairness_exponent')}, compatibility = {self.get_propery('compatibility_exponent')}"
+
+    def setup(self, input_properties: dict, names=None):
+        if names is None:
+            names = WeightedProductAllocationMechanism._PROPERTY_NAMES
+        else:
+            names = WeightedProductAllocationMechanism._PROPERTY_NAMES + names
+        super().setup(input_properties, names)
+
+    def score(self, agent_name, fairness_values, compatibility_values):
+        fairness_exp = self.get_property('fairness_exponent')
+        compat_exp = self.get_property('compatibility_exponent')
+        fairness_term = (1.0 - fairness_values[agent_name]) ^ fairness_exp
+        compat_term =  compatibility_values[agent_name] ^ compat_exp
+        return fairness_term * compat_term
+
+class LeastFairAllocationMechanism(AllocationMechanism):
     """
     The LeastFair allocation mechanism allocates to the agent with the lowest fairness score.
     """
+
+    def __init__(self):
+        super().__init__()
 
     def compute_allocation_probabilities(self, agents, history, context):
         # Compute the fairness scores for each agent
@@ -85,10 +127,13 @@ class LeastFair(AllocationMechanism):
         probs[lowest_agent] = 1.0
         return probs
 
-class MostCompatible(AllocationMechanism):
+class MostCompatibleAllocationMechanism(AllocationMechanism):
     """
     The MostCompatible allocation mechanism allocates to the agent with the highest compatibility score.
     """
+
+    def __init__(self):
+        super().__init__()
 
     def compute_allocation_probabilities(self, agents, history, context):
         """
@@ -138,9 +183,11 @@ class AllocationMechanismFactory:
 
 
 # Register the mechanisms created above
-mechanism_specs = [("random_allocation", ProductAllocationMechanism),
-                ("least_fair", LeastFair),
-                ("most_compatible", MostCompatible)]
+mechanism_specs = [("random_allocation", RandomAllocationMechanism),
+                   ("product_allocation", ProductAllocationMechanism),
+                   ("weighted_product_allocation", WeightedProductAllocationMechanism),
+                   ("least_fair", LeastFairAllocationMechanism),
+                   ("most_compatible", MostCompatibleAllocationMechanism)]
 
-AllocationMechanismFactory.register_allocation_mechanism(mechanism_specs)
+AllocationMechanismFactory.register_allocation_mechanisms(mechanism_specs)
 
