@@ -1,7 +1,8 @@
 from .fairness_metric import FairnessMetricFactory
 from .compatibility_metric import CompatibilityMetricFactory
-from scruf.util.config_util import check_keys
+from scruf.util import is_valid_keys
 from scruf.util.errors import ConfigKeyMissingError, ConfigNoAgentsError
+from scruf.util import ResultList
 from icecream import ic
 
 class FairnessAgent:
@@ -10,6 +11,7 @@ class FairnessAgent:
         self.name = name
         self.fairness_metric = None
         self.compatibility_metric = None
+        self.choice_scorer = None
 
     def setup(self, properties):
         # Set up fairness metric
@@ -30,11 +32,20 @@ class FairnessAgent:
         else:
             self.compatibility_metric.setup(dict())
 
+        # Set up choice scorer
+        choice_scorer_name = properties['choice_scorer_class']
+        self.choice_scorer = ChoiceScorerFactory.create_choice_scorer(choice_scorer_name)
+
+        if ['scorer'] in properties:
+            self.compatibility_metric.setup(properties['scorer'])
+        else:
+            self.compatibility_metric.setup(dict())
+
 class AgentCollection:
 
     @classmethod
     def check_config(cls, config):
-        if not check_keys(config, [['agent']]):
+        if not is_valid_keys(config, ['agent']):
             raise ConfigKeyMissingError('agent')
         if len(config['agent']) == 0:
             raise ConfigNoAgentsError()
@@ -75,5 +86,7 @@ class AgentCollection:
         return {agent.name: agent.compatibility_metric.compute_compatibility(context) \
                     for agent in self.agents}
 
+    def score_items(self, rec_list: ResultList, list_size):
+        pass
 
     # TODO: Also some function for use in the choice phase

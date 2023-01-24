@@ -3,6 +3,8 @@ import logging
 import os
 import toml
 from .util.errors import ConfigFileError
+from .scruf import Scruf
+
 
 def read_args():
     parser = argparse.ArgumentParser(
@@ -14,6 +16,7 @@ def read_args():
     arg_check(vars(input_args))
     return vars(input_args)
 
+
 def arg_check(input_args):
     config_file = input_args['config']
     if not os.path.exists(config_file):
@@ -22,10 +25,12 @@ def arg_check(input_args):
     else:
         return
 
+
 def load_config(config_file):
     with open(config_file, 'r') as f:
         config = toml.load(f)
     return config
+
 
 if __name__ == '__main__':
 

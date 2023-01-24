@@ -21,6 +21,7 @@ class UnregisteredFairnessMetricError(ScrufError):
         self.message = f'Cannot create fairness metric: Class {name} is not registered and may not exist.'
         super().__init__(self.message)
 
+
 class InvalidCompatibilityMetricError(ScrufError):
     def __init__(self, name):
         self.message = f'Cannot create compatibility metric: Class {name} is not a subclass of CompatibilityMetric.'
@@ -47,13 +48,15 @@ class ConfigFileError(ScrufError):
 
 class ConfigKeyMissingError(ScrufError):
     def __init__(self, key):
-        self.message = f'Error in configuration file. Expecting key {key}.'
+        self.message = f'Error in configuration file. Expecting key "{key}".'
         super().__init__(self.message)
+
 
 class ConfigNoAgentsError(ScrufError):
     def __init__(self):
         self.message = f'Error in configuration file. No fairness agents were specified.'
         super().__init__(self.message)
+
 
 class InvalidAllocationMechanismError(ScrufError):
     def __init__(self, name):
@@ -66,6 +69,7 @@ class UnregisteredAllocationMechanismError(ScrufError):
         self.message = f'Cannot create allocation mechanism: Class {name} is not registered and may not exist.'
         super().__init__(self.message)
 
+
 class InvalidChoiceMechanismError(ScrufError):
     def __init__(self, name):
         self.message = f'Cannot create choice mechanism: Class {name} is not a subclass of ChoiceMechanism.'
@@ -75,4 +79,16 @@ class InvalidChoiceMechanismError(ScrufError):
 class UnregisteredChoiceMechanismError(ScrufError):
     def __init__(self, name):
         self.message = f'Cannot create choice mechanism: Class {name} is not registered and may not exist.'
+        super().__init__(self.message)
+
+
+class MissingFeatureDataFilenameError(ScrufError):
+    def __init__(self):
+        self.message = f'Cannot set up item feature data: Expecting data.feature_filename in configuration file.'
+        super().__init__(self.message)
+
+
+class PathDoesNotExistError(ScrufError):
+    def __init__(self, path, keys):
+        self.message = f'Expected path {str(path)} from config file {keys} does not exist.'
         super().__init__(self.message)

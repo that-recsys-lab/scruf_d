@@ -17,17 +17,19 @@ class Scruf:
         self.choice_mechanism = \
             AllocationMechanismFactory.create_allocation_mechanism(config['allocation_class'])
 
-    def run_experiment(self):
-        self.setup_experiment()
-        self.run_loop()
-        self.cleanup_experiment()
-
     def setup_experiment(self):
         # TODO Setup data sources
         self.history.setup(self.config)
         self.agents.setup(self.config)
         self.allocation_mechanism.setup(self.config)
         self.choice_mechanism.setup(self.config)
+
+    def run_experiment(self):
+        self.setup_experiment()
+        self.run_loop()
+        self.cleanup_experiment()
+
+
 
     # Get next user
     # Calculate fairness and compatibility

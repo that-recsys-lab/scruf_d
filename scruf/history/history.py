@@ -1,17 +1,14 @@
 import json
 import pathlib
 
-from scruf.util import HistoryCollection, get_value_from_keys, check_keys, ConfigKeyMissingError
+from scruf.util import HistoryCollection, get_value_from_keys, check_keys, ConfigKeyMissingError, ConfigKeys, \
+    get_working_dir_path
 from .results_history import ResultsHistory
 
 
 class ScrufHistory:
 
-    PATH_KEYS = ['location', 'path']
-    OUTPUT_KEYS = ['output', 'filename']
-    WINDOW_SIZE_KEYS = ['parameters', 'history_window_size']
-
-    CONFIG_ELEMENTS = [PATH_KEYS, OUTPUT_KEYS, WINDOW_SIZE_KEYS]
+    CONFIG_ELEMENTS = [ConfigKeys.WORKING_PATH_KEYS, ConfigKeys.OUTPUT_PATH_KEYS, ConfigKeys.WINDOW_SIZE_KEYS]
 
     @classmethod
     def check_config(cls, config):
@@ -31,9 +28,9 @@ class ScrufHistory:
     def setup(self, config):
         ScrufHistory.check_config(config)
 
-        self.working_dir = pathlib.Path(get_value_from_keys(config, ScrufHistory.PATH_KEYS))
-        self.history_file_name = get_value_from_keys(config, ScrufHistory.OUTPUT_KEYS)
-        window_size = get_value_from_keys(config, ScrufHistory.WINDOW_SIZE_KEYS)
+        self.working_dir = get_working_dir_path(config)
+        self.history_file_name = get_value_from_keys(config, ConfigKeys.OUTPUT_PATH_KEYS)
+        window_size = get_value_from_keys(config, ConfigKeys.WINDOW_SIZE_KEYS)
 
         self.allocation_history = HistoryCollection(window_size)
         self.choice_history = HistoryCollection(window_size)

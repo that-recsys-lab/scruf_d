@@ -1,5 +1,8 @@
 from abc import ABC, abstractmethod
-from scruf.util import PropertyMismatchError, InvalidChoiceMechanismError, UnregisteredChoiceMechanismError
+
+from scruf.agent import AgentCollection
+from scruf.util import PropertyMismatchError, InvalidChoiceMechanismError, UnregisteredChoiceMechanismError, \
+    ResultList, PropertyCollection
 
 class ChoiceMechanism:
     """
@@ -26,30 +29,23 @@ class ChoiceMechanism:
         return self.prop_coll.get_property(property_name)
 
     @abstractmethod
-    def compute_choice(self, agents, allocation_probabilities, recommended_items):
+    def compute_choice(self, agents: AgentCollection, allocation_probabilities, recommended_items: ResultList, list_size):
         pass
 
-class RandomChoice(ChoiceMechanism):
+class NullChoiceMechanism(ChoiceMechanism):
     """
-    A RandomChoice mechanism selects an agent for each user based on the allocation probabilities.
+    The agents have no influence on the recommendations
     """
 
     def __init__(self):
         super().__init__()
         
-    def compute_choice(self, agents, allocation_probabilities, recommended_items):
+    def compute_choice(self, agents, allocation_probabilities, recommended_items: ResultList, list_size):
         """
-        Selects the agent with the highest allocation probability for each user.
+        Returns the recommendation list without any .
         :return: selected agent for each user
         """
-        selected_agents = []
-        for i, agent in enumerate(agents):
-            max_prob = max(allocation_probabilities)
-            if allocation_probabilities[i] == max_prob:
-                selected_agents.append(agent)
-            else:
-                selected_agents.append(None)
-        return selected_agents
+        return recommended_items.trim(list_size)
 
 class ChoiceMechanismFactory:
     """
@@ -77,9 +73,9 @@ class ChoiceMechanismFactory:
         return mechanism_class()
 
 # Register the mechanisms created above
-mechanism_specs = [("random_choice", RandomChoice)]
+mechanism_specs = [("null_choice", NullChoiceMechanism)]
 
-ChoiceMechanismFactory.register_choice_mechanism(mechanism_specs)
+ChoiceMechanismFactory.register_choice_mechanisms(mechanism_specs)
 
 
 

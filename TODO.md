@@ -5,8 +5,8 @@
 * Implement the compatibility metric class, similar to the fairness metric. Just the ability to create different classes and maybe some basic baselines: Always compatible, never compatible. Use a factory to make it configurable - DONE
 * Add compatibility to the fairness agent implementation -DONE
 * Add user_agent_compatibility?
-* Move fairness metric execution to AgentCollection class
-* Move compatibility metric execution to AgentCollection class
+* Move fairness metric execution to AgentCollection class - DONE RB
+* Move compatibility metric execution to AgentCollection class - DONE RB
 
 ## Mechanisms
 * Implement the allocation mechanism class. - DONE
@@ -14,9 +14,9 @@
 on how choice is implemented at the agent level.
 
 ## Unit Tests
-* Implement unit tests for compatibility metric.
-* Implement unit tests for allocation mechanism.
-* Implement unit tests for choice mechanism.
+* Implement unit tests for compatibility metric. DONE RB
+* Implement unit tests for allocation mechanism. DONE RB
+* Implement unit tests for choice mechanism. DONE RB
 
 ## Util
 * Update Util 
@@ -63,3 +63,8 @@ Others?
 * Export to librec-auto project for evaluation
 
 Eventually SCRUF-specific evaluation. 
+
+# Things to think about
+
+* Should we make the configuration data into its own class.
+* Should we get rid of the feature name vs feature id distinction

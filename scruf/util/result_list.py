@@ -54,14 +54,17 @@ class ResultList:
 
     # Assumes the list is sorted.
     def trim(self, new_length):
-        self.results = self.results[0:new_length]
+        if len(self.result) > new_length:
+            self.results = self.results[0:new_length]
 
     def rescore(self, score_fn):
+        self.rescore_no_sort(score_fn)
+        self.sort()
+
+    def rescore_no_sort(self, score_fn):
         for result in self.results:
             new_score = score_fn(result)
             result.update_score(new_score)
-
-        self.sort()
 
     def filter_results(self, filter_fn):
         return filter(filter_fn, self.results)
