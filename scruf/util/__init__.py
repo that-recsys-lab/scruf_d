@@ -4,6 +4,7 @@ from .errors import ScrufError, PropertyMismatchError, \
     ConfigFileError, ConfigKeyMissingError, \
     InvalidAllocationMechanismError, UnregisteredAllocationMechanismError, \
     InvalidChoiceMechanismError, UnregisteredChoiceMechanismError, \
+    InvalidChoiceScorerError, UnregisteredChoiceScorerError, \
     MissingFeatureDataFilenameError, PathDoesNotExistError
 from .result_list import ResultList
 from .history_collection import HistoryCollection

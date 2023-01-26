@@ -1,6 +1,6 @@
 import unittest
 import toml
-from scruf.util.config_util import is_valid_keys, get_value_from_keys, check_keys
+from scruf.util.config_util import is_valid_keys, get_value_from_keys, check_key_lists
 
 SAMPLE_TOML = '''
 # Test TOML
@@ -48,9 +48,9 @@ class ConfigUtilTestCase(unittest.TestCase):
                      ['c', '1', 'value'],
                      ['b', 'bar']]
 
-        self.assertTrue(check_keys(self.config, path_specs))
+        self.assertTrue(check_key_lists(self.config, path_specs))
         path_specs.append(['e', 'lalalala'])
-        self.assertFalse(check_keys(self.config, path_specs))
+        self.assertFalse(check_key_lists(self.config, path_specs))
 
 
 if __name__ == '__main__':

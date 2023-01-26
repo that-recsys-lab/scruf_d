@@ -1,4 +1,5 @@
-from collections import namedtuple
+from collections import defaultdict
+
 
 class ResultEntry:
 
@@ -27,7 +28,7 @@ class ResultEntry:
 class ResultList:
 
     def __init__(self):
-        self.results = None
+        self.results = []
 
     def setup(self, triples, presorted=False, trim=0):
         self.results = []
@@ -44,6 +45,12 @@ class ResultList:
     def get_results(self):
         return self.results
 
+    def add_result(self, user, item, score, sort=False):
+        new_entry = ResultEntry(user=user, item=item, score=score, rank=-1)
+        self.results.append(new_entry)
+        if sort:
+            self.sort()
+
     # In addition to sorting, also sets the rank value
     def sort(self):
         sorted_results = sorted(self.results, key=lambda result: result.score, reverse=True)
@@ -54,7 +61,7 @@ class ResultList:
 
     # Assumes the list is sorted.
     def trim(self, new_length):
-        if len(self.result) > new_length:
+        if len(self.results) > new_length:
             self.results = self.results[0:new_length]
 
     def rescore(self, score_fn):
@@ -68,4 +75,27 @@ class ResultList:
 
     def filter_results(self, filter_fn):
         return filter(filter_fn, self.results)
+
+    @staticmethod
+    # Assumes all the same user. Maybe should check for this
+    # Does not require the result lists be in the same order
+    def combine_results(result_lists):
+        if len(result_lists) == 0:
+            return []
+        userid = result_lists[0].results[0].user
+        score_table = defaultdict(list)
+        for result_list in result_lists:
+            for entry in result_list.results:
+                score_table[entry.item].append(entry.score)
+
+        output = ResultList()
+        for item, value_list in score_table.items():
+            output.add_result(userid, item, sum(value_list), sort=False)
+
+        output.sort()
+
+        return output
+
+
+
 

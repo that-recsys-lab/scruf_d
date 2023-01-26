@@ -1,7 +1,7 @@
 import json
 import pathlib
 
-from scruf.util import HistoryCollection, get_value_from_keys, check_keys, ConfigKeyMissingError, ConfigKeys, \
+from scruf.util import HistoryCollection, get_value_from_keys, check_key_lists, ConfigKeys, \
     get_working_dir_path
 from .results_history import ResultsHistory
 
@@ -12,7 +12,7 @@ class ScrufHistory:
 
     @classmethod
     def check_config(cls, config):
-        if not check_keys(config, ScrufHistory.CONFIG_ELEMENTS):
+        if not check_key_lists(config, ScrufHistory.CONFIG_ELEMENTS):
             raise ConfigKeyMissingError(ScrufHistory.CONFIG_ELEMENTS)
 
     def __init__(self):

@@ -1,14 +1,17 @@
 import unittest
 import toml
-from scruf.agent import FairnessAgent, ProportionalItemFM, AgentCollection
+from scruf.agent import FairnessAgent, ProportionalItemFM, AgentCollection, FixedValueChoiceScorer
 
 # This is just the agent part
 CONFIG_DOCUMENT = """
 [agent]
+
 [agent.country]
 name = "Country"
 metric_class = "proportional_item"
 compatibility_class = "always_one"
+choice_scorer_class = "fixed_value"
+
 [agent.country.metric]
 protected_feature = "country"
 protected_values = ["ug", "th", "ke", "ha"]
@@ -16,12 +19,14 @@ proportion = 0.2
 
 [agent.sector]
 name = "Sector"
-metric_class = "list_exposure"
+metric_class = "proportional_item"
 compatibility_class = "always_zero"
+choice_scorer_class = "fixed_value"
 
 [agent.sector.metric]
 protected_feature = "sector"
 protected_values = [7, 18, 35]
+proportion = 0.5
 """
 
 class AgentTestCase(unittest.TestCase):

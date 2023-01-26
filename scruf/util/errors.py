@@ -81,6 +81,17 @@ class UnregisteredChoiceMechanismError(ScrufError):
         self.message = f'Cannot create choice mechanism: Class {name} is not registered and may not exist.'
         super().__init__(self.message)
 
+class InvalidChoiceScorerError(ScrufError):
+    def __init__(self, name):
+        self.message = f'Cannot create choice scorer: Class {name} is not a subclass of ChoiceScorer.'
+        super().__init__(self.message)
+
+
+class UnregisteredChoiceScorerError(ScrufError):
+    def __init__(self, name):
+        self.message = f'Cannot create choice scorer: Class {name} is not registered and may not exist.'
+        super().__init__(self.message)
+
 
 class MissingFeatureDataFilenameError(ScrufError):
     def __init__(self):

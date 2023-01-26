@@ -2,7 +2,7 @@ import unittest
 import toml
 from icecream import ic
 
-from scruf.agent import AgentCollection
+from scruf.agent import AgentCollection, FixedValueChoiceScorer
 from scruf.allocation import AllocationMechanismFactory, WeightedProductAllocationMechanism, \
     MostCompatibleAllocationMechanism, LeastFairAllocationMechanism
 
@@ -21,11 +21,13 @@ SAMPLE_AGENTS = '''
 name = "Low Compatibility"
 metric_class = "always_zero"
 compatibility_class = "always_zero"
+choice_scorer_class = "fixed_value"
 
 [agent.high_compat]
 name = "High Compatibility"
 metric_class = "always_one"
 compatibility_class = "always_one"
+choice_scorer_class = "fixed_value"
 '''
 
 

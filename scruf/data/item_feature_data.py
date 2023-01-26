@@ -64,3 +64,6 @@ class ItemFeatureData:
                 protected_items.update(items)
 
             self.protected_item_index[feature_name] = protected_items
+
+    def is_protected(self, feature_name, item):
+        return item in self.protected_item_index[feature_name]

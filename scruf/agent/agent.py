@@ -1,5 +1,6 @@
 from .fairness_metric import FairnessMetricFactory
 from .compatibility_metric import CompatibilityMetricFactory
+from .choice_scorer import ChoiceScorerFactory
 from scruf.util import is_valid_keys
 from scruf.util.errors import ConfigKeyMissingError, ConfigNoAgentsError
 from scruf.util import ResultList
@@ -36,7 +37,7 @@ class FairnessAgent:
         choice_scorer_name = properties['choice_scorer_class']
         self.choice_scorer = ChoiceScorerFactory.create_choice_scorer(choice_scorer_name)
 
-        if ['scorer'] in properties:
+        if 'scorer' in properties:
             self.compatibility_metric.setup(properties['scorer'])
         else:
             self.compatibility_metric.setup(dict())

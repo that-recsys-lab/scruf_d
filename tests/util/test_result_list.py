@@ -44,6 +44,15 @@ class ResultListTestCase(unittest.TestCase):
         self.assertEqual(len(filtered), 2)
         self.assertEqual(filtered[0].item, 'i5')
 
+    def test_combine(self):
+        rlist1 = ResultList()
+        rlist1.setup(RESULT_TRIPLES)
+        rlist2 = ResultList()
+        rlist2.setup(RESULT_TRIPLES)
+        output = ResultList.combine_results([rlist1, rlist2])
+
+        self.assertEqual(output.results[0].item, 'i5')
+        self.assertEqual(output.results[0].score, 10)
 
 if __name__ == '__main__':
     unittest.main()
