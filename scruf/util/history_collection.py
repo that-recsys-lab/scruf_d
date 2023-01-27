@@ -11,7 +11,7 @@ class HistoryCollection:
         self.collection = deque(maxlen=window_size)
         self.time = 0
 
-    def __str__(self):
+    def __repr__(self):
         return f"<HistoryCollection: window: {self.collection._maxlen} current time: {self.time}>"
 
     def add_item(self, item):

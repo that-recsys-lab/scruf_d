@@ -12,7 +12,7 @@ class ResultEntry:
         self.old_scores = []
         self.old_ranks = []
 
-    def __str__(self):
+    def __repr__(self):
         return f'ResultEntry: U:{self.user}, I:{self.item}, S:{self.score}, R{self.rank}, OS:{self.old_scores}, OR:{self.old_ranks}'
 
     def update_score(self, new_score):

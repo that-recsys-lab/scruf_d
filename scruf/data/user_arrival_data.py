@@ -67,12 +67,20 @@ class BulkLoadedUserData(UserArrivalData):
     # Default is to go through all users
     # NOT THREAD SAFE. Assumes only one iteration happening at a time
     # Also assumes that the data does not change during the iteration
-    def user_iterator(self, iterations=-1):
-        self.current_user_index = -1
-        if iterations == -1 or iterations > len(self.arrival_sequence):
-            iterations = len(self.arrival_sequence)
+    def user_iterator(self, iterations=-1, restart=True):
+        if restart:
+            self.current_user_index = -1
 
-        while self.current_user_index < iterations - 1:
+        if iterations == -1 or iterations > len(self.arrival_sequence):
+            last_item_read = len(self.arrival_sequence) - 1
+        elif self.current_user_index == -1:
+            last_item_read = iterations - 1
+        else:
+            last_item_read = self.current_user_index + iterations
+
+        # ic("creating iterator", self.current_user_index, iterations, last_item_read, restart)
+
+        while self.current_user_index < last_item_read:
             self.current_user_index += 1
             arrived_user = self.arrival_sequence[self.current_user_index]
             yield self.user_table[arrived_user]

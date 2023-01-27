@@ -3,6 +3,7 @@ import tempfile
 import pathlib
 import toml
 from scruf.data import BulkLoadedUserData
+from icecream import ic
 
 TEST_USER_DATA = '''user1, item1, 4.0
 user1, item2, 3.5
@@ -70,11 +71,15 @@ class ItemFeatureTestCase(unittest.TestCase):
 
         iter2 = user_data.user_iterator(iterations=1)
         for res_list in iter2:
-            pass
+            ic(res_list.get_results()[0])
 
         self.assertEqual(user_data.current_user_index, 0)
 
+        iter3 = user_data.user_iterator(iterations=1, restart=False)
+        for res_list in iter3:
+            ic(res_list.get_results()[0])
 
+        self.assertEqual(user_data.current_user_index, 1)
 
 if __name__ == '__main__':
     unittest.main()

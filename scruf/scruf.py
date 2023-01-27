@@ -66,14 +66,14 @@ class Scruf:
     # Produce final recommendation list
     # Update the history log
     # Loop
-    def run_loop(self, iterations=-1):
+    def run_loop(self, iterations=-1, restart=True):
         agents = Scruf.state.agents
         history = Scruf.state.history
         context = Scruf.state.context
         amech = Scruf.state.allocation_mechanism
         cmech = Scruf.state.choice_mechanism
 
-        for user_info in Scruf.state.user_data.user_iterator(iterations):
+        for user_info in Scruf.state.user_data.user_iterator(iterations, restart=restart):
             allocation = amech.compute_allocation_probabilities(agents, history, context)
             cmech.compute_choice(agents, allocation, user_info, Scruf.state.output_list_size)
             history.write_current_state()
