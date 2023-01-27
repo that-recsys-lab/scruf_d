@@ -5,7 +5,9 @@ from agent.test_fairness_metric import FairnessMetricTestCase
 from agent.test_compatibility_metric import CompatibilityMetricTestCase
 from allocation.test_allocation_mechanism import AllocationMechanismTestCase
 from choice.test_choice_mechanism import ChoiceMechanismTestCase
+from data.test_context_class import ContextClassTestCase
 from data.test_item_feature import ItemFeatureTestCase
+from data.test_user_data import UserDataTestCase
 from history.test_results_history import TestResultsHistory
 from history.test_scruf_history import ScrufHistoryTestCase
 from util.test_hcollection import TestHistoryCollection
@@ -25,8 +27,12 @@ def suite():
     suite.addTest(alloc_test)
     choice_test = unittest.defaultTestLoader.loadTestsFromTestCase(ChoiceMechanismTestCase)
     suite.addTest(choice_test)
+    ctx_test = unittest.defaultTestLoader.loadTestsFromTestCase(ContextClassTestCase)
+    suite.addTest(ctx_test)
     if_test = unittest.defaultTestLoader.loadTestsFromTestCase(ItemFeatureTestCase)
     suite.addTest(if_test)
+    ud_test = unittest.defaultTestLoader.loadTestsFromTestCase(UserDataTestCase)
+    suite.addTest(ud_test)
     rhist_tests = unittest.defaultTestLoader.loadTestsFromTestCase(TestResultsHistory)
     suite.addTest(rhist_tests)
     shist_tests = unittest.defaultTestLoader.loadTestsFromTestCase(ScrufHistoryTestCase)

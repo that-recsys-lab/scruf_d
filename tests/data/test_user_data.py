@@ -26,7 +26,7 @@ path = "."
 rec_filename = "test-users.csv"
 '''
 
-class ItemFeatureTestCase(unittest.TestCase):
+class UserDataTestCase(unittest.TestCase):
     def setUp(self):
         # Create a temporary directory
         self.temp_dir = tempfile.TemporaryDirectory()
@@ -71,13 +71,15 @@ class ItemFeatureTestCase(unittest.TestCase):
 
         iter2 = user_data.user_iterator(iterations=1)
         for res_list in iter2:
-            ic(res_list.get_results()[0])
+            pass
+            #ic(res_list.get_results()[0])
 
         self.assertEqual(user_data.current_user_index, 0)
 
         iter3 = user_data.user_iterator(iterations=1, restart=False)
         for res_list in iter3:
-            ic(res_list.get_results()[0])
+            pass
+            #ic(res_list.get_results()[0])
 
         self.assertEqual(user_data.current_user_index, 1)
 
