@@ -81,6 +81,7 @@ class UnregisteredChoiceMechanismError(ScrufError):
         self.message = f'Cannot create choice mechanism: Class {name} is not registered and may not exist.'
         super().__init__(self.message)
 
+
 class InvalidChoiceScorerError(ScrufError):
     def __init__(self, name):
         self.message = f'Cannot create choice scorer: Class {name} is not a subclass of ChoiceScorer.'
@@ -90,6 +91,17 @@ class InvalidChoiceScorerError(ScrufError):
 class UnregisteredChoiceScorerError(ScrufError):
     def __init__(self, name):
         self.message = f'Cannot create choice scorer: Class {name} is not registered and may not exist.'
+        super().__init__(self.message)
+
+class InvalidContextClassError(ScrufError):
+    def __init__(self, name):
+        self.message = f'Cannot create context class: Class {name} is not a subclass of Context.'
+        super().__init__(self.message)
+
+
+class UnregisteredContextClassError(ScrufError):
+    def __init__(self, name):
+        self.message = f'Cannot create context class: Class {name} is not registered and may not exist.'
         super().__init__(self.message)
 
 

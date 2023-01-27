@@ -2,3 +2,77 @@
 # Encapsulates a file of the following form:
 # userID, itemID, rating
 # All rows are grouped by userID and there should be the same number of rows for each user.
+# Later on, we might want a streaming method
+from abc import ABC, abstractmethod
+from scruf.util import get_path_from_keys, ConfigKeys
+import csv
+from scruf.util import ResultList, ResultEntry
+from collections import defaultdict
+from icecream import ic
+
+class UserArrivalData(ABC):
+
+    @abstractmethod
+    def setup(self, config):
+        pass
+
+    @abstractmethod
+    def user_iterator(self):
+        pass
+
+
+class BulkLoadedUserData(UserArrivalData):
+
+    def __init__(self):
+        self.data_file = None
+        self.current_user_index = -1
+        self.arrival_sequence = None
+        self.user_table = None
+
+    def __str__(self):
+        return f"UserArrivalData: currentUser = {self.arrival_sequence[self.current_user_index]}"
+
+    def setup(self, config):
+        self.data_file = get_path_from_keys(config, ConfigKeys.DATA_FILENAME_KEYS, check_exists=True)
+        self._load_data()
+
+    def _load_data(self):
+        self.arrival_sequence = []
+        self.user_table = defaultdict()
+        last_user_id = None
+        current_user_collect = []
+        with open(self.data_file, 'r') as csvfile:
+            reader = csv.reader(csvfile, skipinitialspace=True)
+            for row in reader:
+                user_id = row[0]
+                if last_user_id != user_id: # On to the next user
+                    if last_user_id is not None:  # Not the first user
+                        rlist = ResultList()
+                        rlist.setup(current_user_collect)
+                        self.user_table[last_user_id] = rlist
+                        self.arrival_sequence.append(last_user_id)
+                    # Always reset
+                    current_user_collect = []
+                    last_user_id = user_id
+
+                current_user_collect.append(row)
+        # Need to assemble last result list
+        rlist = ResultList()
+        rlist.setup(current_user_collect)
+        self.user_table[last_user_id] = rlist
+        self.arrival_sequence.append(last_user_id)
+
+        self.current_user_index = None
+
+    # Default is to go through all users
+    # NOT THREAD SAFE. Assumes only one iteration happening at a time
+    # Also assumes that the data does not change during the iteration
+    def user_iterator(self, iterations=-1):
+        self.current_user_index = -1
+        if iterations == -1 or iterations > len(self.arrival_sequence):
+            iterations = len(self.arrival_sequence)
+
+        while self.current_user_index < iterations - 1:
+            self.current_user_index += 1
+            arrived_user = self.arrival_sequence[self.current_user_index]
+            yield self.user_table[arrived_user]

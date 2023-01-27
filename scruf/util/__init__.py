@@ -5,8 +5,9 @@ from .errors import ScrufError, PropertyMismatchError, \
     InvalidAllocationMechanismError, UnregisteredAllocationMechanismError, \
     InvalidChoiceMechanismError, UnregisteredChoiceMechanismError, \
     InvalidChoiceScorerError, UnregisteredChoiceScorerError, \
+    InvalidContextClassError, UnregisteredContextClassError, \
     MissingFeatureDataFilenameError, PathDoesNotExistError
-from .result_list import ResultList
+from .result_list import ResultList, ResultEntry
 from .history_collection import HistoryCollection
 from .config_util import is_valid_keys, get_value_from_keys, check_key_lists, ConfigKeys, get_working_dir_path, \
     get_path_from_keys

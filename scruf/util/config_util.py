@@ -7,6 +7,7 @@ class ConfigKeys:
     FEATURE_FILENAME_KEYS = ['data', 'feature_filename']
     OUTPUT_PATH_KEYS = ['output', 'filename']
     WINDOW_SIZE_KEYS = ['parameters', 'history_window_size']
+    DATA_FILENAME_KEYS = ['data', 'rec_filename']
 
 
 def is_valid_keys(config, key_list):
