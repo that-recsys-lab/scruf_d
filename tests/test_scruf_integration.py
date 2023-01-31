@@ -4,6 +4,7 @@ import pathlib
 import toml
 from scruf import Scruf
 import json
+from icecream import ic
 
 # What to test:
 # Configuration sets up a simple set of mechanisms
@@ -26,7 +27,7 @@ feature_filename = "item_features.csv"
 filename = "history_file.json"
 
 [parameters]
-list_size = 10
+list_size = 2
 iterations = -1 # -1 means run through all the users
 initialize = "skip"
 history_window_size = 50
@@ -149,7 +150,7 @@ class ScrufIntegrationTestCase(unittest.TestCase):
         self.config['location']['path'] = self.temp_dir_path
         scruf = Scruf(self.config)
         self.assertIsNotNone(scruf.state)
-        self.assertEqual(10, scruf.state.output_list_size)
+        self.assertEqual(2, scruf.state.output_list_size)
 
     def test_setup(self):
         self.config['location']['path'] = self.temp_dir_path
@@ -173,16 +174,20 @@ class ScrufIntegrationTestCase(unittest.TestCase):
             line = history_file.readline()
 
         history = json.loads(line)
+        ic(history)
 
         # It should have processed user 1
         self.assertEqual(0, history['time'])
         self.assertEqual('user1', history['user'])
         self.assertIsInstance(history['allocation'], dict)
         alloc = history['allocation']
-
-
-
-
+        # should be all zeros
+        self.assertTrue(all([score == 0.0 for score in alloc['output'].values()]))
+        choice = history['choice']
+        choice_output = choice['output']['results']
+        self.assertEqual(len(choice_output), 2)
+        self.assertTrue(choice_output[0]['item'], 'item1')
+        self.assertTrue(choice_output[1]['item'], 'item2')
 
 if __name__ == '__main__':
     unittest.main()

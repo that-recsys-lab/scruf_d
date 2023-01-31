@@ -44,7 +44,8 @@ def suite():
     suite.addTest(rlist_tests)
     conf_tests = unittest.defaultTestLoader.loadTestsFromTestCase(ConfigUtilTestCase)
     suite.addTest(conf_tests)
-    integration_test = unittest.defaultTestLoader.loadTestsFromTestCase(ScrufIntegrationTestCase)
+    integration_tests = unittest.defaultTestLoader.loadTestsFromTestCase(ScrufIntegrationTestCase)
+    suite.addTest(integration_tests)
 
     return suite
 

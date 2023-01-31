@@ -1,3 +1,4 @@
+import copy
 from abc import ABC, abstractmethod
 
 from scruf.agent import AgentCollection
@@ -53,8 +54,10 @@ class NullChoiceMechanism(ChoiceMechanism):
         Returns the recommendation list without any .
         :return: selected agent for each user
         """
+        output = copy.deepcopy(recommended_items)
+        output.trim(list_size)
         return {'original': recommended_items,
-                'output': recommended_items.trim(list_size)}
+                'output': output}
 
 class ChoiceMechanismFactory:
     """
