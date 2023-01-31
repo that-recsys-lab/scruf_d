@@ -46,6 +46,20 @@ executing = ">=0.3.1"
 pygments = ">=2.2.0"
 
 [[package]]
+name = "jsons"
+version = "1.6.3"
+description = "For serializing Python objects to JSON (dicts) and back"
+category = "main"
+optional = false
+python-versions = ">=3.5"
+
+[package.dependencies]
+typish = ">=1.9.2"
+
+[package.extras]
+test = ["attrs", "codecov", "coverage", "dataclasses", "pytest", "scons", "tzdata"]
+
+[[package]]
 name = "pygments"
 version = "2.13.0"
 description = "Pygments is a syntax highlighting package written in Python."
@@ -72,10 +86,21 @@ category = "main"
 optional = false
 python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
 
+[[package]]
+name = "typish"
+version = "1.9.3"
+description = "Functionality for types"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.extras]
+test = ["codecov", "coverage", "mypy", "nptyping (>=1.3.0)", "numpy", "pycodestyle", "pylint", "pytest"]
+
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "2fb744605e9a74981197b39b3943b429d95ab668a4df623e1200a8f25b1a6654"
+content-hash = "b041513c392c9dd0082767379eaab628ea78f1a0e017aefad828f1100d999414"
 
 [metadata.files]
 asttokens = [
@@ -94,6 +119,10 @@ icecream = [
     {file = "icecream-2.1.3-py2.py3-none-any.whl", hash = "sha256:757aec31ad4488b949bc4f499d18e6e5973c40cc4d4fc607229e78cfaec94c34"},
     {file = "icecream-2.1.3.tar.gz", hash = "sha256:0aa4a7c3374ec36153a1d08f81e3080e83d8ac1eefd97d2f4fe9544e8f9b49de"},
 ]
+jsons = [
+    {file = "jsons-1.6.3-py3-none-any.whl", hash = "sha256:f07f8919316f72a3843c7ca6cc6c900513089f10092626934d1bfe4b5cf15401"},
+    {file = "jsons-1.6.3.tar.gz", hash = "sha256:cd5815c7c6790ae11c70ad9978e0aa850d0d08a643a5105cc604eac8b29a30d7"},
+]
 pygments = [
     {file = "Pygments-2.13.0-py3-none-any.whl", hash = "sha256:f643f331ab57ba3c9d89212ee4a2dabc6e94f117cf4eefde99a0574720d14c42"},
     {file = "Pygments-2.13.0.tar.gz", hash = "sha256:56a8508ae95f98e2b9bdf93a6be5ae3f7d8af858b43e02c5a2ff083726be40c1"},
@@ -105,4 +134,7 @@ six = [
 toml = [
     {file = "toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b"},
     {file = "toml-0.10.2.tar.gz", hash = "sha256:b3bda1d108d5dd99f4a20d24d9c348e91c4db7ab1b749200bded2f839ccbe68f"},
+]
+typish = [
+    {file = "typish-1.9.3-py3-none-any.whl", hash = "sha256:03cfee5e6eb856dbf90244e18f4e4c41044c8790d5779f4e775f63f982e2f896"},
 ]

@@ -82,5 +82,8 @@ class BulkLoadedUserData(UserArrivalData):
 
         while self.current_user_index < last_item_read:
             self.current_user_index += 1
-            arrived_user = self.arrival_sequence[self.current_user_index]
+            arrived_user = self.get_current_user()
             yield self.user_table[arrived_user]
+
+    def get_current_user(self):
+        return self.arrival_sequence[self.current_user_index]

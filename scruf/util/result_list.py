@@ -82,7 +82,7 @@ class ResultList:
     def combine_results(result_lists):
         if len(result_lists) == 0:
             return []
-        userid = result_lists[0].results[0].user
+        user_id = result_lists[0].results[0].user
         score_table = defaultdict(list)
         for result_list in result_lists:
             for entry in result_list.results:
@@ -90,7 +90,26 @@ class ResultList:
 
         output = ResultList()
         for item, value_list in score_table.items():
-            output.add_result(userid, item, sum(value_list), sort=False)
+            output.add_result(user_id, item, sum(value_list), sort=False)
+
+        output.sort()
+
+        return output
+
+    # As above but input is an agent -> ResultList dictionary
+    @staticmethod
+    def combine_results_dict(result_dict):
+        if len(result_dict) == 0:
+            return []
+        score_table = defaultdict(list)
+        for result_list in result_dict.values():
+            for entry in result_list.results:
+                user_id = entry.user
+                score_table[entry.item].append(entry.score)
+
+        output = ResultList()
+        for item, value_list in score_table.items():
+            output.add_result(user_id, item, sum(value_list), sort=False)
 
         output.sort()
 

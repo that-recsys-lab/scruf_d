@@ -13,8 +13,7 @@ compatibility_class = "always_one"
 choice_scorer_class = "fixed_value"
 
 [agent.country.metric]
-protected_feature = "country"
-protected_values = ["ug", "th", "ke", "ha"]
+feature = "country"
 proportion = 0.2
 
 [agent.sector]
@@ -24,8 +23,7 @@ compatibility_class = "always_zero"
 choice_scorer_class = "fixed_value"
 
 [agent.sector.metric]
-protected_feature = "sector"
-protected_values = [7, 18, 35]
+feature = "sector"
 proportion = 0.5
 """
 
@@ -44,7 +42,7 @@ class AgentTestCase(unittest.TestCase):
     def test_multi_agent_creation(self):
         config = toml.loads(CONFIG_DOCUMENT)
         agent_coll = AgentCollection()
-        agent_coll.setup(config, None)
+        agent_coll.setup(config)
 
 
 if __name__ == '__main__':

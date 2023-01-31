@@ -45,12 +45,13 @@ class AllocationMechanismTestCase(unittest.TestCase):
     def test_mechanism_scoring(self):
         config = toml.loads(SAMPLE_AGENTS)
         agents = AgentCollection()
-        agents.setup(config, None)
+        agents.setup(config)
 
         alloc1 = MostCompatibleAllocationMechanism()
         alloc1.setup({})
 
-        probs1 = alloc1.compute_allocation_probabilities(agents, None, None)
+        alloc_result = alloc1.compute_allocation_probabilities(agents, None, None)
+        probs1 = alloc_result['output']
 
         self.assertEqual(probs1['Low Compatibility'], 0.0)
         self.assertEqual(probs1['High Compatibility'], 1.0)
@@ -58,7 +59,8 @@ class AllocationMechanismTestCase(unittest.TestCase):
         alloc2 = LeastFairAllocationMechanism()
         alloc2.setup({})
 
-        probs2 = alloc2.compute_allocation_probabilities(agents, None, None)
+        alloc_result = alloc2.compute_allocation_probabilities(agents, None, None)
+        probs2 = alloc_result['output']
 
         self.assertEqual(probs2['Low Compatibility'], 1.0)
         self.assertEqual(probs2['High Compatibility'], 0.0)

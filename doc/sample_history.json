@@ -1,0 +1,10 @@
+{
+  "time": 1,
+  "user": "user 1",
+  "allocation": {"fairness scores": {"agent 1": 0.3, "agent 2": 0.8, "agent 3", 0.2},
+    "compatibility scores": {"agent 1": 0.0, "agent 2": 0.1, "agent 3", 0.8},
+    "output": {"agent 1":  0.0, "agent 2", 1.0, "agent 3": 0.0}},
+  "choice": {"original": [["item 1", 5.0], ["item 2", 4.0], ["item 3", 3.0], ["item 4", 2.0]],
+    "agent 2": [["item 1", 0.0], ["item 2", 0.0], ["item 3", 1.5], ["item 4", 0.0]],
+    "output": [["item 1", 5.0], ["item 3", 4.5]]}
+}

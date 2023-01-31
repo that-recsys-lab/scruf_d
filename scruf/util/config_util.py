@@ -27,7 +27,7 @@ def get_value_from_keys(config, key_list, default=None):
     else:
         head_key = key_list[0]
         if head_key in config:
-            return get_value_from_keys(config[head_key], key_list[1:])
+            return get_value_from_keys(config[head_key], key_list[1:], default=default)
         elif default is None:
             raise ConfigKeyMissingError(head_key)
         else:

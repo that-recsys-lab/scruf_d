@@ -62,11 +62,10 @@ class AgentCollection:
         return {name:default for name in self.agent_names()}
 
     # Note: Overwrites the agent list
-    def setup(self, config, fairness_history):
+    def setup(self, config):
 
         AgentCollection.check_config(config)
 
-        self.history = fairness_history
         agent_coll_config = config['agent']
 
         agent_list = []

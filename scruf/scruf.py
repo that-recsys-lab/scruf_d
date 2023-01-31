@@ -21,24 +21,29 @@ class Scruf:
             # Data sources
             self.user_data: UserArrivalData = BulkLoadedUserData()
             self.item_features: ItemFeatureData = ItemFeatureData()
-            ctx = ContextFactory.create_context_class(get_value_from_keys(config, ['context', 'context_class']))
+
+            ctx_class = get_value_from_keys(config, ['context', 'context_class'])
+            ctx = ContextFactory.create_context_class(ctx_class)
             self.context: Context = ctx
 
             # Mechanisms
-            amech = AllocationMechanismFactory.create_allocation_mechanism(config['allocation_class'])
+            amech_class = get_value_from_keys(config, ['allocation', 'allocation_class'])
+            amech = AllocationMechanismFactory.create_allocation_mechanism(amech_class)
             self.allocation_mechanism: AllocationMechanism = amech
-            cmech = ChoiceMechanismFactory.create_choice_mechanism(config['choice_class'])
+
+            cmech_class = get_value_from_keys(config, ['choice', 'choice_class'])
+            cmech = ChoiceMechanismFactory.create_choice_mechanism(cmech_class)
             self.choice_mechanism: ChoiceMechanism = cmech
 
             # Parameters
             self.output_list_size: int = get_value_from_keys(config, ['parameters', 'list_size'])
             self.iterations: int = get_value_from_keys(config, ['parameters', 'iterations'])
 
-    state = None
+    state: ScrufState = None
 
     def __init__(self, config):
         Scruf.state = Scruf.ScrufState(config)
-        ic(toml.dumps(config))
+        # ic(toml.dumps(config))
 
     @staticmethod
     def setup_experiment():
@@ -48,8 +53,10 @@ class Scruf:
         Scruf.state.user_data.setup(Scruf.state.config)
         Scruf.state.item_features.setup(Scruf.state.config)
         # Mechanisms
-        Scruf.state.allocation_mechanism.setup(Scruf.state.config)
-        Scruf.state.choice_mechanism.setup(Scruf.state.config)
+        amech_props = get_value_from_keys(Scruf.state.config, ['allocation', 'properties'], default={})
+        Scruf.state.allocation_mechanism.setup(amech_props)
+        cmech_props = get_value_from_keys(Scruf.state.config, ['choice', 'properties'], default={})
+        Scruf.state.choice_mechanism.setup(cmech_props)
         # Bookkeeping
         Scruf.state.history.setup(Scruf.state.config)
 
@@ -74,11 +81,11 @@ class Scruf:
         cmech = Scruf.state.choice_mechanism
 
         for user_info in Scruf.state.user_data.user_iterator(iterations, restart=restart):
-            allocation = amech.compute_allocation_probabilities(agents, history, context)
-            cmech.compute_choice(agents, allocation, user_info, Scruf.state.output_list_size)
+            allocation = amech.do_allocation()
+            cmech.do_choice(allocation, user_info)
             history.write_current_state()
 
 
     @staticmethod
-    def cleanup_experiment(self):
+    def cleanup_experiment():
         Scruf.state.history.cleanup()

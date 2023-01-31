@@ -17,3 +17,4 @@ class ResultsHistory(HistoryCollection):
         results = self.get_recent_results(k)
         items = [result.item for result in results]
         return Counter(items)
+

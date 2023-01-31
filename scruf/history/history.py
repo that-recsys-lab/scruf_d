@@ -1,5 +1,6 @@
-import json
+import jsons
 import pathlib
+import scruf
 
 from scruf.util import HistoryCollection, get_value_from_keys, check_key_lists, ConfigKeys, \
     get_working_dir_path
@@ -34,37 +35,25 @@ class ScrufHistory:
 
         self.allocation_history = HistoryCollection(window_size)
         self.choice_history = HistoryCollection(window_size)
-        self.fairness_history = HistoryCollection(window_size)
-        self.recommendation_input_history = ResultsHistory(window_size)
-        self.recommendation_output_history = ResultsHistory(window_size)
+        #self.recommendation_input_history = ResultsHistory(window_size)
+        #self.recommendation_output_history = ResultsHistory(window_size)
 
         self._history_file = open(self.working_dir / self.history_file_name, 'xt')
 
     def write_current_state(self):
-        # the unreranked recommendation list for the current user
-        rec_input = self.recommendation_input_history.get_most_recent()
-        current_time = self.recommendation_input_history.time
-        current_user = rec_input.results[0].user
-        # a dict of agent: weight
+        current_time = scruf.Scruf.state.user_data.current_user_index
+        current_user = scruf.Scruf.state.user_data.get_current_user()
         alloc = self.allocation_history.get_most_recent()
-        # a dict of agent: choice outputs
         choice = self.choice_history.get_most_recent()
-        # a dict of agent: fairness metric values
-        fairness = self.fairness_history.get_most_recent()
-        # the reranked recommendation list for the current user
-        rec_output = self.recommendation_output_history.get_most_recent()
 
         output_json = {
-            'current_time': current_time,
-            'current_user': current_user,
-            'fairness_metrics': fairness,
-            'allocation_weights': alloc,
-            'rec_input': rec_input,
+            'time': current_time,
+            'user': current_user,
+            'allocation': alloc,
             'choice': choice,
-            'rec_output': rec_output
         }
 
-        json_str = json.dumps(output_json)
+        json_str = jsons.dumps(output_json)
         self._history_file.write(json_str)
         self._history_file.write('\n')
         self._history_file.flush()

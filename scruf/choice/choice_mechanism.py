@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from scruf.agent import AgentCollection
 from scruf.util import PropertyMismatchError, InvalidChoiceMechanismError, UnregisteredChoiceMechanismError, \
     ResultList, PropertyCollection
+import scruf
 
 class ChoiceMechanism:
     """
@@ -28,6 +29,13 @@ class ChoiceMechanism:
     def get_property(self, property_name):
         return self.prop_coll.get_property(property_name)
 
+    def do_choice(self, allocation_probabilities, recommendations):
+        agents = scruf.Scruf.state.agents
+        list_size = scruf.Scruf.state.output_list_size
+        results = self.compute_choice(agents, allocation_probabilities, recommendations, list_size)
+        scruf.Scruf.state.history.choice_history.add_item(results)
+        return results['output']
+
     @abstractmethod
     def compute_choice(self, agents: AgentCollection, allocation_probabilities, recommended_items: ResultList, list_size):
         pass
@@ -45,7 +53,8 @@ class NullChoiceMechanism(ChoiceMechanism):
         Returns the recommendation list without any .
         :return: selected agent for each user
         """
-        return recommended_items.trim(list_size)
+        return {'original': recommended_items,
+                'output': recommended_items.trim(list_size)}
 
 class ChoiceMechanismFactory:
     """

@@ -51,6 +51,7 @@ class HistoryCollection:
             entry = self.collection[current_time - t]
             return entry.item
 
-
+    def is_empty(self):
+        return len(self.collection) == 0
 
 

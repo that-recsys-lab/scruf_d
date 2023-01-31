@@ -5,19 +5,16 @@ from scruf.util import PropertyMismatchError, UnregisteredFairnessMetricError, I
 
 ITEM_FEATURE_PROPERTIES = \
 {
-    'protected_feature': 'test_feature',
-    'protected_values': ['f1', 'f2', 'f3']
+    'feature': 'test_feature',
 }
 
 ITEM_FEATURE_PROPERTIES_MISSING = \
 {
-    'protected_feature': 'test_feature'
 }
 
 ITEM_FEATURE_PROPERTIES_EXTRA = \
 {
-    'protected_feature': 'test_feature',
-    'protected_values': ['f1', 'f2', 'f3'],
+    'feature': 'test_feature',
     'extra_prop': 42
 }
 
@@ -26,11 +23,11 @@ class FairnessMetricTestCase(unittest.TestCase):
         metric = ItemFeatureFairnessMetric()
         metric.setup(ITEM_FEATURE_PROPERTIES)
         self.assertEquals(set(metric.get_property_names()),
-                          {'protected_feature', 'protected_values'})
+                          {'feature'})
 
         props = metric.get_properties()
-        self.assertEquals(props['protected_feature'], ITEM_FEATURE_PROPERTIES['protected_feature'])
-        self.assertEquals(props['protected_values'], ITEM_FEATURE_PROPERTIES['protected_values'])
+        self.assertEquals(props['feature'], ITEM_FEATURE_PROPERTIES['feature'])
+        #self.assertEquals(props['protected_values'], ITEM_FEATURE_PROPERTIES['protected_values'])
 
     def test_metric_property_mismatch(self):
         metric = ItemFeatureFairnessMetric()

@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from scruf.util import PropertyCollection, InvalidAllocationMechanismError, UnregisteredAllocationMechanismError, \
     normalize_score_dict
 from scruf.agent import AgentCollection
+import scruf
 import random
 
 class AllocationMechanism(ABC):
@@ -29,6 +30,14 @@ class AllocationMechanism(ABC):
     def get_property(self, property_name):
         return self.prop_coll.get_property(property_name)
 
+    def do_allocation(self):
+        agents = scruf.Scruf.state.agents
+        history = scruf.Scruf.state.history
+        context = scruf.Scruf.state.context
+        allocation_result = self.compute_allocation_probabilities(agents, history, context)
+        history.allocation_history.add_item(allocation_result)
+        return allocation_result['output']
+
     @abstractmethod
     def compute_allocation_probabilities(self, agents, history, context):
         pass
@@ -45,6 +54,10 @@ class RandomAllocationMechanism(AllocationMechanism):
         allocation_probabilities = agents.agent_value_pairs()
         selected = random.choice(agents.agent_names())
         allocation_probabilities[selected] = 1
+        nan_scores = agents.agent_value_pairs(default=float('NaN'))
+        return {'fairness scores': nan_scores,
+                'compatibility scores': nan_scores,
+                'output': allocation_probabilities}
 
 class ScoredAllocationMechanism(AllocationMechanism):
 
@@ -72,7 +85,9 @@ class ScoredAllocationMechanism(AllocationMechanism):
 
         # Normalize the scores to sum to 1
         scores = normalize_score_dict(scores, inplace=True)
-        return scores
+        return {'fairness scores': fairness_values,
+                'compatibility scores': compat_values,
+                'output': scores}
 
 
 class ProductAllocationMechanism(ScoredAllocationMechanism):
@@ -123,9 +138,13 @@ class LeastFairAllocationMechanism(AllocationMechanism):
         lowest_agent = min(scores, key=scores.get)
         # Create empty probability vector
         probs = agents.agent_value_pairs(default=0.0)
-        # Set selected agent probability to 1.0
-        probs[lowest_agent] = 1.0
-        return probs
+        # Set selected agent probability to 1.0, unless all are fair in which case select none.
+        if any([score != 1.0 for score in scores.values()]):
+            probs[lowest_agent] = 1.0
+        nan_scores = agents.agent_value_pairs(default=float('NaN'))
+        return {'fairness scores': scores,
+                'compatibility scores': nan_scores,
+                'output': probs}
 
 class MostCompatibleAllocationMechanism(AllocationMechanism):
     """
@@ -152,9 +171,14 @@ class MostCompatibleAllocationMechanism(AllocationMechanism):
         highest_agent = max(scores, key=scores.get)
         # Create empty probability vector
         probs = agents.agent_value_pairs(default=0.0)
-        # Set selected agent probability to 1.0
+        # Set selected agent probability to 1.0, unless all are incompatible in which case select none.
+        if any([score != 0.0 for score in scores.values()]):
+            probs[highest_agent] = 1.0
         probs[highest_agent] = 1.0
-        return probs
+        nan_scores = agents.agent_value_pairs(default=float('NaN'))
+        return {'fairness scores': nan_scores,
+                'compatibility scores': scores,
+                'output': probs}
 
 class AllocationMechanismFactory:
     """

@@ -2,16 +2,16 @@ from . import FairnessMetric, FairnessMetricFactory
 
 class ItemFeatureFairnessMetric(FairnessMetric):
     """
-    An ItemFeatureFairnessMetric is one where recommended items are associated with a single protected
-    feature and a set of protected values.
+    An ItemFeatureFairnessMetric is one where recommended items are associated with a protected
+    feature defined in the feature section.
     """
-    _PROPERTY_NAMES = ['protected_feature', 'protected_values']
+    _PROPERTY_NAMES = ['feature']
 
     def __init__(self):
         super().__init__()
 
     def __str__(self):
-        return f"ItemFeatureFairnessMetric: feature = {self.get_property('protected_feature')}"
+        return f"ItemFeatureFairnessMetric: feature = {self.get_property('feature')}"
 
     def setup(self, input_properties: dict, names=None):
         if names is None:
@@ -37,7 +37,7 @@ class ProportionalItemFM(ItemFeatureFairnessMetric):
         super().__init__()
 
     def __str__(self):
-        return f"ProportionalItemFM: feature = {self.get_propery('protected_feature')}"
+        return f"ProportionalItemFM: feature = {self.get_propery('feature')}"
 
     def setup(self, input_properties: dict, names=None):
         if names is None:
@@ -46,7 +46,11 @@ class ProportionalItemFM(ItemFeatureFairnessMetric):
             names = ProportionalItemFM._PROPERTY_NAMES + names
         super().setup(input_properties, names)
 
+    # No data means assume fairness
+    # Might want this to be configurable.
     def compute_fairness(self, history):
+        if history.choice_history.is_empty():
+            return 1.0
         return float('nan')
 
 

@@ -9,6 +9,7 @@ readme = "README.md"
 python = "^3.9"
 toml = "*"
 icecream = "*"
+jsons = "^1.6.3"
 
 [build-system]
 requires = ["poetry-core"]
