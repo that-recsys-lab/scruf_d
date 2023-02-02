@@ -57,7 +57,7 @@ choice_scorer_class = "zero_scorer"
 
 [agent.f1.metric]
 feature = "Feature 1"
-proportion = 0.5
+proportion = 0.75
 
 [agent.f2]
 name = "Feature 2 Agent"
@@ -78,7 +78,7 @@ choice_class = "null_choice"
 
 TEST_FEATURE_DATA = '''item1, feature1, a
 item1, feature2, 1
-item2, feature1, b
+item2, feature1, d
 item3, feature1, a
 item3, feature2, 1
 item4, feature1, c
@@ -174,7 +174,7 @@ class ScrufIntegrationTestCase(unittest.TestCase):
             line = history_file.readline()
 
         history = json.loads(line)
-        ic(history)
+        #ic(history)
 
         # It should have processed user 1
         self.assertEqual(0, history['time'])
@@ -188,6 +188,31 @@ class ScrufIntegrationTestCase(unittest.TestCase):
         self.assertEqual(len(choice_output), 2)
         self.assertTrue(choice_output[0]['item'], 'item1')
         self.assertTrue(choice_output[1]['item'], 'item2')
+
+    # Need to get proportional fairness working to test this.
+    def test_run_two(self):
+        self.config['location']['path'] = self.temp_dir_path
+        scruf = Scruf(self.config)
+        scruf.setup_experiment()
+        scruf.run_loop(iterations=2)
+        scruf.cleanup_experiment()
+
+        self.assertEqual(1, scruf.state.user_data.current_user_index)
+
+        with open(self.temp_dir_path / TEST_HISTORY_FILE, 'r') as history_file:
+            line1 = history_file.readline()
+            line2 = history_file.readline()
+
+        history = json.loads(line2)
+        ic(history)
+
+        # It should have processed user 2
+        self.assertEqual(1, history['time'])
+        self.assertEqual('user2', history['user'])
+        self.assertIsInstance(history['allocation'], dict)
+        alloc = history['allocation']
+        fairness = alloc['fairness scores']
+        output = alloc['output']
 
 if __name__ == '__main__':
     unittest.main()

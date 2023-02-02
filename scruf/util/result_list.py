@@ -9,23 +9,15 @@ class ResultEntry:
         self.item = item
         self.score = score
         self.rank = rank
-        self.old_scores = []
-        self.old_ranks = []
 
     def __repr__(self):
-        return f'ResultEntry: U:{self.user}, I:{self.item}, S:{self.score}, R{self.rank}, OS:{self.old_scores}, OR:{self.old_ranks}'
-
-    def update_score(self, new_score):
-        self.old_scores.append(self.score)
-        self.score = new_score
-
-    def update_rank(self, new_rank):
-        if not self.rank == -1:
-            self.old_ranks.append(self.rank)
-        self.rank = new_rank
+        return f'ResultEntry: U:{self.user}, I:{self.item}, S:{self.score}, R{self.rank}'
 
 
 class ResultList:
+
+    def __repr__(self):
+        return f'Result: {self.results}'
 
     def __init__(self):
         self.results = []
@@ -55,7 +47,7 @@ class ResultList:
     def sort(self):
         sorted_results = sorted(self.results, key=lambda result: result.score, reverse=True)
         for i in range(0, len(sorted_results)):
-            sorted_results[i].update_rank(i)
+            sorted_results[i].rank= i
 
         self.results = sorted_results
 
@@ -71,7 +63,7 @@ class ResultList:
     def rescore_no_sort(self, score_fn):
         for result in self.results:
             new_score = score_fn(result)
-            result.update_score(new_score)
+            result.score = new_score
 
     def filter_results(self, filter_fn):
         return filter(filter_fn, self.results)
@@ -114,7 +106,3 @@ class ResultList:
         output.sort()
 
         return output
-
-
-
-

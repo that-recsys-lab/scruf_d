@@ -1,4 +1,5 @@
 from . import FairnessMetric, FairnessMetricFactory
+import scruf
 
 class ItemFeatureFairnessMetric(FairnessMetric):
     """
@@ -37,7 +38,7 @@ class ProportionalItemFM(ItemFeatureFairnessMetric):
         super().__init__()
 
     def __str__(self):
-        return f"ProportionalItemFM: feature = {self.get_propery('feature')}"
+        return f"ProportionalItemFM: feature = {self.get_property('feature')}"
 
     def setup(self, input_properties: dict, names=None):
         if names is None:
@@ -51,7 +52,33 @@ class ProportionalItemFM(ItemFeatureFairnessMetric):
     def compute_fairness(self, history):
         if history.choice_history.is_empty():
             return 1.0
-        return float('nan')
+        else:
+            prior_results = history.choice_history.get_recent(-1)
+            target_proportion = float(self.get_property('proportion'))
+            protected, total_items = self.count_protected(prior_results)
+            protected_ratio = float(protected) / total_items
+            # If protected ratio is at or above
+            if protected_ratio > target_proportion:
+                protected_ratio = target_proportion
+            # 1.0 is ratio = target
+            fairness_value = protected_ratio / target_proportion
+            return fairness_value
+
+
+    def count_protected(self, history_entries):
+        feature = self.get_property('feature')
+        item_data = scruf.Scruf.state.item_features
+        protected_count = 0
+        total_count = 0
+        for history_entry in history_entries:
+            result = history_entry['output']
+            protected_vector = [1 if item_data.is_protected(feature, result_entry.item) else 0 \
+                                    for result_entry in result.get_results()]
+            protected_count += sum(protected_vector)
+            total_count += len(result.get_results())
+
+        return protected_count, total_count
+
 
 
 # Register the metrics created above
