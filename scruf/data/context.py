@@ -2,6 +2,7 @@
 # opportunity (i.e. a user).
 from abc import ABC, abstractmethod
 from scruf.util import PropertyCollection, InvalidContextClassError, UnregisteredContextClassError
+import toml
 
 class Context(ABC):
 
@@ -31,7 +32,20 @@ class NullContext(Context):
     def get_context(self, user_id):
         return None
 
+class TomlFileContext(Context):
+    def __init__(self, file_path):
+        super().__init__()
+        self.file_path = file_path
 
+    def get_context(self, user_id):
+        with open(self.file_path, 'r') as f:
+            data = toml.load(f)
+            user_context = data.get(user_id)
+            if user_context is None:
+                return None
+            self.setup(user_context, names=['user_id'])
+            return self.prop_coll.get_properties()
+        
 class ContextFactory:
     """
     The ContextFactory associates names with class objects so these can be instantiated
@@ -61,6 +75,6 @@ class ContextFactory:
 
 
 # Register the context classes created above
-context_specs = [("null_context", NullContext)]
+context_specs = [("null_context", NullContext),("toml_file_context", TomlFileContext)]
 
 ContextFactory.register_context_classes(context_specs)
