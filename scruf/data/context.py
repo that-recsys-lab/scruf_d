@@ -2,6 +2,7 @@
 # opportunity (i.e. a user).
 from abc import ABC, abstractmethod
 from scruf.util import PropertyCollection, InvalidContextClassError, UnregisteredContextClassError
+import csv
 
 class Context(ABC):
 
@@ -58,9 +59,26 @@ class ContextFactory:
         if context_class is None:
             raise UnregisteredContextClassError(context_type)
         return context_class()
+    
+
+class CSVContext(Context):
+    def __init__(self, csv_file_path):
+        super().__init__()
+        self.csv_file_path = csv_file_path
+
+    def get_context(self, user_id):
+        with open(self.csv_file_path, "r") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                if row["user_id"] == user_id:
+                    return row
+        return None
 
 
 # Register the context classes created above
-context_specs = [("null_context", NullContext)]
+context_specs = [("null_context", NullContext), ("csv_context", CSVContext)]
 
 ContextFactory.register_context_classes(context_specs)
+
+# Create an instance of CSVContext class with a specific csv_file_path
+csv_context = ContextFactory.create_context_class("csv_context", csv_file_path="/path/to/compatibility.csv")
