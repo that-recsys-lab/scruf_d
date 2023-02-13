@@ -10,7 +10,7 @@ class CompatibilityMetric (PropertyMixin,ABC):
     """
 
     @abstractmethod
-    def compute_compatibility(self, history):
+    def compute_compatibility(self, context):
         pass
 
 class AlwaysOneCompatibilityMetric(CompatibilityMetric):

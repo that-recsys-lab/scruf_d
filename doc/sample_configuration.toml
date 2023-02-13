@@ -47,6 +47,7 @@ compatibility = "entropy"
 
 [agent.country.metric]
 feature = "Country"
+proportion = 0.3
 
 [agent.sector]
 name = "Sector"
@@ -73,5 +74,7 @@ compatibility_exponent = 0.7
 
 [choice]
 algorithm = "fixed_utility"
+
+[choice.properties]
 delta = 0.5
 alpha = 0.2

@@ -35,20 +35,41 @@ Specification for the choice mechanism
 
 ```
 [location]
-path = "my/experiment/here"
+path = "your_path/here"
 overwrite = "true"
 
 [data]
-rec_filename = "data/recommendations.txt"
-feature_filename = "data/item_features.txt"
+rec_filename = "recommendations.txt"
+feature_filename = "item_features.txt"
 
 [output]
-path = "results"
+filename = "history_file.json"
 
 [parameters]
 list_size = 10
 iterations = -1 # -1 means run through all the users
 initialize = "skip"
+history_window_size = 50
+
+[context]
+context_class = "null_context"
+
+[feature]
+
+[feature.country]
+name = "Country"
+protected_feature = "country"
+protected_values = ["ug", "th", "ke", "ha"]
+
+[feature.sector]
+name = "Sector"
+protected_feature = "sector"
+protected_values = [7, 18, 35]
+
+[feature.loan_size]
+name = "Loan Size"
+protected_feature = "bucket5"
+protected_values = [1]
 
 [agent]
 
@@ -58,33 +79,35 @@ metric_class = "proportional_fair"
 compatibility = "entropy"
 
 [agent.country.metric]
-protected_feature = "country"
-protected_values = ["ug", "th", "ke", "ha"]
+feature = "Country"
 
 [agent.sector]
 name = "Sector"
 metric_class = "list_exposure"
-compatibility = "entropy"
+compatibility_class = "entropy"
 
 [agent.sector.metric]
-protected_feature = "sector"
-protected_values = [7, 18, 35]
+feature = "Sector"
 
 [agent.loan_size]
 name = "Loan Size"
 metric_class = "list_exposure"
-compatibility = "risk_aversion"
+compatibility_class = "risk_aversion"
 
 [agent.loan_size.metric]
-protected_feature = "bucket5"
-protected_values = [1]
+feature = "Loan Size"
 
 [allocation]
-algorithm = "lottery_single"
-history_length = 10
+algorithm = "weighted_product_allocation"
+
+[allocation.properties]
+fairness_exponent = 1.0
+compatibility_exponent = 0.7
 
 [choice]
 algorithm = "fixed_utility"
+
+[choice.properties]
 delta = 0.5
 alpha = 0.2
 ```
