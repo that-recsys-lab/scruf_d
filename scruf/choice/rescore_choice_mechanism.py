@@ -16,13 +16,6 @@ class RescoreChoiceMechanism(ChoiceMechanism):
     def __str__(self):
         return f"ReScoreChoiceMechanism: rec_weight = {self.get_property('recommender_weight')}"
 
-    def setup(self, input_properties: dict, names=None):
-        if names is None:
-            names = RescoreChoiceMechanism._PROPERTY_NAMES
-        else:
-            names = RescoreChoiceMechanism._PROPERTY_NAMES + names
-        super().setup(input_properties, names)
-
     def compute_choice(self, agents: AgentCollection, allocation_probabilities, recommended_items: ResultList, list_size):
         results_dict = {}
         for agent in agents.agents:
@@ -36,7 +29,7 @@ class RescoreChoiceMechanism(ChoiceMechanism):
         recommended_items.rescore(lambda entry: entry.score * rec_weight)
         results_dict['original'] = recommended_items
 
-        new_scores = ResultList.combine_results_dict(agent_results_dict)
+        new_scores = ResultList.combine_results_dict(results_dict)
         new_scores.trim(list_size)
         results_dict['output'] = new_scores
         return agent_results

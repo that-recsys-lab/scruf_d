@@ -1,30 +1,13 @@
 from abc import ABC, abstractmethod
-from scruf.util import InvalidCompatibilityMetricError, UnregisteredCompatibilityMetricError, PropertyCollection
+from scruf.util import InvalidCompatibilityMetricError, UnregisteredCompatibilityMetricError, PropertyMixin
 
-class CompatibilityMetric (ABC):
+class CompatibilityMetric (PropertyMixin,ABC):
     """
     A CompatibilityMetric uses a system History & * to computes a score in the range [0..1] reflecting the
     compatibility of the users over the Recommended Items with some particular concern. All metrics are
     initialized with a dictionary of property name, value pairs. Each subclass has to specify the
     property names that it expects.
     """
-
-    def __init__(self):
-        self.prop_coll = PropertyCollection()
-
-    def setup(self, input_properties: dict, names=None):
-        if names is None:
-            names = []
-        self.prop_coll.setup(input_properties, names)
-
-    def get_property_names(self):
-        return self.prop_coll.get_property_names()
-
-    def get_properties(self):
-        return self.prop_coll.get_properties()
-
-    def get_property(self, property_name):
-        return self.prop_coll.get_property(property_name)
 
     @abstractmethod
     def compute_compatibility(self, history):

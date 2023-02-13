@@ -1,5 +1,5 @@
+from abc import ABC
 from .errors import PropertyMismatchError
-
 
 class PropertyCollection:
     def __init__(self):
@@ -42,3 +42,31 @@ class PropertyCollection:
             return
         else:
             raise PropertyMismatchError(self, list(diff_left), list(diff_right))
+
+
+class PropertyMixin():
+
+    _PROPERTY_NAMES = []
+
+    def __init__(self):
+        self.prop_coll = PropertyCollection()
+
+    def setup(self, input_properties: dict):
+        self.prop_coll.setup(input_properties, self._PROPERTY_NAMES)
+
+    def configure_names(self, subclass_props=None):
+        if subclass_props is None:
+            names = self._PROPERTY_NAMES
+        else:
+            names = self._PROPERTY_NAMES + subclass_props
+        return names
+
+
+    def get_property_names(self):
+        return self.prop_coll.get_property_names()
+
+    def get_properties(self):
+        return self.prop_coll.get_properties()
+
+    def get_property(self, property_name):
+        return self.prop_coll.get_property(property_name)

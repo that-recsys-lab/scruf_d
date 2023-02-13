@@ -3,32 +3,15 @@ from abc import ABC, abstractmethod
 
 from scruf.agent import AgentCollection
 from scruf.util import PropertyMismatchError, InvalidChoiceMechanismError, UnregisteredChoiceMechanismError, \
-    ResultList, PropertyCollection
+    ResultList, PropertyMixin
 import scruf
 
-class ChoiceMechanism:
+class ChoiceMechanism(PropertyMixin,ABC):
     """
     A ChoiceMechanism takes in a list of allocation probabilities for all agents per user, a list of recommended items for each user, and
     a list of agents, and selects an agent for each user based on the allocation probabilities. After this the agent's preferred item is given 
     a boost in the ranking of the recommended items. Finally, a new recommended list is generated for each user based on the boosted ranking.
     """
-
-    def __init__(self):
-        self.prop_coll = PropertyCollection()
-
-    def setup(self, input_properties: dict, names=None):
-        if names is None:
-            names = []
-        self.prop_coll.setup(input_properties, names)
-
-    def get_property_names(self):
-        return self.prop_coll.get_property_names()
-
-    def get_properties(self):
-        return self.prop_coll.get_properties()
-
-    def get_property(self, property_name):
-        return self.prop_coll.get_property(property_name)
 
     def do_choice(self, allocation_probabilities, recommendations):
         agents = scruf.Scruf.state.agents

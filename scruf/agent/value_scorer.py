@@ -18,13 +18,6 @@ class FixedValueChoiceScorer(ChoiceScorer):
         prot_feature = self.get_property('protected_feature')
         return f"FixedValueChoiceScore: protected feature = {prot_feature} associated value {prot_value}"
 
-    def setup(self, input_properties: dict, names=None):
-        if names is None:
-            names = FixedValueChoiceScorer._PROPERTY_NAMES
-        else:
-            names = FixedValueChoiceScorer._PROPERTY_NAMES + names
-        super().setup(input_properties, names)
-
     # For every item in the list
     #   check if it is in the protected feature set
     #   if so, replace the score with the score + value

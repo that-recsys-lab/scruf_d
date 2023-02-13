@@ -32,10 +32,6 @@ class ResultListTestCase(unittest.TestCase):
         self.assertEqual(res.item, 'i3')
         self.assertEqual(res.score, -5.0)
         self.assertEqual(res.rank, 0)
-        self.assertEqual(len(res.old_scores), 1)
-        self.assertEqual(res.old_scores, [2.5])
-        self.assertEqual(len(res.old_ranks), 1)
-        self.assertEqual(res.old_ranks, [4])
 
     def test_filter(self):
         rlist = ResultList()

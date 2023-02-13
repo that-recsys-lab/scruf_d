@@ -14,13 +14,6 @@ class ItemFeatureFairnessMetric(FairnessMetric):
     def __str__(self):
         return f"ItemFeatureFairnessMetric: feature = {self.get_property('feature')}"
 
-    def setup(self, input_properties: dict, names=None):
-        if names is None:
-            names = ItemFeatureFairnessMetric._PROPERTY_NAMES
-        else:
-            names = ItemFeatureFairnessMetric._PROPERTY_NAMES + names
-        super().setup(input_properties, names)
-
     def compute_fairness(self, history):
         return float('nan')
 
@@ -32,20 +25,13 @@ class ProportionalItemFM(ItemFeatureFairnessMetric):
     is >= the given value, the fairness is 1.0. It linearly interpolates to zero.
     """
 
-    _PROPERTY_NAMES = ['proportion']
+    _PROPERTY_NAMES = ['feature', 'proportion']
 
     def __init__(self):
         super().__init__()
 
     def __str__(self):
         return f"ProportionalItemFM: feature = {self.get_property('feature')}"
-
-    def setup(self, input_properties: dict, names=None):
-        if names is None:
-            names = ProportionalItemFM._PROPERTY_NAMES
-        else:
-            names = ProportionalItemFM._PROPERTY_NAMES + names
-        super().setup(input_properties, names)
 
     # No data means assume fairness
     # Might want this to be configurable.

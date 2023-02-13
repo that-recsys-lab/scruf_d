@@ -1,31 +1,14 @@
 from abc import ABC, abstractmethod
-from scruf.util import InvalidFairnessMetricError, UnregisteredFairnessMetricError, PropertyCollection
+from scruf.util import InvalidFairnessMetricError, UnregisteredFairnessMetricError, PropertyMixin
 
 
-class FairnessMetric (ABC):
+class FairnessMetric (PropertyMixin,ABC):
     """
     A FairnessMetric uses a system History to computes a score in the range [0..1] reflecting the
     fairness relative to some particular concern of the outcomes over that history. All metrics are
     initialized with a dictionary of property name, value pairs. Each subclass has to specify the
     property names that it expects.
     """
-
-    def __init__(self):
-        self.prop_coll = PropertyCollection()
-
-    def setup(self, input_properties: dict, names=None):
-        if names is None:
-            names = []
-        self.prop_coll.setup(input_properties, names)
-
-    def get_property_names(self):
-        return self.prop_coll.get_property_names()
-
-    def get_properties(self):
-        return self.prop_coll.get_properties()
-
-    def get_property(self, property_name):
-        return self.prop_coll.get_property(property_name)
 
     @abstractmethod
     def compute_fairness(self, history):

@@ -1,26 +1,9 @@
 # Context provides the basis of computing the compatibility between an agent and a recommendation
 # opportunity (i.e. a user).
 from abc import ABC, abstractmethod
-from scruf.util import PropertyCollection, InvalidContextClassError, UnregisteredContextClassError
+from scruf.util import PropertyMixin, InvalidContextClassError, UnregisteredContextClassError
 
-class Context(ABC):
-
-    def __init__(self):
-        self.prop_coll = PropertyCollection()
-
-    def setup(self, input_properties: dict, names=None):
-        if names is None:
-            names = []
-        self.prop_coll.setup(input_properties, names)
-
-    def get_property_names(self):
-        return self.prop_coll.get_property_names()
-
-    def get_properties(self):
-        return self.prop_coll.get_properties()
-
-    def get_property(self, property_name):
-        return self.prop_coll.get_property(property_name)
+class Context(PropertyMixin,ABC):
 
     @abstractmethod
     def get_context(self, user_id):

@@ -1,34 +1,17 @@
 from abc import ABC, abstractmethod
-from scruf.util import PropertyCollection, InvalidAllocationMechanismError, UnregisteredAllocationMechanismError, \
+from scruf.util import PropertyMixin, InvalidAllocationMechanismError, UnregisteredAllocationMechanismError, \
     normalize_score_dict
 from scruf.agent import AgentCollection
 import scruf
 import random
 
-class AllocationMechanism(ABC):
+class AllocationMechanism(PropertyMixin,ABC):
     """
     An AllocationMechanism computes allocation probabilities for a
     collection of FairnessAgents based on their fairness and compatibility scores. All mechanisms are
     initialized with a dictionary of property name, value pairs. Each subclass has to specify the
     property names that it expects.
     """
-
-    def __init__(self):
-        self.prop_coll = PropertyCollection()
-
-    def setup(self, input_properties: dict, names=None):
-        if names is None:
-            names = []
-        self.prop_coll.setup(input_properties, names)
-
-    def get_property_names(self):
-        return self.prop_coll.get_property_names()
-
-    def get_properties(self):
-        return self.prop_coll.get_properties()
-
-    def get_property(self, property_name):
-        return self.prop_coll.get_property(property_name)
 
     def do_allocation(self):
         agents = scruf.Scruf.state.agents
@@ -108,13 +91,6 @@ class WeightedProductAllocationMechanism(ScoredAllocationMechanism):
 
     def __str__(self):
         return f"WeightedProductAllocation: fairness = {self.get_propery('fairness_exponent')}, compatibility = {self.get_propery('compatibility_exponent')}"
-
-    def setup(self, input_properties: dict, names=None):
-        if names is None:
-            names = WeightedProductAllocationMechanism._PROPERTY_NAMES
-        else:
-            names = WeightedProductAllocationMechanism._PROPERTY_NAMES + names
-        super().setup(input_properties, names)
 
     def score(self, agent_name, fairness_values, compatibility_values):
         fairness_exp = self.get_property('fairness_exponent')

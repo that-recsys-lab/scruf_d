@@ -22,11 +22,11 @@ class FairnessMetricTestCase(unittest.TestCase):
     def test_metric_creation(self):
         metric = ItemFeatureFairnessMetric()
         metric.setup(ITEM_FEATURE_PROPERTIES)
-        self.assertEquals(set(metric.get_property_names()),
+        self.assertEqual(set(metric.get_property_names()),
                           {'feature'})
 
         props = metric.get_properties()
-        self.assertEquals(props['feature'], ITEM_FEATURE_PROPERTIES['feature'])
+        self.assertEqual(props['feature'], ITEM_FEATURE_PROPERTIES['feature'])
         #self.assertEquals(props['protected_values'], ITEM_FEATURE_PROPERTIES['protected_values'])
 
     def test_metric_property_mismatch(self):
