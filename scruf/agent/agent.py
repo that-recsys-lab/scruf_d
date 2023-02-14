@@ -1,9 +1,10 @@
 from .fairness_metric import FairnessMetricFactory
 from .compatibility_metric import CompatibilityMetricFactory
 from .choice_scorer import ChoiceScorerFactory
-from scruf.util import is_valid_keys
+from scruf.util import get_value_from_keys
 from scruf.util.errors import ConfigKeyMissingError, ConfigNoAgentsError
 from scruf.util import ResultList
+import scruf
 from icecream import ic
 
 class FairnessAgent:
@@ -45,10 +46,12 @@ class FairnessAgent:
 class AgentCollection:
 
     @classmethod
-    def check_config(cls, config):
-        if not is_valid_keys(config, ['agent']):
-            raise ConfigKeyMissingError('agent')
-        if len(config['agent']) == 0:
+    def check_config(cls, config=None):
+        if config is None:
+            agents = scruf.Scruf.get_value_from_keys(['agent'])
+        else:
+            agents = get_value_from_keys(['agent'], config)
+        if len(agents) == 0:
             raise ConfigNoAgentsError()
 
     def __init__(self):
@@ -62,7 +65,7 @@ class AgentCollection:
         return {name:default for name in self.agent_names()}
 
     # Note: Overwrites the agent list
-    def setup(self, config):
+    def setup(self, config=None):
 
         AgentCollection.check_config(config)
 

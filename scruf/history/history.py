@@ -3,7 +3,7 @@ import pathlib
 import scruf
 
 from scruf.util import HistoryCollection, get_value_from_keys, check_key_lists, ConfigKeys, \
-    get_working_dir_path
+    get_working_dir_path, ConfigKeyMissingError
 from .results_history import ResultsHistory
 
 
@@ -13,7 +13,7 @@ class ScrufHistory:
 
     @classmethod
     def check_config(cls, config):
-        if not check_key_lists(config, ScrufHistory.CONFIG_ELEMENTS):
+        if not check_key_lists(ScrufHistory.CONFIG_ELEMENTS, config):
             raise ConfigKeyMissingError(ScrufHistory.CONFIG_ELEMENTS)
 
     def __init__(self):
@@ -30,8 +30,8 @@ class ScrufHistory:
         ScrufHistory.check_config(config)
 
         self.working_dir = get_working_dir_path(config)
-        self.history_file_name = get_value_from_keys(config, ConfigKeys.OUTPUT_PATH_KEYS)
-        window_size = get_value_from_keys(config, ConfigKeys.WINDOW_SIZE_KEYS)
+        self.history_file_name = get_value_from_keys(ConfigKeys.OUTPUT_PATH_KEYS, config)
+        window_size = get_value_from_keys(ConfigKeys.WINDOW_SIZE_KEYS, config)
 
         self.allocation_history = HistoryCollection(window_size)
         self.choice_history = HistoryCollection(window_size)

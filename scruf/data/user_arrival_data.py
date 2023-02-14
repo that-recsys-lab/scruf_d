@@ -8,6 +8,7 @@ from scruf.util import get_path_from_keys, ConfigKeys
 import csv
 from scruf.util import ResultList, ResultEntry
 from collections import defaultdict
+import scruf
 from icecream import ic
 
 class UserArrivalData(ABC):
@@ -33,7 +34,7 @@ class BulkLoadedUserData(UserArrivalData):
         return f"UserArrivalData: currentUser = {self.arrival_sequence[self.current_user_index]}"
 
     def setup(self, config):
-        self.data_file = get_path_from_keys(config, ConfigKeys.DATA_FILENAME_KEYS, check_exists=True)
+        self.data_file = get_path_from_keys(ConfigKeys.DATA_FILENAME_KEYS, config, check_exists=True)
         self._load_data()
 
     def _load_data(self):

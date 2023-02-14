@@ -35,22 +35,22 @@ class ConfigUtilTestCase(unittest.TestCase):
         self.config = toml.loads(SAMPLE_TOML)
 
     def test_valid_paths(self):
-        self.assertTrue(is_valid_keys(self.config, ['c', '3', 'value']))
-        self.assertFalse(is_valid_keys(self.config, ['d', 'fake']))
+        self.assertTrue(is_valid_keys(['c', '3', 'value'], config=self.config))
+        self.assertFalse(is_valid_keys(['d', 'fake'], self.config))
 
     def test_get_value(self):
-        self.assertEqual(get_value_from_keys(self.config, ['c', '3', 'value']), 4)
-        self.assertEqual(get_value_from_keys(self.config, ['b', 'bar']), 'foo')
-        self.assertEqual(get_value_from_keys(self.config, ['e', 'list']), [1, 2, 3])
+        self.assertEqual(get_value_from_keys(['c', '3', 'value'], config=self.config), 4)
+        self.assertEqual(get_value_from_keys(['b', 'bar'], config=self.config), 'foo')
+        self.assertEqual(get_value_from_keys(['e', 'list'], config=self.config), [1, 2, 3])
 
     def test_check_paths(self):
         path_specs = [['c', '3', 'value'],
                      ['c', '1', 'value'],
                      ['b', 'bar']]
 
-        self.assertTrue(check_key_lists(self.config, path_specs))
+        self.assertTrue(check_key_lists(path_specs, config=self.config))
         path_specs.append(['e', 'lalalala'])
-        self.assertFalse(check_key_lists(self.config, path_specs))
+        self.assertFalse(check_key_lists(path_specs, config=self.config))
 
 
 if __name__ == '__main__':

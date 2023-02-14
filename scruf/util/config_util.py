@@ -1,5 +1,6 @@
 # Utilities for working with the TOML input
 from scruf.util.errors import ConfigKeyMissingError, PathDoesNotExistError
+import scruf
 from pathlib import Path
 
 class ConfigKeys:
@@ -10,41 +11,41 @@ class ConfigKeys:
     DATA_FILENAME_KEYS = ['data', 'rec_filename']
 
 
-def is_valid_keys(config, key_list):
+def is_valid_keys(key_list, config):
     if len(key_list) == 0:
         return True
     else:
         head_key = key_list[0]
         if head_key in config:
-            return is_valid_keys(config[head_key], key_list[1:])
+            return is_valid_keys(key_list[1:], config=config[head_key])
         else:
             return False
 
 
-def get_value_from_keys(config, key_list, default=None):
+def get_value_from_keys(key_list, config, default=None):
     if len(key_list) == 0:
         return config
     else:
         head_key = key_list[0]
         if head_key in config:
-            return get_value_from_keys(config[head_key], key_list[1:], default=default)
+            return get_value_from_keys(key_list[1:], config[head_key], default=default)
         elif default is None:
             raise ConfigKeyMissingError(head_key)
         else:
             return default
 
 
-def check_key_lists(config, path_specs):
-    return all(map(lambda path: is_valid_keys(config, path), path_specs))
+def check_key_lists(path_specs, config):
+    return all(map(lambda path: is_valid_keys(path, config), path_specs))
 
 
 def get_working_dir_path(config):
-    return Path(get_value_from_keys(config, ConfigKeys.WORKING_PATH_KEYS)).absolute()
+    return Path(get_value_from_keys(ConfigKeys.WORKING_PATH_KEYS, config)).absolute()
 
 
-def get_path_from_keys(config, keys, check_exists=False):
+def get_path_from_keys(keys, config, check_exists=False):
     working_dir = get_working_dir_path(config)
-    relative_dir = get_value_from_keys(config, keys)
+    relative_dir = get_value_from_keys(keys, config)
     full_path = working_dir / relative_dir
     if check_exists:
         if full_path.exists():

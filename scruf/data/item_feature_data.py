@@ -19,13 +19,12 @@ class ItemFeatureData:
         self.protected_item_index = None
 
     def setup(self, config):
-        self.feature_file = get_path_from_keys(config, ConfigKeys.FEATURE_FILENAME_KEYS, check_exists=True)
+        self.feature_file = get_path_from_keys(ConfigKeys.FEATURE_FILENAME_KEYS, check_exists=True, config=config)
 
         self.load_item_features()
 
         self.known_features = {}
-        if is_valid_keys(config, ['feature']):
-            self.setup_features(config['feature'])
+        self.setup_features(config['feature'])
 
         self.setup_indices()
 
