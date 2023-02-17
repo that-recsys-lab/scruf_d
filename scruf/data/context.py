@@ -1,10 +1,15 @@
 # Context provides the basis of computing the compatibility between an agent and a recommendation
 # opportunity (i.e. a user).
 from abc import ABC, abstractmethod
+from collections import defaultdict
 from scruf.util import PropertyMixin, InvalidContextClassError, UnregisteredContextClassError
 import csv
 
 class Context(PropertyMixin,ABC):
+
+    @abstractmethod
+    def setup(self, config):
+        pass
 
     @abstractmethod
     def get_context(self, user_id):
@@ -12,23 +17,33 @@ class Context(PropertyMixin,ABC):
 
 class NullContext(Context):
 
+    def setup(self, config):
+        pass
+
     def get_context(self, user_id):
         return None
     
 class CSVContext(Context):
     _PROPERTIES = ["compatibility_file"]
-    
-    def get_context(self, user_id):
+
+    def __init__(self):
+        self.compatibility_dict = defaultdict(dict)
+
+    def setup(self, config):
         comp_file = self.get_property("compatibility_file")
         if not comp_file:
             raise ValueError("compatibility_file property not set")
 
         with open(comp_file, "r") as f:
-            reader = csv.DictReader(f)
+            reader = csv.DictReader(f, fieldnames=['user_id', 'agent', 'compatibility'])
             for row in reader:
-                if row["user_id"] == user_id:
-                    return row
-        return None
+                user_id = row['user_id']
+                agent = row['agent']
+                compatibility = float(row['compatibility'])
+                self.compatibility_dict[user_id][agent] = compatibility
+    
+    def get_context(self, user_id):
+        return self.compatibility_dict[user_id]
 
 
 class ContextFactory:

@@ -52,6 +52,7 @@ class Scruf:
         # Data sources
         Scruf.state.user_data.setup(Scruf.state.config)
         Scruf.state.item_features.setup(Scruf.state.config)
+        Scruf.state.context.setup(Scruf.state.config)
         # Mechanisms
         amech_props = Scruf.get_value_from_keys(['allocation', 'properties'], default={})
         Scruf.state.allocation_mechanism.setup(amech_props)
