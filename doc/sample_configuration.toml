@@ -19,7 +19,10 @@ initialize = "skip"
 history_window_size = 50
 
 [context]
-context_class = "null_context"
+context_class = "csv_context"
+
+[context.properties]
+compatibility_file = "compat_data.csv"
 
 [feature]
 
