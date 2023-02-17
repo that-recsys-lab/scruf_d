@@ -2,20 +2,20 @@
 # opportunity (i.e. a user).
 from abc import ABC, abstractmethod
 from collections import defaultdict
-from scruf.util import PropertyMixin, InvalidContextClassError, UnregisteredContextClassError
+from scruf.util import PropertyMixin, InvalidContextClassError, UnregisteredContextClassError, get_path_from_keys
 import csv
 
-class Context(PropertyMixin,ABC):
 
-    @abstractmethod
-    def setup(self, config):
-        pass
+class Context(PropertyMixin,ABC):
 
     @abstractmethod
     def get_context(self, user_id):
         pass
 
 class NullContext(Context):
+
+    def __init__(self):
+        super().__init__()
 
     def setup(self, config):
         pass
@@ -24,15 +24,16 @@ class NullContext(Context):
         return None
     
 class CSVContext(Context):
-    _PROPERTIES = ["compatibility_file"]
+    _PROPERTY_NAMES = ["compatibility_file"]
 
     def __init__(self):
+        super().__init__()
         self.compatibility_dict = defaultdict(dict)
 
     def setup(self, config):
-        comp_file = self.get_property("compatibility_file")
-        if not comp_file:
-            raise ValueError("compatibility_file property not set")
+        super().setup(config['context']['properties'])
+        comp_file = get_path_from_keys(['context', 'properties', 'compatibility_file'], config,
+                                       check_exists=True)
 
         with open(comp_file, "r") as f:
             reader = csv.DictReader(f, fieldnames=['user_id', 'agent', 'compatibility'])
