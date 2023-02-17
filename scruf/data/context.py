@@ -2,6 +2,7 @@
 # opportunity (i.e. a user).
 from abc import ABC, abstractmethod
 from scruf.util import PropertyMixin, InvalidContextClassError, UnregisteredContextClassError
+import csv
 
 class Context(PropertyMixin,ABC):
 
@@ -12,6 +13,21 @@ class Context(PropertyMixin,ABC):
 class NullContext(Context):
 
     def get_context(self, user_id):
+        return None
+    
+class CSVContext(Context):
+    _PROPERTIES = ["compatibility_file"]
+    
+    def get_context(self, user_id):
+        comp_file = self.get_property("compatibility_file")
+        if not comp_file:
+            raise ValueError("compatibility_file property not set")
+
+        with open(comp_file, "r") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                if row["user_id"] == user_id:
+                    return row
         return None
 
 
@@ -44,6 +60,6 @@ class ContextFactory:
 
 
 # Register the context classes created above
-context_specs = [("null_context", NullContext)]
+context_specs = [("null_context", NullContext), ("csv_context", CSVContext)]
 
 ContextFactory.register_context_classes(context_specs)
