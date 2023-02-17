@@ -82,7 +82,7 @@ class Scruf:
         cmech = Scruf.state.choice_mechanism
 
         for user_info in Scruf.state.user_data.user_iterator(iterations, restart=restart):
-            allocation = amech.do_allocation()
+            allocation = amech.do_allocation(user_info)
             cmech.do_choice(allocation, user_info)
             history.write_current_state()
 

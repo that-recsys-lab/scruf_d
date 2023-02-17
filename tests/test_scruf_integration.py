@@ -33,7 +33,10 @@ initialize = "skip"
 history_window_size = 50
 
 [context]
-context_class = "null_context"
+context_class = "csv_context"
+
+[context.properties]
+compatibility_file = "compat_data.csv"
 
 [feature]
 
@@ -52,7 +55,7 @@ protected_values = 1
 [agent.f1]
 name = "Feature 1 Agent"
 metric_class = "proportional_item"
-compatibility_class = "always_zero"
+compatibility_class = "context_compatibility"
 choice_scorer_class = "zero_scorer"
 
 [agent.f1.metric]
@@ -62,7 +65,7 @@ proportion = 0.75
 [agent.f2]
 name = "Feature 2 Agent"
 metric_class = "proportional_item"
-compatibility_class = "always_zero"
+compatibility_class = "context_compatibility"
 choice_scorer_class = "zero_scorer"
 
 [agent.f2.metric]
@@ -70,7 +73,7 @@ feature = "Feature 2"
 proportion = 0.5
 
 [allocation]
-allocation_class = "least_fair"
+allocation_class = "most_compatible"
 
 [choice]
 choice_class = "null_choice"
@@ -88,8 +91,27 @@ item6, feature1, e
 item6, feature2, 1
 '''
 
+TEST_CONTEXT_DATA = '''user1,Feature 1 Agent,0.0
+user1,Feature 2 Agent,0.0
+user2,Feature 1 Agent,1.0
+user2,Feature 2 Agent,0.0
+user3,Feature 1 Agent,0.5
+user3,Feature 2 Agent,0.5
+user4,Feature 1 Agent,1.0
+user4,Feature 2 Agent,0.0
+user5,Feature 1 Agent,0.0
+user5,Feature 2 Agent,1.0
+user6,Feature 1 Agent,0.5
+user6,Feature 2 Agent,0.5
+user7,Feature 1 Agent,0.25
+user7,Feature 2 Agent,0.10
+user8,Feature 1 Agent,0.75
+user8,Feature 2 Agent,0.95
+'''
+
 TEST_FEATURE_FILE = 'item_features.csv'
 TEST_HISTORY_FILE = 'history_file.json'
+TEST_CONTEXT_FILE = 'compat_data.csv'
 
 TEST_RECOMMENDATIONS = '''user1, item1, 5.0
 user1, item2, 4.0
@@ -139,6 +161,9 @@ class ScrufIntegrationTestCase(unittest.TestCase):
         with open(self.temp_dir_path / TEST_RECOMMENDATION_FILE, 'w') as feature_file:
             feature_file.write(TEST_RECOMMENDATIONS)
 
+        with open(self.temp_dir_path / TEST_CONTEXT_FILE, 'w') as feature_file:
+            feature_file.write(TEST_CONTEXT_DATA)
+
         self.config = toml.loads(TEST_CONFIG)
 
     def tearDown(self):
@@ -174,7 +199,7 @@ class ScrufIntegrationTestCase(unittest.TestCase):
             line = history_file.readline()
 
         history = json.loads(line)
-        #ic(history)
+        ic(history)
 
         # It should have processed user 1
         self.assertEqual(0, history['time'])

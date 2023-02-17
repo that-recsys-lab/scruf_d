@@ -34,6 +34,13 @@ class ResultList:
         if trim > 0:
             self.trim(trim)
 
+    # Assumes all results are for the same user
+    def get_user(self):
+        if len(self.results) > 0:
+            return self.results[0].user
+        else:
+            return None
+
     def get_results(self):
         return self.results
 

@@ -8,6 +8,8 @@ class CompatibilityMetric (PropertyMixin,ABC):
     initialized with a dictionary of property name, value pairs. Each subclass has to specify the
     property names that it expects.
     """
+    def set_agent(self, agent):
+        self.agent = agent
 
     @abstractmethod
     def compute_compatibility(self, context):

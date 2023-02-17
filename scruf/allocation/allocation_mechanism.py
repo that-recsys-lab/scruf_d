@@ -13,10 +13,11 @@ class AllocationMechanism(PropertyMixin,ABC):
     property names that it expects.
     """
 
-    def do_allocation(self):
+    def do_allocation(self, user_info):
+        user_id = user_info.get_user()
         agents = scruf.Scruf.state.agents
         history = scruf.Scruf.state.history
-        context = scruf.Scruf.state.context
+        context = scruf.Scruf.state.context.get_context(user_id)
         allocation_result = self.compute_allocation_probabilities(agents, history, context)
         history.allocation_history.add_item(allocation_result)
         return allocation_result['output']
@@ -142,7 +143,7 @@ class MostCompatibleAllocationMechanism(AllocationMechanism):
         A list of allocation probabilities for the agents.
         """
         # Compute the fairness scores for each agent
-        scores = agents.compute_compatibility(history)
+        scores = agents.compute_compatibility(context)
         # Find highest compatibility
         highest_agent = max(scores, key=scores.get)
         # Create empty probability vector
@@ -150,7 +151,6 @@ class MostCompatibleAllocationMechanism(AllocationMechanism):
         # Set selected agent probability to 1.0, unless all are incompatible in which case select none.
         if any([score != 0.0 for score in scores.values()]):
             probs[highest_agent] = 1.0
-        probs[highest_agent] = 1.0
         nan_scores = agents.agent_value_pairs(default=float('NaN'))
         return {'fairness scores': nan_scores,
                 'compatibility scores': scores,

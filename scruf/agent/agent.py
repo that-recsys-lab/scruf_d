@@ -24,6 +24,7 @@ class FairnessAgent:
             self.fairness_metric.setup(properties['metric'])
         else:
             self.fairness_metric.setup(dict())
+        self.fairness_metric.set_agent(self)
 
         # Set up compatibility metric
         compatibility_metric_name = properties['compatibility_class']
@@ -33,6 +34,7 @@ class FairnessAgent:
             self.compatibility_metric.setup(properties['compatibility'])
         else:
             self.compatibility_metric.setup(dict())
+        self.compatibility_metric.set_agent(self)
 
         # Set up choice scorer
         choice_scorer_name = properties['choice_scorer_class']

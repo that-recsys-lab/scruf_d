@@ -24,8 +24,7 @@ context_class = "null_context"
 
 TEST_COMPATIBILITIES_FILE = 'compat_data.csv'
 
-SAMPLE_COMPATIBILITIES = '''
-user1,agent1,1.0
+SAMPLE_COMPATIBILITIES = '''user1,agent1,1.0
 user1,agent2,0.5
 user1,agent3,0.0
 user2,agent1,0.55
