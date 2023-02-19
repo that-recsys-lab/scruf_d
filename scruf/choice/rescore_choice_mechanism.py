@@ -21,6 +21,7 @@ class RescoreChoiceMechanism(ChoiceMechanism):
         for agent in agents.agents:
             scorer = agent.choice_scorer
             weight = allocation_probabilities[agent.agent_name]
+            # If weight is zero could skip these steps.
             agent_results = scorer.score_results(recommended_items, inplace=False)
             agent_results.rescore(lambda entry: entry.score * weight)
             results_dict[agent.agent_name] = agent_results

@@ -41,9 +41,9 @@ class FairnessAgent:
         self.choice_scorer = ChoiceScorerFactory.create_choice_scorer(choice_scorer_name)
 
         if 'scorer' in properties:
-            self.compatibility_metric.setup(properties['scorer'])
+            self.choice_scorer.setup(properties['scorer'])
         else:
-            self.compatibility_metric.setup(dict())
+            self.choice_scorer.setup(dict())
 
 class AgentCollection:
 

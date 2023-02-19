@@ -31,6 +31,7 @@ class FixedValueChoiceScorer(ChoiceScorer):
 
         if_data = scruf.Scruf.state.item_features
         delta = float(self.get_property('protected_score_value'))
+        # Maybe should be just delta or zero.
         result_list.rescore(lambda entry: entry.score +
                                     (delta if if_data.is_protected(entry.item) else 0))
         return result_list

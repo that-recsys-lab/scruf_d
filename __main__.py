@@ -2,15 +2,15 @@ import argparse
 import logging
 import os
 import toml
-from .util.errors import ConfigFileError
-from .scruf import Scruf
+from scruf.util.errors import ConfigFileError
+from scruf import Scruf
 
 
 def read_args():
     parser = argparse.ArgumentParser(
         description='SCRUF-D tool for dynamic fairness-aware recommender systems experiments')
 
-    parser.add_argument('config', help='Path to the configuration file.')
+    parser.add_argument('config_file', help='Path to the configuration file.')
 
     input_args = parser.parse_args()
     arg_check(vars(input_args))
@@ -18,7 +18,7 @@ def read_args():
 
 
 def arg_check(input_args):
-    config_file = input_args['config']
+    config_file = input_args['config_file']
     if not os.path.exists(config_file):
         print(f'Configuration file {config_file} not found. Working directory: {os.getcwd()} Exiting.')
         exit(-1)
