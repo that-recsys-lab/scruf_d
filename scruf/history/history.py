@@ -38,7 +38,12 @@ class ScrufHistory:
         #self.recommendation_input_history = ResultsHistory(window_size)
         #self.recommendation_output_history = ResultsHistory(window_size)
 
-        self._history_file = open(self.working_dir / self.history_file_name, 'xt')
+        history_path = self.working_dir / self.history_file_name
+        if get_value_from_keys(['location', 'overwrite'], config) == 'true':
+            if history_path.exists():
+                history_path.unlink()
+
+        self._history_file = open(history_path, 'xt')
 
     def write_current_state(self):
         current_time = scruf.Scruf.state.user_data.current_user_index

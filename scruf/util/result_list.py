@@ -24,6 +24,7 @@ class ResultList:
 
     def setup(self, triples, presorted=False, trim=0):
         self.results = []
+        # Test for length of triples. If > 3, signal file format error
         for user, item, rating in triples:
             result = ResultEntry(user=user, item=item, score=float(rating), rank=-1)
             self.results.append(result)

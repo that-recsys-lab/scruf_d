@@ -18,7 +18,7 @@ class ChoiceMechanism(PropertyMixin,ABC):
         list_size = scruf.Scruf.state.output_list_size
         results = self.compute_choice(agents, allocation_probabilities, recommendations, list_size)
         scruf.Scruf.state.history.choice_history.add_item(results)
-        return results['output']
+        return results
 
     @abstractmethod
     def compute_choice(self, agents: AgentCollection, allocation_probabilities, recommended_items: ResultList, list_size):

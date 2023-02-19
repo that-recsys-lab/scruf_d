@@ -64,7 +64,7 @@ class Scruf:
     def run_experiment(self):
         Scruf.setup_experiment()
         self.run_loop(iterations=Scruf.state.iterations)
-        Scruf.cleanup_experiment(self)
+        Scruf.cleanup_experiment()
 
     # Get next user
     # Calculate fairness and compatibility
