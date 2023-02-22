@@ -16,6 +16,10 @@ choice_scorer_class = "fixed_value"
 feature = "country"
 proportion = 0.2
 
+[agent.country.scorer]
+protected_feature = "country"
+protected_score_value = 0.5
+
 [agent.sector]
 name = "Sector"
 metric_class = "proportional_item"
@@ -25,6 +29,10 @@ choice_scorer_class = "fixed_value"
 [agent.sector.metric]
 feature = "sector"
 proportion = 0.5
+
+[agent.sector.scorer]
+protected_feature = "sector"
+protected_score_value = 0.5
 """
 
 class AgentTestCase(unittest.TestCase):

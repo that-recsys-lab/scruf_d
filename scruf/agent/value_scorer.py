@@ -33,8 +33,7 @@ class FixedValueChoiceScorer(ChoiceScorer):
         delta = float(self.get_property('protected_score_value'))
         feature = self.get_property('protected_feature')
         # Maybe should be just delta or zero.
-        result_list.rescore(lambda entry: entry.score +
-                                    (delta if if_data.is_protected(feature, entry.item) else 0))
+        result_list.rescore(lambda entry: delta if if_data.is_protected(feature, entry.item) else 0)
         return result_list
 
 

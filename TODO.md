@@ -71,6 +71,11 @@ Just the ability to create different classes and maybe some basic baselines: Alw
   * Could bias recommendation scores by compatibilities
     * norm(mean + compat)
 
+### Known bugs
+* least misery, most compatible should pick randomly when there are ties.
+* random seed should be part of configuration file
+* 
+
 ## Specific implementations
 
 ### Fairness metrics

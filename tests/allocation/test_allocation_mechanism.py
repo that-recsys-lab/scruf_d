@@ -4,7 +4,7 @@ from icecream import ic
 
 from scruf.agent import AgentCollection, FixedValueChoiceScorer
 from scruf.allocation import AllocationMechanismFactory, WeightedProductAllocationMechanism, \
-    MostCompatibleAllocationMechanism, LeastFairAllocationMechanism
+    MostCompatibleAllocationMechanism, LeastFairAllocationMechanism, StaticAllocationLottery
 
 SAMPLE_PROPERTIES = '''
 [allocation]
@@ -23,13 +23,27 @@ metric_class = "always_zero"
 compatibility_class = "always_zero"
 choice_scorer_class = "fixed_value"
 
+[agent.low_compat.scorer]
+protected_feature = "foo"
+protected_score_value = 0.5
+
 [agent.high_compat]
 name = "High Compatibility"
 metric_class = "always_one"
 compatibility_class = "always_one"
 choice_scorer_class = "fixed_value"
+
+[agent.high_compat.scorer]
+protected_feature = "bar"
+protected_score_value = 0.5
 '''
 
+SAMPLE_LOTTERY_PROPERTIES = '''
+[allocation]
+algorithm = "static_lottery"
+[allocation.properties]
+weights = [["Agent 1", "0.5"], ["Agent 2", "0.2"]]
+'''
 
 class AllocationMechanismTestCase(unittest.TestCase):
 
@@ -65,3 +79,14 @@ class AllocationMechanismTestCase(unittest.TestCase):
         self.assertEqual(probs2['Low Compatibility'], 1.0)
         self.assertEqual(probs2['High Compatibility'], 0.0)
 
+    def test_static_lottery(self):
+        config = toml.loads(SAMPLE_LOTTERY_PROPERTIES)
+        alg_name = config['allocation']['algorithm']
+        alloc = AllocationMechanismFactory.create_allocation_mechanism(alg_name)
+        alloc.setup(config['allocation']['properties'])
+        lottery = alloc.lottery
+        self.assertEqual(lottery['Agent 1'], 0.5)
+        self.assertEqual(lottery['Agent 2'], 0.2)
+        self.assertAlmostEqual(lottery['__dummy__'], 0.3)
+
+        

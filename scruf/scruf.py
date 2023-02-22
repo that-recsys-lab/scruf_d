@@ -1,4 +1,4 @@
-import toml
+import random
 from scruf.history import ScrufHistory
 from scruf.agent import AgentCollection
 from scruf.allocation import AllocationMechanismFactory, AllocationMechanism
@@ -13,6 +13,7 @@ class Scruf:
     class ScrufState:
         def __init__(self, config):
             self.config: dict = config
+            self.rand = random.Random(get_value_from_keys(['parameters', 'random_seed'], default=420))
             self.history: ScrufHistory = ScrufHistory()
 
             # Fairness agents

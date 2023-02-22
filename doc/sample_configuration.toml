@@ -17,6 +17,7 @@ list_size = 10
 iterations = -1 # -1 means run through all the users
 initialize = "skip"
 history_window_size = 50
+random_seed = 20230221
 
 [context]
 context_class = "csv_context"
