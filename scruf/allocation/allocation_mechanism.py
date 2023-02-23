@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from scruf.util import PropertyMixin, InvalidAllocationMechanismError, UnregisteredAllocationMechanismError, \
-    normalize_score_dict
+    normalize_score_dict, ContextNotFoundError
 from scruf.agent import AgentCollection
 import scruf
 import random
@@ -18,6 +18,8 @@ class AllocationMechanism(PropertyMixin,ABC):
         agents = scruf.Scruf.state.agents
         history = scruf.Scruf.state.history
         context = scruf.Scruf.state.context.get_context(user_id)
+        if len(context) == 0:
+            raise ContextNotFoundError(user_id)
         allocation_result = self.compute_allocation_probabilities(agents, history, context)
         history.allocation_history.add_item(allocation_result)
         return allocation_result['output']

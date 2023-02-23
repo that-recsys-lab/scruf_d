@@ -115,3 +115,9 @@ class PathDoesNotExistError(ScrufError):
     def __init__(self, path, keys):
         self.message = f'Expected path {str(path)} from config file {keys} does not exist.'
         super().__init__(self.message)
+
+
+class ContextNotFoundError(ScrufError):
+    def __init__(self, user_id):
+        self.message = f'Context has no entry for user {user_id}.'
+        super().__init__(self.message)
