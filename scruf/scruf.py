@@ -13,7 +13,7 @@ class Scruf:
     class ScrufState:
         def __init__(self, config):
             self.config: dict = config
-            self.rand = random.Random(get_value_from_keys(['parameters', 'random_seed'], default=420))
+            self.rand = random.Random(get_value_from_keys(['parameters', 'random_seed'], config, default=420))
             self.history: ScrufHistory = ScrufHistory()
 
             # Fairness agents

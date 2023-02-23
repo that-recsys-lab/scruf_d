@@ -89,4 +89,3 @@ class AllocationMechanismTestCase(unittest.TestCase):
         self.assertEqual(lottery['Agent 2'], 0.2)
         self.assertAlmostEqual(lottery['__dummy__'], 0.3)
 
-        
