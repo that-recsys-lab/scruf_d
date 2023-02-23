@@ -1,39 +1,19 @@
 # TODO items
 
-## Agents
-
-* Implement the compatibility metric class, similar to the fairness metric. 
-Just the ability to create different classes and maybe some basic baselines: Always compatible, never compatible. Use a factory to make it configurable - DONE
-* Add compatibility to the fairness agent implementation -DONE
-* Add user_agent_compatibility?
-* Move fairness metric execution to AgentCollection class - DONE RB
-* Move compatibility metric execution to AgentCollection class - DONE RB
 
 ## Mechanisms
-* Implement the allocation mechanism class. - DONE
-* Implement the choice mechanism class. - DONE RB (Might need to revisit this)
+* Change choice mechanism so that it matches the formal definition (list-based)
+* Change implementation to allow random choice among equal scoring alternatives.
 
 ## Unit Tests
-* Implement unit tests for compatibility metric. DONE RB
-* Implement unit tests for allocation mechanism. DONE RB
-* Implement unit tests for choice mechanism. DONE RB
+* Unit tests for lottery mechanisms
 
 ## Util
-* Update Util 
 
-## Data handling
-* Implement the history class. Basically an updatable set of tables of the inputs and outputs of each part of the system.
-  * Components implemented just need to package it up
-* Implement the recommendation agent class. Stores recommendations for all the users and retrieves as needed. 
-* Implement an item data store so we can look up the features of items as needed. - DONE RB
-* Also for users, I guess. (Not sure we need)
-* Connect history to mechanisms
+## Data Handling
 
 ## Simulation
-* Implement a class to hold the experiment state - DONE RB
-* Implement a loader that takes the configuration and creates the experiment state
-* Implement the simulation loop that links together all the bits.
-* Logging so we can keep track and debug.
+* Test and document Jupyter notebook usage
 
 ## TORS paper
 * Finish implementation of proportional fairness metric
@@ -113,3 +93,37 @@ Eventually SCRUF-specific evaluation.
 * Should we get rid of the feature name vs feature id distinction
 * Should we simplify ResultList and get rid of the history aspect.
 * dynamic item database?
+
+# Completed items
+
+## Agents
+
+* Implement the compatibility metric class, similar to the fairness metric.
+  Just the ability to create different classes and maybe some basic baselines: Always compatible, never compatible. Use a factory to make it configurable - DONE
+* Add compatibility to the fairness agent implementation -DONE
+* Add user_agent_compatibility?
+* Move fairness metric execution to AgentCollection class - DONE RB
+* Move compatibility metric execution to AgentCollection class - DONE RB
+
+## Mechanisms
+* Implement the allocation mechanism class. - DONE
+* Implement the choice mechanism class. - DONE RB (Might need to revisit this)
+
+## Unit Tests
+* Implement unit tests for compatibility metric. DONE RB
+* Implement unit tests for allocation mechanism. DONE RB
+* Implement unit tests for choice mechanism. DONE RB
+
+## Data handling
+* Implement the history class. Basically an updatable set of tables of the inputs and outputs of each part of the system.
+  * Components implemented just need to package it up
+* Implement the recommendation agent class. Stores recommendations for all the users and retrieves as needed.
+* Implement an item data store so we can look up the features of items as needed. - DONE RB
+* Also for users, I guess. (Not sure we need)
+* Connect history to mechanisms
+
+## Simulation
+* Implement a class to hold the experiment state - DONE RB
+* Implement a loader that takes the configuration and creates the experiment state
+* Implement the simulation loop that links together all the bits.
+* Logging so we can keep track and debug.

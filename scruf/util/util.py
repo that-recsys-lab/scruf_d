@@ -10,6 +10,12 @@ def normalize_score_dict(score_dict: dict, inplace=False):
 
     return score_dict
 
+# Collapse scores
+# type = max or min
+# Picks the max or min entry from a score_dict
+# If all are at an extreme (max, extreme = 0), (min extreme = 1), then return 0 vector
+# If multiple equal max or min values, choose randomly or first
+
 
 def ensure_list(val):
     if type(val) is not list:
