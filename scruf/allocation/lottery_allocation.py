@@ -38,7 +38,7 @@ class LotteryAllocationMechanism(AllocationMechanism):
                     for agent_name in agents.agent_names()}
 
         # Normalize the scores to sum to 1
-        scores = self.score_dict_lottery(scores)
+        scores = self.score_dict_lottery(scores, agents)
         return {'fairness scores': fairness_values,
                 'compatibility scores': compat_values,
                 'output': scores}
