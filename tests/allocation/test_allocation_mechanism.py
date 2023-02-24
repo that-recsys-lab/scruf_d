@@ -1,5 +1,7 @@
 import unittest
 import toml
+import random
+import scruf
 from icecream import ic
 
 from scruf.agent import AgentCollection, FixedValueChoiceScorer
@@ -60,6 +62,9 @@ class AllocationMechanismTestCase(unittest.TestCase):
         config = toml.loads(SAMPLE_AGENTS)
         agents = AgentCollection()
         agents.setup(config)
+
+        scruf.Scruf.state = scruf.Scruf.ScrufState(None)
+        scruf.Scruf.state.rand = random.Random(20220223)
 
         alloc1 = MostCompatibleAllocationMechanism()
         alloc1.setup({})

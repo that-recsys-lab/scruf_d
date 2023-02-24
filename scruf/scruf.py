@@ -12,33 +12,34 @@ class Scruf:
 
     class ScrufState:
         def __init__(self, config):
-            self.config: dict = config
-            self.rand = random.Random(get_value_from_keys(['parameters', 'random_seed'], config, default=420))
-            self.history: ScrufHistory = ScrufHistory()
+            if config is not None:
+                self.config: dict = config
+                self.rand = random.Random(get_value_from_keys(['parameters', 'random_seed'], config, default=420))
+                self.history: ScrufHistory = ScrufHistory()
 
-            # Fairness agents
-            self.agents: AgentCollection = AgentCollection()
+                # Fairness agents
+                self.agents: AgentCollection = AgentCollection()
 
-            # Data sources
-            self.user_data: UserArrivalData = BulkLoadedUserData()
-            self.item_features: ItemFeatureData = ItemFeatureData()
+                # Data sources
+                self.user_data: UserArrivalData = BulkLoadedUserData()
+                self.item_features: ItemFeatureData = ItemFeatureData()
 
-            ctx_class = get_value_from_keys(['context', 'context_class'], config)
-            ctx = ContextFactory.create_context_class(ctx_class)
-            self.context: Context = ctx
+                ctx_class = get_value_from_keys(['context', 'context_class'], config)
+                ctx = ContextFactory.create_context_class(ctx_class)
+                self.context: Context = ctx
 
-            # Mechanisms
-            amech_class = get_value_from_keys(['allocation', 'allocation_class'], config)
-            amech = AllocationMechanismFactory.create_allocation_mechanism(amech_class)
-            self.allocation_mechanism: AllocationMechanism = amech
+                # Mechanisms
+                amech_class = get_value_from_keys(['allocation', 'allocation_class'], config)
+                amech = AllocationMechanismFactory.create_allocation_mechanism(amech_class)
+                self.allocation_mechanism: AllocationMechanism = amech
 
-            cmech_class = get_value_from_keys(['choice', 'choice_class'], config)
-            cmech = ChoiceMechanismFactory.create_choice_mechanism(cmech_class)
-            self.choice_mechanism: ChoiceMechanism = cmech
+                cmech_class = get_value_from_keys(['choice', 'choice_class'], config)
+                cmech = ChoiceMechanismFactory.create_choice_mechanism(cmech_class)
+                self.choice_mechanism: ChoiceMechanism = cmech
 
-            # Parameters
-            self.output_list_size: int = get_value_from_keys(['parameters', 'list_size'], config)
-            self.iterations: int = get_value_from_keys(['parameters', 'iterations'], config)
+                # Parameters
+                self.output_list_size: int = get_value_from_keys(['parameters', 'list_size'], config)
+                self.iterations: int = get_value_from_keys(['parameters', 'iterations'], config)
 
     state: ScrufState = None
 

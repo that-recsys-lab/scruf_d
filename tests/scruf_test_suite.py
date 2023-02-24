@@ -13,6 +13,7 @@ from history.test_scruf_history import ScrufHistoryTestCase
 from util.test_hcollection import TestHistoryCollection
 from util.test_result_list import ResultListTestCase
 from util.test_config_util import ConfigUtilTestCase
+from util.test_score_dict import ScoreDictTestCase
 from test_scruf_integration import ScrufIntegrationTestCase
 
 
@@ -44,6 +45,8 @@ def suite():
     suite.addTest(rlist_tests)
     conf_tests = unittest.defaultTestLoader.loadTestsFromTestCase(ConfigUtilTestCase)
     suite.addTest(conf_tests)
+    score_tests = unittest.defaultTestLoader.loadTestsFromTestCase(ScoreDictTestCase)
+    suite.addTest(score_tests)
     integration_tests = unittest.defaultTestLoader.loadTestsFromTestCase(ScrufIntegrationTestCase)
     suite.addTest(integration_tests)
 

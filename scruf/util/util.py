@@ -27,7 +27,7 @@ def collapse_score_dict(score_dict: dict, type='max', handle_multiple='first', r
 
     if type == 'max':
         selected_value = max(score_dict.values())
-    if type == 'min':
+    elif type == 'min':
         selected_value = min(score_dict.values())
     else:
         raise UnknownCollapseParameterError('type', type)
