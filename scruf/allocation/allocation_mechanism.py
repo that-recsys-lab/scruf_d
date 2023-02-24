@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from scruf.util import PropertyMixin, InvalidAllocationMechanismError, UnregisteredAllocationMechanismError, \
-    normalize_score_dict, ContextNotFoundError
+    normalize_score_dict, collapse_score_dict, ContextNotFoundError
 from scruf.agent import AgentCollection
 import scruf
 import random
@@ -114,11 +114,15 @@ class LeastFairAllocationMechanism(AllocationMechanism):
         # Compute the fairness scores for each agent
         scores = agents.compute_fairness(history)
         # Find lowest fairness
-        lowest_agent = min(scores, key=scores.get)
+        lowest_agent = collapse_score_dict(scores, type='min', handle_multiple='random',
+                                           rand=scruf.Scruf.state.rand)
+        # To get prior behavior, change to
+        #lowest_agent = collapse_score_dict(scores, type='min', handle_multiple='first',
+        #                                   rand=scruf.Scruf.state.rand)
         # Create empty probability vector
         probs = agents.agent_value_pairs(default=0.0)
-        # Set selected agent probability to 1.0, unless all are fair in which case select none.
-        if any([score != 1.0 for score in scores.values()]):
+
+        if lowest_agent is not None:
             probs[lowest_agent] = 1.0
         nan_scores = agents.agent_value_pairs(default=float('NaN'))
         return {'fairness scores': scores,
@@ -147,11 +151,12 @@ class MostCompatibleAllocationMechanism(AllocationMechanism):
         # Compute the fairness scores for each agent
         scores = agents.compute_compatibility(context)
         # Find highest compatibility
-        highest_agent = max(scores, key=scores.get)
+        highest_agent = collapse_score_dict(scores, type='max', handle_multiple='random',
+                                           rand=scruf.Scruf.state.rand)
         # Create empty probability vector
         probs = agents.agent_value_pairs(default=0.0)
-        # Set selected agent probability to 1.0, unless all are incompatible in which case select none.
-        if any([score != 0.0 for score in scores.values()]):
+
+        if highest_agent is not None:
             probs[highest_agent] = 1.0
         nan_scores = agents.agent_value_pairs(default=float('NaN'))
         return {'fairness scores': nan_scores,

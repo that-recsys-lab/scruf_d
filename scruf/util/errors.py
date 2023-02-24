@@ -93,6 +93,7 @@ class UnregisteredChoiceScorerError(ScrufError):
         self.message = f'Cannot create choice scorer: Class {name} is not registered and may not exist.'
         super().__init__(self.message)
 
+
 class InvalidContextClassError(ScrufError):
     def __init__(self, name):
         self.message = f'Cannot create context class: Class {name} is not a subclass of Context.'
@@ -120,4 +121,9 @@ class PathDoesNotExistError(ScrufError):
 class ContextNotFoundError(ScrufError):
     def __init__(self, user_id):
         self.message = f'Context has no entry for user {user_id}.'
+        super().__init__(self.message)
+
+class UnknownCollapseParameterError(ScrufError):
+    def __init__(self, parameter_type, parameter_value):
+        self.message = f'Unknown parameter for collapse_score_dict: parameter {parameter_type} value {parameter_value}'
         super().__init__(self.message)
