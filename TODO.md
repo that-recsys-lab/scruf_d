@@ -3,7 +3,6 @@
 
 ## Mechanisms
 * Change choice mechanism so that it matches the formal definition (list-based)
-* Change implementation to allow random choice among equal scoring alternatives.
 
 ## Unit Tests
 * Unit tests for lottery mechanisms
@@ -31,7 +30,7 @@
   * graphs of fairness over time
   * fairness regret
   * accuracy regret
-  * overall ndcg
+  * (Not doing this: overall ndcg)
   * overall fairness
 * Experimental conditions
   * compatibility distributed across users / agents
@@ -52,8 +51,6 @@
     * norm(mean + compat)
 
 ### Known bugs
-* least misery, most compatible should pick randomly when there are ties.
-* random seed should be part of configuration file
 * 
 
 ## Specific implementations
@@ -61,6 +58,7 @@
 ### Fairness metrics
 * Proportional fairness
 * Minimum exposure metrics
+* Generalized cross-entropy
 
 Other stuff from the literature?
 
@@ -70,12 +68,9 @@ Other stuff from the literature?
 Others?
 
 ### Allocation mechanism
-* Least misery - DONE 
-* Random serial dictator
 * Probabilistic serial mechanism
 
 ### Choice mechanism
-* Fixed delta - DONE RB
 * Greedy MMR-type
 * FA*IR
 
@@ -108,6 +103,7 @@ Eventually SCRUF-specific evaluation.
 ## Mechanisms
 * Implement the allocation mechanism class. - DONE
 * Implement the choice mechanism class. - DONE RB (Might need to revisit this)
+* Change implementation to allow random choice among equal scoring alternatives.
 
 ## Unit Tests
 * Implement unit tests for compatibility metric. DONE RB
@@ -127,3 +123,10 @@ Eventually SCRUF-specific evaluation.
 * Implement a loader that takes the configuration and creates the experiment state
 * Implement the simulation loop that links together all the bits.
 * Logging so we can keep track and debug.
+
+## Allocation
+* Least misery - DONE 
+* Ra ndom serial dictator
+
+## Choice
+* Fixed delta - DONE RB

@@ -116,3 +116,4 @@ dmypy.json
  .idea/
  poetry.lock
 .idea/scruf.iml
+.idea/scruf.iml

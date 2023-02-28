@@ -2,6 +2,7 @@ from .allocation_mechanism import AllocationMechanism, AllocationMechanismFactor
 from scruf.agent import AgentCollection
 from scruf.util import normalize_score_dict
 from abc import abstractmethod
+from icecream import ic
 import scruf
 
 # Similar to a scored allocation but the weights are treated like lottery and
@@ -98,8 +99,10 @@ class StaticAllocationLottery(LotteryAllocationMechanism):
             weights.append([self._DUMMY_AGENT, 1 - weights_sum])
         self.lottery = normalize_score_dict({agent: float(wt) for agent, wt in weights})
 
-    def score_dict_lottery(self, score_dict: dict, agents):
-        winner = scruf.Scruf.state.rand.choices(self.lottery.keys(), self.lottery.values())
+    def score_dict_lottery(self, _, agents):
+        # ic(list(self.lottery.keys()), list(self.lottery.values()))
+        winner = scruf.Scruf.state.rand.choices(list(self.lottery.keys()), list(self.lottery.values()))[0]
+        #ic(winner)
         result = scruf.Scruf.state.agents.agent_value_pairs(default=0.0)
         if winner != self._DUMMY_AGENT:
             result[winner] = 1.0

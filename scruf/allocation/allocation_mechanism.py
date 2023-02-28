@@ -158,8 +158,8 @@ class MostCompatibleAllocationMechanism(AllocationMechanism):
 
         if highest_agent is not None:
             probs[highest_agent] = 1.0
-        nan_scores = agents.agent_value_pairs(default=float('NaN'))
-        return {'fairness scores': nan_scores,
+        fairness_values = agents.compute_fairness(history)
+        return {'fairness scores': fairness_values,
                 'compatibility scores': scores,
                 'output': probs}
 
