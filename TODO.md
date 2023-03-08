@@ -1,8 +1,8 @@
 # TODO items
 
-
 ## Mechanisms
 * Change choice mechanism so that it matches the formal definition (list-based)
+* Null allocation (effectively the same as null_choice) but handy for experimenting
 
 ## Unit Tests
 * Unit tests for lottery mechanisms
@@ -14,30 +14,35 @@
 ## Simulation
 * Test and document Jupyter notebook usage
 
-## TORS paper
-* Finish implementation of proportional fairness metric
-* Implement static allocation mechanism
-* Implement fairness only random dictator
-* File-based context class
-* Experiments
-  * Static probability
-  * Null choice (no fairness)
-  * Random dictator (pick single agent lottery based fairness score)
+## Data generation
+* Data with non-binary compatibilities
+* Data with protected group overlap
+* Data with linkage between items, users and compatibilities
+  * Maybe an inverse latent variable model?
+* Use Kiva data / other data sets
+
+## Experiments
+
+* Allocations
   * Probabilistic serial mechanism 
-  * Product (fairness * compatibility)
+  * Product (fairness * compatibility) lottery (when we have non-binary compatibility)
+  * Product allocation
+* Choice
   * More complex choice mechanisms?
 * Metrics
-  * graphs of fairness over time
-  * fairness regret
+  * get ndcg etc. via librec-auto working
   * accuracy regret
-  * (Not doing this: overall ndcg)
-  * overall fairness
+  * overall ndcg
+  * overall fairness (note different from what the agent's measure which is a function of the window)
 * Experimental conditions
   * compatibility distributed across users / agents
   * how hard are the fairness targets to meet
     * ranking of protected items
     * proportion of protected items
-  * how quickly does the algorithm respond
+    * smaller delta values in the reranker
+  * different window sizes
+  * two-sided compatibilities
+  * different initialization setups
 * Data generation
   * Inputs
     * item agent distributions
@@ -49,9 +54,10 @@
     * item feature list
   * Could bias recommendation scores by compatibilities
     * norm(mean + compat)
+    * or generate linked data
 
 ### Known bugs
-* 
+* output files are too large
 
 ## Specific implementations
 
@@ -59,7 +65,7 @@
 * Proportional fairness
 * Minimum exposure metrics
 * Generalized cross-entropy
-
+ 
 Other stuff from the literature?
 
 ### Compatibility metrics
@@ -79,15 +85,14 @@ Others?
 ## Data handling
 
 * Export to librec-auto project for evaluation
-
-Eventually SCRUF-specific evaluation. 
+* Eventually SCRUF-specific evaluation. 
 
 # Things to think about
 
 * Should we make the configuration data into its own class.
 * Should we get rid of the feature name vs feature id distinction
-* Should we simplify ResultList and get rid of the history aspect.
-* dynamic item database?
+* experiments with dynamic item database?
+* How to integrate bandit/reinforcement learning?
 
 # Completed items
 
@@ -130,3 +135,9 @@ Eventually SCRUF-specific evaluation.
 
 ## Choice
 * Fixed delta - DONE RB
+
+## Paper is done! Yay!
+* Implement static allocation mechanism
+* Implement fairness only random dictator
+* File-based context class
+* Finish implementation of proportional fairness metric
