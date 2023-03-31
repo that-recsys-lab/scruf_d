@@ -1,15 +1,11 @@
 # TODO items
 
-## Mechanisms
-* Change choice mechanism so that it matches the formal definition (list-based)
-* Null allocation (effectively the same as null_choice) but handy for experimenting
+## Data Handling
+### Known bugs
+* output files are too large
 
 ## Unit Tests
 * Unit tests for lottery mechanisms
-
-## Util
-
-## Data Handling
 
 ## Simulation
 * Test and document Jupyter notebook usage
@@ -56,22 +52,18 @@
     * norm(mean + compat)
     * or generate linked data
 
-### Known bugs
-* output files are too large
 
 ## Specific implementations
 
 ### Fairness metrics
 * Proportional fairness
 * Minimum exposure metrics
-* Generalized cross-entropy
- 
-Other stuff from the literature?
+* Generalized cross-entropy 
+* Other stuff from the literature?
 
 ### Compatibility metrics
-* Nasim's entropy measure
-
-Others?
+* Nasim's entropy measure (separate preprocess)
+* Others?
 
 ### Allocation mechanism
 * Probabilistic serial mechanism
@@ -79,20 +71,26 @@ Others?
 ### Choice mechanism
 * Greedy MMR-type
 * FA*IR
-
-Others?
+* Integrate whalrus (https://francois-durand.github.io/whalrus/)
+  * Allow creation of whalrus voting functions at run-time through configuration
+  * Convert BallotCollection to appropriate type
+  * Convert results to ResultList
 
 ## Data handling
 
 * Export to librec-auto project for evaluation
 * Eventually SCRUF-specific evaluation. 
 
+## Mechanisms
+
+## Util
+
 # Things to think about
 
 * Should we make the configuration data into its own class.
 * Should we get rid of the feature name vs feature id distinction
 * experiments with dynamic item database?
-* How to integrate bandit/reinforcement learning?
+* How to integrate bandit/reinforcement learning
 
 # Completed items
 
@@ -135,9 +133,20 @@ Others?
 
 ## Choice
 * Fixed delta - DONE RB
+* Change choice mechanism so that it matches the formal definition (list-based)
+  * Replace choice scorer with preference generator
+  * Reimplement existing choice scorer with preference-based equivalent
+  * Replace choice mechanism definition
+    * input: list of preferences, list of weights, list length
+  * Redefine do_choice to work with new definition
+  * Reimplement rescorer as weighted Borda choice
+* Null allocation (effectively the same as null_choice) but handy for experimenting
+
 
 ## Paper is done! Yay!
 * Implement static allocation mechanism
 * Implement fairness only random dictator
 * File-based context class
 * Finish implementation of proportional fairness metric
+
+

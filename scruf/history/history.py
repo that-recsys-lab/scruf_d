@@ -18,7 +18,8 @@ class ScrufHistory:
 
     def __init__(self):
         self.allocation_history: HistoryCollection = None
-        self.choice_history: HistoryCollection = None
+        self.choice_input_history: HistoryCollection = None
+        self.choice_output_history: HistoryCollection = None
         self.fairness_history: HistoryCollection = None
         self.recommendation_input_history: ResultsHistory = None
         self.recommendation_output_history: ResultsHistory = None
@@ -34,7 +35,8 @@ class ScrufHistory:
         window_size = get_value_from_keys(ConfigKeys.WINDOW_SIZE_KEYS, config)
 
         self.allocation_history = HistoryCollection(window_size)
-        self.choice_history = HistoryCollection(window_size)
+        self.choice_input_history = HistoryCollection(window_size)
+        self.choice_output_history = HistoryCollection(window_size)
         #self.recommendation_input_history = ResultsHistory(window_size)
         #self.recommendation_output_history = ResultsHistory(window_size)
 
@@ -49,13 +51,15 @@ class ScrufHistory:
         current_time = scruf.Scruf.state.user_data.current_user_index
         current_user = scruf.Scruf.state.user_data.get_current_user()
         alloc = self.allocation_history.get_most_recent()
-        choice = self.choice_history.get_most_recent()
+        choice_input = self.choice_input_history.get_most_recent()
+        choice_output = self.choice_output_history.get_most_recent()
 
         output_json = {
             'time': current_time,
             'user': current_user,
             'allocation': alloc,
-            'choice': choice,
+            'choice_in': choice_input,
+            'choice_out': choice_output
         }
 
         json_str = jsons.dumps(output_json)

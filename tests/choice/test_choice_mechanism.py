@@ -1,7 +1,7 @@
 import unittest
 import toml
 
-from scruf.choice import ChoiceMechanismFactory, NullChoiceMechanism, RescoreChoiceMechanism
+from scruf.choice import ChoiceMechanismFactory, NullChoiceMechanism, WScoringChoiceMechanism
 
 SAMPLE_PROPERTIES = '''
 [choice]
@@ -10,7 +10,7 @@ algorithm = "null_choice"
 
 SAMPLE_PROPERTIES2 = '''
 [choice]
-algorithm = "weighted_rescore"
+algorithm = "weighted_scoring"
 [choice.properties]
 recommender_weight = 0.8
 '''
@@ -29,5 +29,5 @@ class ChoiceMechanismTestCase(unittest.TestCase):
         choice = ChoiceMechanismFactory.create_choice_mechanism(alg_name)
         choice.setup(config['choice']['properties'])
 
-        self.assertEqual(choice.__class__, RescoreChoiceMechanism)
+        self.assertEqual(choice.__class__, WScoringChoiceMechanism)
         self.assertAlmostEqual(choice.get_property('recommender_weight'), 0.8)

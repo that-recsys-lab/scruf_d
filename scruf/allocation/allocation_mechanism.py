@@ -112,7 +112,7 @@ class LeastFairAllocationMechanism(AllocationMechanism):
 
     def compute_allocation_probabilities(self, agents, history, context):
         # Compute the fairness scores for each agent
-        scores = agents.compute_fairness(history)
+        scores = agents.compute_fairnesses(history)
         # Find lowest fairness
         lowest_agent = collapse_score_dict(scores, type='min', handle_multiple='random',
                                            rand=scruf.Scruf.state.rand)
@@ -149,7 +149,7 @@ class MostCompatibleAllocationMechanism(AllocationMechanism):
         A list of allocation probabilities for the agents.
         """
         # Compute the fairness scores for each agent
-        scores = agents.compute_compatibility(context)
+        scores = agents.compute_compatibilities(context)
         # Find highest compatibility
         highest_agent = collapse_score_dict(scores, type='max', handle_multiple='random',
                                            rand=scruf.Scruf.state.rand)
@@ -158,7 +158,7 @@ class MostCompatibleAllocationMechanism(AllocationMechanism):
 
         if highest_agent is not None:
             probs[highest_agent] = 1.0
-        fairness_values = agents.compute_fairness(history)
+        fairness_values = agents.compute_fairnesses(history)
         return {'fairness scores': fairness_values,
                 'compatibility scores': scores,
                 'output': probs}

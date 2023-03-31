@@ -82,15 +82,15 @@ class UnregisteredChoiceMechanismError(ScrufError):
         super().__init__(self.message)
 
 
-class InvalidChoiceScorerError(ScrufError):
+class InvalidPreferenceFunctionError(ScrufError):
     def __init__(self, name):
-        self.message = f'Cannot create choice scorer: Class {name} is not a subclass of ChoiceScorer.'
+        self.message = f'Cannot create preference function: Class {name} is not a subclass of PreferenceFunction.'
         super().__init__(self.message)
 
 
-class UnregisteredChoiceScorerError(ScrufError):
+class UnregisteredPreferenceFunctionError(ScrufError):
     def __init__(self, name):
-        self.message = f'Cannot create choice scorer: Class {name} is not registered and may not exist.'
+        self.message = f'Cannot create preference function: Class {name} is not registered and may not exist.'
         super().__init__(self.message)
 
 

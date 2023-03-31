@@ -4,7 +4,7 @@ import random
 import scruf
 from icecream import ic
 
-from scruf.agent import AgentCollection, FixedValueChoiceScorer
+from scruf.agent import AgentCollection, BinaryPreferenceFunction
 from scruf.allocation import AllocationMechanismFactory, WeightedProductAllocationMechanism, \
     MostCompatibleAllocationMechanism, LeastFairAllocationMechanism, StaticAllocationLottery
 
@@ -23,21 +23,21 @@ SAMPLE_AGENTS = '''
 name = "Low Compatibility"
 metric_class = "always_zero"
 compatibility_class = "always_zero"
-choice_scorer_class = "fixed_value"
+preference_function_class = "binary_preference"
 
-[agent.low_compat.scorer]
-protected_feature = "foo"
-protected_score_value = 0.5
+[agent.low_compat.preference]
+feature = "foo"
+delta = 0.5
 
 [agent.high_compat]
 name = "High Compatibility"
 metric_class = "always_one"
 compatibility_class = "always_one"
-choice_scorer_class = "fixed_value"
+preference_function_class = "binary_preference"
 
-[agent.high_compat.scorer]
-protected_feature = "bar"
-protected_score_value = 0.5
+[agent.high_compat.preference]
+feature = "bar"
+delta = 0.5
 '''
 
 SAMPLE_LOTTERY_PROPERTIES = '''

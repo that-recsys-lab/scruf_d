@@ -70,3 +70,4 @@ class PropertyMixin():
 
     def get_property(self, property_name):
         return self.prop_coll.get_property(property_name)
+

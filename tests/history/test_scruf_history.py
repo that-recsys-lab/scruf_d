@@ -78,7 +78,8 @@ class ScrufHistoryTestCase(unittest.TestCase):
         self.history.setup(self.config)
         self.assertIsNotNone(self.history.allocation_history)
         self.assertEqual(self.history.allocation_history.window_size, 50)
-        self.assertIsNotNone(self.history.choice_history)
+        self.assertIsNotNone(self.history.choice_output_history)
+        self.assertIsNotNone(self.history.choice_input_history)
 
         self.assertFalse(self.history._history_file.closed)
 

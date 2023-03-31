@@ -36,10 +36,10 @@ class ProportionalItemFM(ItemFeatureFairnessMetric):
     # No data means assume fairness
     # Might want this to be configurable.
     def compute_fairness(self, history):
-        if history.choice_history.is_empty():
+        if history.choice_output_history.is_empty():
             return 1.0
         else:
-            prior_results = history.choice_history.get_recent(-1)
+            prior_results = history.choice_output_history.get_recent(-1)
             target_proportion = float(self.get_property('proportion'))
             protected, total_items = self.count_protected(prior_results)
             protected_ratio = float(protected) / total_items
@@ -56,8 +56,8 @@ class ProportionalItemFM(ItemFeatureFairnessMetric):
         item_data = scruf.Scruf.state.item_features
         protected_count = 0
         total_count = 0
-        for history_entry in history_entries:
-            result = history_entry['output']
+        for result in history_entries:
+            #result = history_entry['output']
             protected_vector = [1 if item_data.is_protected(feature, result_entry.item) else 0 \
                                     for result_entry in result.get_results()]
             protected_count += sum(protected_vector)

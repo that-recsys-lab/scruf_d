@@ -14,6 +14,7 @@ from util.test_hcollection import TestHistoryCollection
 from util.test_result_list import ResultListTestCase
 from util.test_config_util import ConfigUtilTestCase
 from util.test_score_dict import ScoreDictTestCase
+from util.test_ballot_collection import TestBallotCollection
 from test_scruf_integration import ScrufIntegrationTestCase
 
 
@@ -41,6 +42,8 @@ def suite():
     suite.addTest(shist_tests)
     hcoll_tests = unittest.defaultTestLoader.loadTestsFromTestCase(TestHistoryCollection)
     suite.addTest(hcoll_tests)
+    bcoll_tests = unittest.defaultTestLoader.loadTestsFromTestCase(TestBallotCollection)
+    suite.addTest(bcoll_tests)
     rlist_tests = unittest.defaultTestLoader.loadTestsFromTestCase(ResultListTestCase)
     suite.addTest(rlist_tests)
     conf_tests = unittest.defaultTestLoader.loadTestsFromTestCase(ConfigUtilTestCase)

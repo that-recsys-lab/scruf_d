@@ -2,27 +2,39 @@ import copy
 from abc import ABC, abstractmethod
 
 from scruf.agent import AgentCollection
-from scruf.util import PropertyMismatchError, InvalidChoiceMechanismError, UnregisteredChoiceMechanismError, \
+from scruf.util import BallotCollection, InvalidChoiceMechanismError, UnregisteredChoiceMechanismError, \
     ResultList, PropertyMixin
 import scruf
 
 class ChoiceMechanism(PropertyMixin,ABC):
     """
-    A ChoiceMechanism takes in a list of allocation probabilities for all agents per user, a list of recommended items for each user, and
-    a list of agents, and selects an agent for each user based on the allocation probabilities. After this the agent's preferred item is given 
-    a boost in the ranking of the recommended items. Finally, a new recommended list is generated for each user based on the boosted ranking.
+    A ChoiceMechanism takes in a list of weights, a list of agents, a list of recommended items. The agents generate
+    their own preference lists and the specific compute_choice method combines the weights and the preferences.
     """
 
-    def do_choice(self, allocation_probabilities, recommendations):
+    def do_choice(self, allocation_probabilities, recommendations: ResultList):
         agents = scruf.Scruf.state.agents
         list_size = scruf.Scruf.state.output_list_size
-        results = self.compute_choice(agents, allocation_probabilities, recommendations, list_size)
-        scruf.Scruf.state.history.choice_history.add_item(results)
+        agent_ballots = self.compute_agent_ballots(agents, allocation_probabilities, recommendations)
+        bcoll, results = self.compute_choice(agents, agent_ballots, recommendations, list_size)
+        scruf.Scruf.state.history.choice_input_history.add_item(bcoll)
+        scruf.Scruf.state.history.choice_output_history.add_item(results)
         return results
 
+    def compute_agent_ballots(self, agents, allocation_probabilities, recommendations: ResultList):
+        bcoll = BallotCollection()
+        for agent_name, prob in allocation_probabilities.items():
+            if prob > 0:
+                aobj = agents.get_agent(agent_name)
+                prefs = aobj.compute_preferences(recommendations)
+                bcoll.set_ballot(agent_name, prefs, prob)
+        return bcoll
+
     @abstractmethod
-    def compute_choice(self, agents: AgentCollection, allocation_probabilities, recommended_items: ResultList, list_size):
+    # Returns the ballots (including the recommender) and the final result
+    def compute_choice(self, agents: AgentCollection, bcoll: BallotCollection, recommendations: ResultList, list_size):
         pass
+
 
 class NullChoiceMechanism(ChoiceMechanism):
     """
@@ -34,13 +46,14 @@ class NullChoiceMechanism(ChoiceMechanism):
         
     def compute_choice(self, agents, allocation_probabilities, recommended_items: ResultList, list_size):
         """
-        Returns the recommendation list without any .
+        Returns the recommendation list without any re-ranking.
         :return: selected agent for each user
         """
+        bcoll = BallotCollection()
+        bcoll.set_ballot('__rec', recommended_items, 1.0)
         output = copy.deepcopy(recommended_items)
         output.trim(list_size)
-        return {'original': recommended_items,
-                'output': output}
+        return bcoll, output
 
 class ChoiceMechanismFactory:
     """

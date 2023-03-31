@@ -1,6 +1,6 @@
 from .fairness_metric import FairnessMetricFactory
 from .compatibility_metric import CompatibilityMetricFactory
-from .choice_scorer import ChoiceScorerFactory
+from .preference_function import PreferenceFunctionFactory
 from scruf.util import get_value_from_keys
 from scruf.util.errors import ConfigKeyMissingError, ConfigNoAgentsError
 from scruf.util import ResultList
@@ -13,7 +13,7 @@ class FairnessAgent:
         self.name = name
         self.fairness_metric = None
         self.compatibility_metric = None
-        self.choice_scorer = None
+        self.preference_function = None
 
     def setup(self, properties):
         # Set up fairness metric
@@ -37,13 +37,22 @@ class FairnessAgent:
         self.compatibility_metric.set_agent(self)
 
         # Set up choice scorer
-        choice_scorer_name = properties['choice_scorer_class']
-        self.choice_scorer = ChoiceScorerFactory.create_choice_scorer(choice_scorer_name)
+        preference_function_name = properties['preference_function_class']
+        self.preference_function = PreferenceFunctionFactory.create_preference_function(preference_function_name)
 
-        if 'scorer' in properties:
-            self.choice_scorer.setup(properties['scorer'])
+        if 'preference' in properties:
+            self.preference_function.setup(properties['preference'])
         else:
-            self.choice_scorer.setup(dict())
+            self.preference_function.setup(dict())
+
+    def compute_fairness(self, history):
+        return self.fairness_metric.compute_fairness(history)
+
+    def compute_compatibility(self, context):
+        return self.compatibility_metric.compute_compatibility(context)
+
+    def compute_preferences(self, recommendations):
+        return self.preference_function.compute_preferences(recommendations)
 
 class AgentCollection:
 
@@ -62,6 +71,14 @@ class AgentCollection:
 
     def agent_names(self):
         return [agent.name for agent in self.agents]
+
+    def get_agent(self, name):
+        agent = None
+        for ag in self.agents:
+            if ag.name == name:
+                agent = ag
+        return agent
+
 
     def agent_value_pairs(self, default=0.0):
         return {name:default for name in self.agent_names()}
@@ -83,15 +100,12 @@ class AgentCollection:
 
         self.agents = agent_list
 
-    def compute_fairness(self, history):
-        return {agent.name: agent.fairness_metric.compute_fairness(history) \
-                    for agent in self.agents}
+    def compute_fairnesses(self, history):
+        return {agent.name: agent.compute_fairness(history) for agent in self.agents}
 
-    def compute_compatibility(self, context):
-        return {agent.name: agent.compatibility_metric.compute_compatibility(context) \
-                    for agent in self.agents}
+    def compute_compatibilities(self, context):
+        return {agent.name: agent.compute_compatibility(context) for agent in self.agents}
 
-    def score_items(self, rec_list: ResultList, list_size):
-        pass
+    def compute_preference_lists(self, recommendations):
+        return {agent.name: agent.compute_preferences(recommendations) for agent in self.agents}
 
-    # TODO: Also some function for use in the choice phase

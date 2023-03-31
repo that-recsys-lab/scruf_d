@@ -56,7 +56,7 @@ protected_values = 1
 name = "Feature 1 Agent"
 metric_class = "proportional_item"
 compatibility_class = "context_compatibility"
-choice_scorer_class = "zero_scorer"
+preference_function_class = "zero_preference"
 
 [agent.f1.metric]
 feature = "Feature 1"
@@ -66,11 +66,15 @@ proportion = 0.75
 name = "Feature 2 Agent"
 metric_class = "proportional_item"
 compatibility_class = "context_compatibility"
-choice_scorer_class = "zero_scorer"
+preference_function_class = "binary_preference"
 
 [agent.f2.metric]
 feature = "Feature 2"
 proportion = 0.5
+
+[agent.f2.preference]
+feature = "Feature 2"
+delta = 0.5
 
 [allocation]
 allocation_class = "most_compatible"
@@ -208,8 +212,7 @@ class ScrufIntegrationTestCase(unittest.TestCase):
         alloc = history['allocation']
         # should be all zeros
         self.assertTrue(all([score == 0.0 for score in alloc['output'].values()]))
-        choice = history['choice']
-        choice_output = choice['output']['results']
+        choice_output = history['choice_out']['results']
         self.assertEqual(len(choice_output), 2)
         self.assertTrue(choice_output[0]['item'], 'item1')
         self.assertTrue(choice_output[1]['item'], 'item2')

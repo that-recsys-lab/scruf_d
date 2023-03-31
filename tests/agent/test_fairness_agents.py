@@ -1,6 +1,6 @@
 import unittest
 import toml
-from scruf.agent import FairnessAgent, ProportionalItemFM, AgentCollection, FixedValueChoiceScorer
+from scruf.agent import FairnessAgent, ProportionalItemFM, AgentCollection, BinaryPreferenceFunction
 
 # This is just the agent part
 CONFIG_DOCUMENT = """
@@ -10,29 +10,29 @@ CONFIG_DOCUMENT = """
 name = "Country"
 metric_class = "proportional_item"
 compatibility_class = "always_one"
-choice_scorer_class = "fixed_value"
+preference_function_class = "binary_preference"
 
 [agent.country.metric]
 feature = "country"
 proportion = 0.2
 
-[agent.country.scorer]
-protected_feature = "country"
-protected_score_value = 0.5
+[agent.country.preference]
+feature = "country"
+delta = 0.5
 
 [agent.sector]
 name = "Sector"
 metric_class = "proportional_item"
 compatibility_class = "always_zero"
-choice_scorer_class = "fixed_value"
+preference_function_class = "binary_preference"
 
 [agent.sector.metric]
 feature = "sector"
 proportion = 0.5
 
-[agent.sector.scorer]
-protected_feature = "sector"
-protected_score_value = 0.5
+[agent.sector.preference]
+feature = "sector"
+delta = 0.5
 """
 
 class AgentTestCase(unittest.TestCase):

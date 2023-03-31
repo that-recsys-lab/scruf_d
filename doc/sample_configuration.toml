@@ -2,22 +2,21 @@
 # For format reference only -- may not actually work in any given SCRUF-D version / data set
 
 [location]
-path = "your_path/here"
+path = "."
 overwrite = "true"
 
 [data]
-rec_filename = "recommendations.txt"
-feature_filename = "item_features.txt"
+rec_filename = "recommendations.csv"
+feature_filename = "item_features.csv"
 
 [output]
 filename = "history_file.json"
 
 [parameters]
-list_size = 10
+list_size = 2
 iterations = -1 # -1 means run through all the users
 initialize = "skip"
 history_window_size = 50
-random_seed = 20230221
 
 [context]
 context_class = "csv_context"
@@ -27,47 +26,41 @@ compatibility_file = "compat_data.csv"
 
 [feature]
 
-[feature.country]
-name = "Country"
-protected_feature = "country"
-protected_values = ["ug", "th", "ke", "ha"]
+[feature.f1]
+name = "Feature 1"
+protected_feature = "feature1"
+protected_values = ["a", "b"]
 
-[feature.sector]
-name = "Sector"
-protected_feature = "sector"
-protected_values = [7, 18, 35]
-
-[feature.loan_size]
-name = "Loan Size"
-protected_feature = "bucket5"
-protected_values = [1]
+[feature.f2]
+name = "Feature 2"
+protected_feature = "feature2"
+protected_values = 1
 
 [agent]
 
-[agent.country]
-name = "Country"
-metric_class = "proportional_fair"
-compatibility = "entropy"
+[agent.f1]
+name = "Feature 1 Agent"
+metric_class = "proportional_item"
+compatibility_class = "context_compatibility"
+preference_function_class = "zero_preference"
 
-[agent.country.metric]
-feature = "Country"
-proportion = 0.3
+[agent.f1.metric]
+feature = "Feature 1"
+proportion = 0.75
 
-[agent.sector]
-name = "Sector"
-metric_class = "list_exposure"
-compatibility_class = "entropy"
+[agent.f2]
+name = "Feature 2 Agent"
+metric_class = "proportional_item"
+compatibility_class = "context_compatibility"
+preference_function_class = "binary_preference"
 
-[agent.sector.metric]
-feature = "Sector"
+[agent.f2.metric]
+feature = "Feature 2"
+proportion = 0.5
 
-[agent.loan_size]
-name = "Loan Size"
-metric_class = "list_exposure"
-compatibility_class = "risk_aversion"
-
-[agent.loan_size.metric]
-feature = "Loan Size"
+[agent.f2.preference]
+feature = "Feature 2"
+delta = 0.5
 
 [allocation]
 algorithm = "weighted_product_allocation"
