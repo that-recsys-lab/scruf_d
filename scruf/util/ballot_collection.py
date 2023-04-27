@@ -11,6 +11,9 @@ class BallotCollection:
     def get_ballot(self, name):
         return self.ballots[name]
 
+    def get_ballots(self):
+        return self.ballots.values()
+
     def set_ballot(self, name, prefs, weight=1.0):
         bal = Ballot(name, prefs, weight)
         self.ballots[name] = bal

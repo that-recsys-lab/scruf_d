@@ -22,28 +22,6 @@ class WScoringChoiceMechanism(ChoiceMechanism):
         output.trim()
         return bcoll, output
 
-    def compute_choice(self, agents: AgentCollection, allocation_probabilities, recommended_items: ResultList, list_size):
-        results_dict = {}
-
-        # For agent in agents:
-        #   Collect prefs
-        # Weight by weight from dictionary
-        # Combine results
-        # Trim
-        # Return
-        # TODO: write a version of combine results that allows weights
-
-
-
-
-        recommended_items.rescore(lambda entry: entry.score * rec_weight)
-        results_dict['original'] = recommended_items
-
-        new_scores = ResultList.combine_results_dict(results_dict)
-        new_scores.trim(list_size)
-        results_dict['output'] = new_scores
-        return results_dict
-
 
 mechanism_specs = [("weighted_scoring", WScoringChoiceMechanism)]
 
