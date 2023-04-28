@@ -6,14 +6,8 @@ from .choice_mechanism import ChoiceMechanism, ChoiceMechanismFactory
 from scruf.agent import AgentCollection
 from scruf.util import ResultList, BallotCollection, MismatchedWhalrusRuleError
 
-# Note: This version of the mechanism really only works with rules of type RuleScoreNum because we
-# make use of the .scores_as_floats_ feature. Doing it more generally would be possible but the scores
-# coming back would be hella artificial.
-# TODO: Write non-score wrapper. This would be very similar but would assign ordinal numbers to results
-#  based on the ballot ordering.
 
 class WhalrusWrapperMechanism (ChoiceMechanism):
-#    _PROPERTY_NAMES = ['whalrus_rule', 'whalrus_properties', 'recommender_weight']
     _PROPERTY_NAMES = ['whalrus_rule', 'recommender_weight']
 
     _LEGAL_MECHANISMS = []
@@ -77,7 +71,7 @@ class WhalrusWrapperMechanism (ChoiceMechanism):
         return wballot_list, weight_list
 
 
-
+# For score-based mechanisms
 class WhalrusWrapperScoring (WhalrusWrapperMechanism):
     # These are the ones that inherit from RuleScoreNum
     _LEGAL_MECHANISMS = ['RuleApproval', 'RuleBorda', 'RuleBucklinByRounds',
@@ -98,16 +92,21 @@ class WhalrusWrapperScoring (WhalrusWrapperMechanism):
         result_list.setup(triples_list, presorted=False, trim=list_size)
         return result_list
 
+# For mechanisms that don't return a score
 class WhalrusWrapperOrdinal (WhalrusWrapperMechanism):
     # These are the ones that don't inherit from RuleScoreNum
     _LEGAL_MECHANISMS = ['RuleBaldwin', 'RuleBlack', 'RuleCondorcet', 'RuleCoombs',
                          'RuleIRV', 'RuleKimRoush', 'RuleNanson',
                          'RuleSchulze', 'RuleTwoRound']
 
+    # Priority.ASCENDING is kind of arbitrary. It would be better but more difficult to pass this
+    # in from the configuration file.
     def invoke_whalrus_rule(self, ballots, weights):
         self.whalrus_rule = self.whalrus_class(ballots, weights=weights,
                                                tie_break=whalrus.Priority.ASCENDING)
 
+    # Score range is 0..length of list. This is also something we might want to make configurable
+    # some kind of normalization.
     def unwrap_result(self, user, list_size):
         ordered_items = self.whalrus_rule.strict_order_
         ordinal_scores = reversed(range(0, len(ordered_items)))

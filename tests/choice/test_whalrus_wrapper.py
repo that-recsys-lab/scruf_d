@@ -4,7 +4,7 @@ import whalrus
 from icecream import ic
 
 from scruf.choice import ChoiceMechanismFactory, WhalrusWrapperScoring, WhalrusWrapperOrdinal
-from scruf.util import ResultList, BallotCollection
+from scruf.util import ResultList, BallotCollection, MismatchedWhalrusRuleError
 
 SAMPLE_PROPERTIES1 = '''
 [choice]
@@ -17,6 +17,14 @@ recommender_weight = 0.8
 SAMPLE_PROPERTIES2 = '''
 [choice]
 algorithm = "whalrus_ordinal"
+[choice.properties]
+whalrus_rule = "RuleCondorcet"
+recommender_weight = 0.8
+'''
+
+BAD_PROPERTIES1 = '''
+[choice]
+algorithm = "whalrus_scoring"
 [choice.properties]
 whalrus_rule = "RuleCondorcet"
 recommender_weight = 0.8
@@ -172,8 +180,6 @@ class WhalrusWrapperTestCase(unittest.TestCase):
 
         choice.invoke_whalrus_rule(wballots, weights)
 
-        ic(choice.whalrus_rule.strict_order_)
-
         result: ResultList = choice.unwrap_result('foo', 2)
 
         result_contents = result.get_results()
@@ -188,3 +194,10 @@ class WhalrusWrapperTestCase(unittest.TestCase):
         self.assertEqual('foo', second_result.user)
         self.assertEqual('i1', second_result.item)
         self.assertEqual(3, second_result.score)
+
+    def test_type_error(self):
+        config = toml.loads(BAD_PROPERTIES1)
+        alg_name = config['choice']['algorithm']
+        choice = ChoiceMechanismFactory.create_choice_mechanism(alg_name)
+        with self.assertRaises(MismatchedWhalrusRuleError):
+            choice.setup(config['choice']['properties'])

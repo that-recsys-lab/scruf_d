@@ -71,10 +71,6 @@
 ### Choice mechanism
 * Greedy MMR-type
 * FA*IR
-* Integrate whalrus (https://francois-durand.github.io/whalrus/)
-  * Allow creation of whalrus voting functions at run-time through configuration
-  * Convert BallotCollection to appropriate type
-  * Convert results to ResultList
 
 ## Data handling
 
@@ -107,6 +103,11 @@
 * Implement the allocation mechanism class. - DONE
 * Implement the choice mechanism class. - DONE RB (Might need to revisit this)
 * Change implementation to allow random choice among equal scoring alternatives.
+* Integrate whalrus (https://francois-durand.github.io/whalrus/)
+  * Allow creation of whalrus voting functions at run-time through configuration
+  * Convert BallotCollection to appropriate type
+  * Convert results to ResultList
+  * DONE RB
 
 ## Unit Tests
 * Implement unit tests for compatibility metric. DONE RB
