@@ -4,6 +4,7 @@ from .errors import ScrufError, PropertyMismatchError, \
     ConfigFileError, ConfigKeyMissingError, \
     InvalidAllocationMechanismError, UnregisteredAllocationMechanismError, \
     InvalidChoiceMechanismError, UnregisteredChoiceMechanismError, \
+    MismatchedWhalrusRuleError, \
     InvalidPreferenceFunctionError, UnregisteredPreferenceFunctionError, \
     InvalidContextClassError, UnregisteredContextClassError, \
     MissingFeatureDataFilenameError, PathDoesNotExistError, ContextNotFoundError, \

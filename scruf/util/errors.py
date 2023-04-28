@@ -82,6 +82,12 @@ class UnregisteredChoiceMechanismError(ScrufError):
         super().__init__(self.message)
 
 
+class MismatchedWhalrusRuleError(ScrufError):
+    def __init__(self, name, wrapper_name):
+        self.message = f'Cannot create choice mechanism: Whalrus rule {name} does not match {wrapper_name}.'
+        super().__init__(self.message)
+
+
 class InvalidPreferenceFunctionError(ScrufError):
     def __init__(self, name):
         self.message = f'Cannot create preference function: Class {name} is not a subclass of PreferenceFunction.'
