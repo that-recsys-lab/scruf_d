@@ -11,7 +11,8 @@ SAMPLE_PROPERTIES1 = '''
 algorithm = "whalrus_scoring"
 [choice.properties]
 whalrus_rule = "RuleBorda"
-tie_breaker = "none"
+tie_breaker = "None"
+ignore_weights = true
 recommender_weight = 0.8
 '''
 
@@ -21,6 +22,7 @@ algorithm = "whalrus_ordinal"
 [choice.properties]
 whalrus_rule = "RuleCondorcet"
 tie_breaker = "Ascending"
+ignore_weights = false
 recommender_weight = 0.8
 '''
 
@@ -30,6 +32,7 @@ algorithm = "whalrus_scoring"
 [choice.properties]
 whalrus_rule = "RuleCondorcet"
 tie_breaker = "Ascending"
+ignore_weights = false
 recommender_weight = 0.8
 '''
 
@@ -39,6 +42,7 @@ algorithm = "whalrus_ordinal"
 [choice.properties]
 whalrus_rule = "RuleCondorcet"
 tie_breaker = "nonexistent"
+ignore_weights = false
 recommender_weight = 0.8
 '''
 
