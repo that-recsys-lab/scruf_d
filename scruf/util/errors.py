@@ -87,6 +87,11 @@ class MismatchedWhalrusRuleError(ScrufError):
         self.message = f'Cannot create choice mechanism: Whalrus rule {name} does not match {wrapper_name}.'
         super().__init__(self.message)
 
+class UnknownWhalrusTiebreakError(ScrufError):
+    def __init__(self, name):
+        self.message = f'Cannot create choice mechanism: Whalrus tiebreak {name} is unknown.'
+        super().__init__(self.message)
+
 
 class InvalidPreferenceFunctionError(ScrufError):
     def __init__(self, name):

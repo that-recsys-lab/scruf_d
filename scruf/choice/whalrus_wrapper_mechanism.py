@@ -4,17 +4,21 @@ from abc import abstractmethod
 from icecream import ic
 from .choice_mechanism import ChoiceMechanism, ChoiceMechanismFactory
 from scruf.agent import AgentCollection
-from scruf.util import ResultList, BallotCollection, MismatchedWhalrusRuleError
+from scruf.util import ResultList, BallotCollection, MismatchedWhalrusRuleError, UnknownWhalrusTiebreakError
 
+# TODO: Configure tie-breaking mechanism
+# TODO: Configure weight usage
 
 class WhalrusWrapperMechanism (ChoiceMechanism):
-    _PROPERTY_NAMES = ['whalrus_rule', 'recommender_weight']
+    _PROPERTY_NAMES = ['whalrus_rule', 'recommender_weight', 'tie_breaker']
 
     _LEGAL_MECHANISMS = []
+    _LEGAL_TIEBREAKERS = []
 
     def __init__(self):
         super().__init__()
         self.whalrus_class = None
+        self.tiebreak_class = None
         self.whalrus_rule: whalrus.Rule = None
         self.converter = None
 
@@ -24,10 +28,14 @@ class WhalrusWrapperMechanism (ChoiceMechanism):
     def setup(self, input_properties):
         super().setup(input_properties)
         self.whalrus_class = self.get_whalrus_mechanism()
+        self.tiebreak_class = self.get_tie_breaker()
         self.converter = whalrus.ConverterBallotGeneral()
 
     def check_rule_type(self, rule_name):
         return rule_name in self._LEGAL_MECHANISMS
+
+    def check_tiebreak_type(self, tiebreak_name):
+        return tiebreak_name in self._LEGAL_TIEBREAKERS
 
     @abstractmethod
     def unwrap_result(self, user, list_size):
@@ -56,6 +64,18 @@ class WhalrusWrapperMechanism (ChoiceMechanism):
         else:
             raise MismatchedWhalrusRuleError(rule_name, self.__class__.__name__)
 
+    def get_tie_breaker(self):
+        tiebreak_property = self.get_property('tie_breaker')
+        if tiebreak_property == 'none':
+            return None
+        tiebreak_name = 'Priority' + tiebreak_property
+        if self.check_tiebreak_type(tiebreak_property):
+            module = importlib.import_module('whalrus')
+            return getattr(module, tiebreak_name)
+        # Should not get to else b
+        else:
+            raise UnknownWhalrusTiebreakError(tiebreak_name)
+
     # SCRUF ballots are name, weight, result list (ordered <user, item, score> triples)
     # WHALRUS ballot objects can be created from an {item: score} dictionary. The agent weights have to be collected
     # separately, so this function returns ([ballots], [weights])
@@ -80,6 +100,8 @@ class WhalrusWrapperScoring (WhalrusWrapperMechanism):
                          'RuleRangeVoting', 'RuleRankedPairs', 'RuleSimplifiedDodgson',
                          'RuleVeto']
 
+    _LEGAL_TIEBREAKERS = ['none']
+
     def invoke_whalrus_rule(self, ballots, weights):
         self.whalrus_rule = self.whalrus_class(ballots, weights=weights)
 
@@ -92,6 +114,7 @@ class WhalrusWrapperScoring (WhalrusWrapperMechanism):
         result_list.setup(triples_list, presorted=False, trim=list_size)
         return result_list
 
+
 # For mechanisms that don't return a score
 class WhalrusWrapperOrdinal (WhalrusWrapperMechanism):
     # These are the ones that don't inherit from RuleScoreNum
@@ -99,11 +122,13 @@ class WhalrusWrapperOrdinal (WhalrusWrapperMechanism):
                          'RuleIRV', 'RuleKimRoush', 'RuleNanson',
                          'RuleSchulze', 'RuleTwoRound']
 
+    _LEGAL_TIEBREAKERS = ['Unambiguous', 'Abstain', 'Ascending', 'Descending', 'Random']
+
     # Priority.ASCENDING is kind of arbitrary. It would be better but more difficult to pass this
     # in from the configuration file.
     def invoke_whalrus_rule(self, ballots, weights):
         self.whalrus_rule = self.whalrus_class(ballots, weights=weights,
-                                               tie_break=whalrus.Priority.ASCENDING)
+                                               tie_break=self.tiebreak_class())
 
     # Score range is 0..length of list. This is also something we might want to make configurable
     # some kind of normalization.

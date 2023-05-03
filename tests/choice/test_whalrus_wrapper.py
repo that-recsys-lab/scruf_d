@@ -4,13 +4,14 @@ import whalrus
 from icecream import ic
 
 from scruf.choice import ChoiceMechanismFactory, WhalrusWrapperScoring, WhalrusWrapperOrdinal
-from scruf.util import ResultList, BallotCollection, MismatchedWhalrusRuleError
+from scruf.util import ResultList, BallotCollection, MismatchedWhalrusRuleError, UnknownWhalrusTiebreakError
 
 SAMPLE_PROPERTIES1 = '''
 [choice]
 algorithm = "whalrus_scoring"
 [choice.properties]
 whalrus_rule = "RuleBorda"
+tie_breaker = "none"
 recommender_weight = 0.8
 '''
 
@@ -19,6 +20,7 @@ SAMPLE_PROPERTIES2 = '''
 algorithm = "whalrus_ordinal"
 [choice.properties]
 whalrus_rule = "RuleCondorcet"
+tie_breaker = "Ascending"
 recommender_weight = 0.8
 '''
 
@@ -27,6 +29,16 @@ BAD_PROPERTIES1 = '''
 algorithm = "whalrus_scoring"
 [choice.properties]
 whalrus_rule = "RuleCondorcet"
+tie_breaker = "Ascending"
+recommender_weight = 0.8
+'''
+
+BAD_PROPERTIES2 = '''
+[choice]
+algorithm = "whalrus_ordinal"
+[choice.properties]
+whalrus_rule = "RuleCondorcet"
+tie_breaker = "nonexistent"
 recommender_weight = 0.8
 '''
 
@@ -200,4 +212,10 @@ class WhalrusWrapperTestCase(unittest.TestCase):
         alg_name = config['choice']['algorithm']
         choice = ChoiceMechanismFactory.create_choice_mechanism(alg_name)
         with self.assertRaises(MismatchedWhalrusRuleError):
+            choice.setup(config['choice']['properties'])
+
+        config = toml.loads(BAD_PROPERTIES2)
+        alg_name = config['choice']['algorithm']
+        choice = ChoiceMechanismFactory.create_choice_mechanism(alg_name)
+        with self.assertRaises(UnknownWhalrusTiebreakError):
             choice.setup(config['choice']['properties'])
