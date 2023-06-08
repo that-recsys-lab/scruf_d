@@ -87,6 +87,7 @@
 * Should we get rid of the feature name vs feature id distinction
 * experiments with dynamic item database?
 * How to integrate bandit/reinforcement learning
+* Click model for additional history
 
 # Completed items
 

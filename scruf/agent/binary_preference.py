@@ -28,7 +28,7 @@ class BinaryPreferenceFunction(PreferenceFunction):
         rec_list = copy.deepcopy(recommendations)
 
         if_data = scruf.Scruf.state.item_features
-        feature = self.get_property('protected_feature')
+        feature = self.get_property('feature')
         delta = self.get_property('delta')
         rec_list.rescore(lambda entry: delta if if_data.is_protected(feature, entry.item) else 0.0)
         return rec_list

@@ -36,7 +36,6 @@ class WhalrusWrapperMechanism (ChoiceMechanism):
         if self.check_rule_type(rule_name):
             module = importlib.import_module('whalrus')
             return getattr(module, rule_name)
-        # Should not get to else b
         else:
             raise MismatchedWhalrusRuleError(rule_name, self.__class__.__name__)
 
@@ -48,7 +47,6 @@ class WhalrusWrapperMechanism (ChoiceMechanism):
         if self.check_tiebreak_type(tiebreak_property):
             module = importlib.import_module('whalrus')
             return getattr(module, tiebreak_name)
-        # Should not get to else b
         else:
             raise UnknownWhalrusTiebreakError(tiebreak_name)
 
@@ -77,7 +75,7 @@ class WhalrusWrapperMechanism (ChoiceMechanism):
             wballots, weights = self.wrap_ballots(bcoll)
             self.invoke_whalrus_rule(wballots, weights=weights)
         user = recommended_items.get_user()
-        output = self.unwrap_result(user, list) # Should include trim
+        output = self.unwrap_result(user, list_size) # Should include trim
 
         return bcoll, output
 

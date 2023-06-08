@@ -33,8 +33,8 @@ class LotteryAllocationMechanism(AllocationMechanism):
         :return: a dictionary mapping agent names to allocation probabilities
         """
         # Compute the fairness and compatibility scores for each agent
-        fairness_values = agents.compute_fairness(history)
-        compat_values = agents.compute_compatibility(context)
+        fairness_values = agents.compute_fairnesses(history)
+        compat_values = agents.compute_compatibilities(context)
         scores = {agent_name: self.score(agent_name, fairness_values, compat_values) \
                     for agent_name in agents.agent_names()}
 
