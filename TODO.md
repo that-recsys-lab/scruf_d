@@ -1,21 +1,16 @@
 # TODO items
 
-## Data Handling
-### Known bugs
+## Known bugs
 * output files are too large
+
+## Data Handling
 
 ## Unit Tests
 * Unit tests for lottery mechanisms
+* Unit tests for choice mechanisms
 
 ## Simulation
 * Test and document Jupyter notebook usage
-
-## Data generation
-* Data with non-binary compatibilities
-* Data with protected group overlap
-* Data with linkage between items, users and compatibilities
-  * Maybe an inverse latent variable model?
-* Use Kiva data / other data sets
 
 ## Experiments
 
@@ -80,14 +75,23 @@
 ## Mechanisms
 
 ## Util
+* Implement the ability to provide default scores for items when balloting
 
 # Things to think about
-
+* Do we need to pass the agent list to compute_choice. Not used anywhere?
 * Should we make the configuration data into its own class.
 * Should we get rid of the feature name vs feature id distinction
 * experiments with dynamic item database?
 * How to integrate bandit/reinforcement learning
 * Click model for additional history
+
+## Data generation (now its own project)
+* Data with non-binary compatibilities
+* Data with protected group overlap
+* Data with linkage between items, users and compatibilities
+  * Maybe an inverse latent variable model?
+* Use Kiva data / other data sets
+
 
 # Completed items
 
