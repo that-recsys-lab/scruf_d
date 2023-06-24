@@ -7,6 +7,7 @@ from agent.test_preference_function import PreferenceFunctionTestCase
 from allocation.test_allocation_mechanism import AllocationMechanismTestCase
 from choice.test_choice_mechanism import ChoiceMechanismTestCase
 from choice.test_whalrus_wrapper import WhalrusWrapperTestCase
+from click_model.test_click_model import ClickModelTestCase
 from data.test_context_class import ContextClassTestCase
 from data.test_item_feature import ItemFeatureTestCase
 from data.test_user_data import UserDataTestCase
@@ -37,6 +38,8 @@ def suite():
     suite.addTest(choice_test)
     whalrus_test = unittest.defaultTestLoader.loadTestsFromTestCase(WhalrusWrapperTestCase)
     suite.addTest(whalrus_test)
+    click_test = unittest.defaultTestLoader.loadTestsFromTestCase(ClickModelTestCase)
+    suite.addTest(click_test)
     ctx_test = unittest.defaultTestLoader.loadTestsFromTestCase(ContextClassTestCase)
     suite.addTest(ctx_test)
     if_test = unittest.defaultTestLoader.loadTestsFromTestCase(ItemFeatureTestCase)

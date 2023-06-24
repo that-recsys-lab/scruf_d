@@ -6,6 +6,7 @@ from scruf.agent import AgentCollection
 from scruf.allocation import AllocationMechanismFactory, AllocationMechanism
 from scruf.choice import ChoiceMechanismFactory, ChoiceMechanism
 from scruf.post import PostProcessorFactory, PostProcessor
+from scruf.click_model import ClickModelFactory, ClickModel
 from scruf.data import ItemFeatureData, UserArrivalData, BulkLoadedUserData, Context, ContextFactory
 from scruf.util import get_value_from_keys, is_valid_keys, check_key_lists, get_working_dir_path, get_path_from_keys
 from icecream import ic
@@ -40,6 +41,11 @@ class Scruf:
                 cmech = ChoiceMechanismFactory.create_choice_mechanism(cmech_class)
                 self.choice_mechanism: ChoiceMechanism = cmech
 
+                # Click model
+                cmodel_class = get_value_from_keys(['click', 'click_class'], config)
+                cmodel = ClickModelFactory.create_click_model(cmodel_class)
+                self.click_model: ClickModel = cmodel
+
                 # Post-processing
                 post_class = get_value_from_keys(['post', 'postprocess_class'], config)
                 post = PostProcessorFactory.create_post_processor(post_class)
@@ -69,9 +75,15 @@ class Scruf:
         Scruf.state.allocation_mechanism.setup(amech_props)
         cmech_props = Scruf.get_value_from_keys(['choice', 'properties'], default={})
         Scruf.state.choice_mechanism.setup(cmech_props)
+
+        # Click model
+        click_props = Scruf.get_value_from_keys(['click', 'properties'], default={})
+        Scruf.state.click_model.setup(click_props)
+
         # Post processing
         post_props = Scruf.get_value_from_keys(['post', 'properties'], default={})
         Scruf.state.post_processor.setup(post_props)
+
         # Bookkeeping
         Scruf.state.history.setup(Scruf.state.config)
 
@@ -87,6 +99,7 @@ class Scruf:
     # Get recommendations
     # Run choice mechanism
     # Produce final recommendation list
+    # Apply click model
     # Update the history log
     # Loop
     def run_loop(self, iterations=-1, restart=True):
@@ -95,12 +108,13 @@ class Scruf:
         context = Scruf.state.context
         amech = Scruf.state.allocation_mechanism
         cmech = Scruf.state.choice_mechanism
+        cmodel = Scruf.state.click_model
 
         for user_info in Scruf.state.user_data.user_iterator(iterations, restart=restart):
             allocation = amech.do_allocation(user_info)
-            cmech.do_choice(allocation, user_info)
+            results = cmech.do_choice(allocation, user_info)
+            cmodel.do_clicks(results, user_info)
             history.write_current_state()
-
 
     @staticmethod
     def cleanup_experiment():

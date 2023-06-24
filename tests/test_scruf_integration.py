@@ -82,8 +82,12 @@ allocation_class = "most_compatible"
 [choice]
 choice_class = "null_choice"
 
+[click]
+click_class = "null_click"
+
 [post]
 postprocess_class = "null"
+
 '''
 
 TEST_FEATURE_DATA = '''item1, feature1, a

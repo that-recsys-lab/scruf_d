@@ -23,6 +23,7 @@ class ScrufHistory:
         self.fairness_history: HistoryCollection = None
         self.recommendation_input_history: ResultsHistory = None
         self.recommendation_output_history: ResultsHistory = None
+        self.click_history: ResultsHistory = None
         self.working_dir: pathlib.Path = None
         self.history_file_name: str = None
         self._history_file = None
@@ -37,6 +38,7 @@ class ScrufHistory:
         self.allocation_history = HistoryCollection(window_size)
         self.choice_input_history = HistoryCollection(window_size)
         self.choice_output_history = HistoryCollection(window_size)
+        self.click_history = HistoryCollection(window_size)
         #self.recommendation_input_history = ResultsHistory(window_size)
         #self.recommendation_output_history = ResultsHistory(window_size)
 
@@ -53,13 +55,15 @@ class ScrufHistory:
         alloc = self.allocation_history.get_most_recent()
         choice_input = self.choice_input_history.get_most_recent()
         choice_output = self.choice_output_history.get_most_recent()
+        click = self.click_history.get_most_recent()
 
         output_json = {
             'time': current_time,
             'user': current_user,
             'allocation': alloc,
             'choice_in': choice_input,
-            'choice_out': choice_output
+            'choice_out': choice_output,
+            'click': click
         }
 
         json_str = jsons.dumps(output_json)

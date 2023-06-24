@@ -76,8 +76,11 @@ algorithm = "fixed_utility"
 delta = 0.5
 alpha = 0.2
 
+[click_model]
+
 [post]
 postprocess_class = "default"
 
 [post.properties]
 filename="experiment_results.csv"
+

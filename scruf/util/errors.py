@@ -149,4 +149,15 @@ class InvalidPostProcessorError(ScrufError):
 class UnregisteredPostProcessorError(ScrufError):
     def __init__(self, name):
         self.message = f'Cannot create post processor: Class {name} is not registered and may not exist.'
+
+
+class InvalidClickModelError(ScrufError):
+    def __init__(self, name):
+        self.message = f'Cannot create click model: Class {name} is not a subclass of ClickModel.'
+        super().__init__(self.message)
+
+
+class UnregisteredClickModelError(ScrufError):
+    def __init__(self, name):
+        self.message = f'Cannot create click model: Class {name} is not registered and may not exist.'
         super().__init__(self.message)
