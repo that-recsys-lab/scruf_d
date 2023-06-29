@@ -1,6 +1,7 @@
 from .preference_function import PreferenceFunctionFactory, PreferenceFunction
 import scruf
 import copy
+import random
 from scruf.util import ResultList
 
 
@@ -34,7 +35,25 @@ class BinaryPreferenceFunction(PreferenceFunction):
         return rec_list
 
 
+# Adds a random value to the binary rescoring effectively making it a total order instead of a partial order.
+class PerturbedBinaryPreferenceFunction(BinaryPreferenceFunction):
+    def __init__(self):
+        super().__init__()
+
+    def __str__ (self):
+        prot_feature = self.get_property('protected_feature')
+        delta = self.get_property('delta')
+        return f"PerturbedPreferenceFunction: protected feature = {prot_feature}, delta = {delta}"
+
+    def compute_preferences(self, recommendations: ResultList) -> ResultList:
+        rand: random.Random = scruf.Scruf.state.rand
+        delta = float(self.get_property('delta'))
+        rec_list = super().compute_preferences(recommendations)
+        rec_list.rescore(lambda entry: entry.score + delta * rand.gauss(0, 0.1))
+        return rec_list
+
 # Register the mechanisms created above
-pfunc_specs = [("binary_preference", BinaryPreferenceFunction)]
+pfunc_specs = [("binary_preference", BinaryPreferenceFunction),
+               ("perturbed_binary", PerturbedBinaryPreferenceFunction)]
 
 PreferenceFunctionFactory.register_preference_functions(pfunc_specs)
