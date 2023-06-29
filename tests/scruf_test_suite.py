@@ -3,6 +3,7 @@ import unittest
 from agent.test_fairness_agents import AgentTestCase
 from agent.test_fairness_metric import FairnessMetricTestCase
 from agent.test_compatibility_metric import CompatibilityMetricTestCase
+from agent.test_preference_function import PreferenceFunctionTestCase
 from allocation.test_allocation_mechanism import AllocationMechanismTestCase
 from choice.test_choice_mechanism import ChoiceMechanismTestCase
 from choice.test_whalrus_wrapper import WhalrusWrapperTestCase
@@ -27,6 +28,8 @@ def suite():
     suite.addTest(metric_tests)
     compat_test = unittest.defaultTestLoader.loadTestsFromTestCase(CompatibilityMetricTestCase)
     suite.addTest(compat_test)
+    pref_test = unittest.defaultTestLoader.loadTestsFromTestCase(CompatibilityMetricTestCase)
+    suite.addTest(pref_test)
     alloc_test = unittest.defaultTestLoader.loadTestsFromTestCase(AllocationMechanismTestCase)
     suite.addTest(alloc_test)
     choice_test = unittest.defaultTestLoader.loadTestsFromTestCase(ChoiceMechanismTestCase)

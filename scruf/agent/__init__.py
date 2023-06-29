@@ -6,4 +6,4 @@ from .compatibility_metric import CompatibilityMetric, CompatibilityMetricFactor
 from .user_agent_compatibility import ContextCompatibilityMetric
 #from .value_scorer import FixedValueChoiceScorer
 from .preference_function import PreferenceFunction, PreferenceFunctionFactory
-from .binary_preference import BinaryPreferenceFunction
+from .binary_preference import BinaryPreferenceFunction, PerturbedBinaryPreferenceFunction

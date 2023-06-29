@@ -46,10 +46,11 @@ class PerturbedBinaryPreferenceFunction(BinaryPreferenceFunction):
         return f"PerturbedPreferenceFunction: protected feature = {prot_feature}, delta = {delta}"
 
     def compute_preferences(self, recommendations: ResultList) -> ResultList:
-        rand: random.Random = scruf.Scruf.ScrufState.rand
+        rand: random.Random = scruf.Scruf.state.rand
         delta = float(self.get_property('delta'))
         rec_list = super().compute_preferences(recommendations)
         rec_list.rescore(lambda entry: entry.score + delta * rand.gauss(0, 0.1))
+        return rec_list
 
 # Register the mechanisms created above
 pfunc_specs = [("binary_preference", BinaryPreferenceFunction),
