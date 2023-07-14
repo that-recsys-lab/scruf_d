@@ -8,7 +8,7 @@ from .errors import ScrufError, PropertyMismatchError, \
     InvalidPreferenceFunctionError, UnregisteredPreferenceFunctionError, \
     InvalidContextClassError, UnregisteredContextClassError, \
     MissingFeatureDataFilenameError, PathDoesNotExistError, ContextNotFoundError, \
-    UnknownCollapseParameterError
+    UnknownCollapseParameterError, InvalidPostProcessorError, UnregisteredPostProcessorError
 from .result_list import ResultList, ResultEntry
 from .history_collection import HistoryCollection
 from .config_util import is_valid_keys, get_value_from_keys, check_key_lists, ConfigKeys, get_working_dir_path, \

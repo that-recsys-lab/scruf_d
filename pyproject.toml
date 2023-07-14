@@ -11,6 +11,8 @@ toml = "*"
 icecream = "*"
 jsons = "^1.6.3"
 whalrus = "^0.4.6"
+jsonlines = "^3.1.0"
+pandas = "^2.0.3"
 
 [build-system]
 requires = ["poetry-core"]

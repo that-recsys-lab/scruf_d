@@ -138,3 +138,15 @@ class UnknownCollapseParameterError(ScrufError):
     def __init__(self, parameter_type, parameter_value):
         self.message = f'Unknown parameter for collapse_score_dict: parameter {parameter_type} value {parameter_value}'
         super().__init__(self.message)
+
+
+class InvalidPostProcessorError(ScrufError):
+    def __init__(self, name):
+        self.message = f'Cannot create post processor: Class {name} is not a subclass of PostProcessor.'
+        super().__init__(self.message)
+
+
+class UnregisteredPostProcessorError(ScrufError):
+    def __init__(self, name):
+        self.message = f'Cannot create post processor: Class {name} is not registered and may not exist.'
+        super().__init__(self.message)

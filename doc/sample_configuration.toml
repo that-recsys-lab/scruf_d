@@ -75,3 +75,9 @@ algorithm = "fixed_utility"
 [choice.properties]
 delta = 0.5
 alpha = 0.2
+
+[post]
+postprocess_class = "default"
+
+[post.properties]
+filename="experiment_results.csv"

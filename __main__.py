@@ -11,6 +11,8 @@ def read_args():
         description='SCRUF-D tool for dynamic fairness-aware recommender systems experiments')
 
     parser.add_argument('config_file', help='Path to the configuration file.')
+    parser.add_argument('-p', '--post', action='store_true',
+                        help='Post-processing only. If set, no simulation will be run.')
 
     input_args = parser.parse_args()
     arg_check(vars(input_args))
@@ -36,11 +38,15 @@ if __name__ == '__main__':
 
     args = read_args()
     config = load_config(args['config_file'])
+    post_only = args['post']
 
     if config == None:
         raise ConfigFileError(args['config_file'])
 
-    scruf = Scruf(config)
+    scruf = Scruf(config, post_only=post_only)
+
+    if post_only:
+        scruf.post_process()
 
     scruf.run_experiment()
 

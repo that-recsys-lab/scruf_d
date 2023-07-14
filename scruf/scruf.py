@@ -3,6 +3,7 @@ from scruf.history import ScrufHistory
 from scruf.agent import AgentCollection
 from scruf.allocation import AllocationMechanismFactory, AllocationMechanism
 from scruf.choice import ChoiceMechanismFactory, ChoiceMechanism
+from scruf.post import PostProcessorFactory, PostProcessor
 from scruf.data import ItemFeatureData, UserArrivalData, BulkLoadedUserData, Context, ContextFactory
 from scruf.util import get_value_from_keys, is_valid_keys, check_key_lists, get_working_dir_path, get_path_from_keys
 from icecream import ic
@@ -37,13 +38,19 @@ class Scruf:
                 cmech = ChoiceMechanismFactory.create_choice_mechanism(cmech_class)
                 self.choice_mechanism: ChoiceMechanism = cmech
 
+                # Post-processing
+                post_class = get_value_from_keys(['post', 'postprocess_class'], config)
+                post = PostProcessorFactory.create_post_processor(post_class)
+                self.post_processor: PostProcessor = amech
+
                 # Parameters
                 self.output_list_size: int = get_value_from_keys(['parameters', 'list_size'], config)
                 self.iterations: int = get_value_from_keys(['parameters', 'iterations'], config)
 
     state: ScrufState = None
 
-    def __init__(self, config):
+    # post_only flag is currently ignored but could be used to avoid some setup tasks.
+    def __init__(self, config, post_only=False):
         Scruf.state = Scruf.ScrufState(config)
         # ic(toml.dumps(config))
 
@@ -67,6 +74,7 @@ class Scruf:
         Scruf.setup_experiment()
         self.run_loop(iterations=Scruf.state.iterations)
         Scruf.cleanup_experiment()
+        Scruf.post_process()
 
     # Get next user
     # Calculate fairness and compatibility
@@ -92,6 +100,10 @@ class Scruf:
     @staticmethod
     def cleanup_experiment():
         Scruf.state.history.cleanup()
+
+    @staticmethod
+    def post_process():
+        Scruf.state.post_processor.process()
 
     @staticmethod
     def is_valid_keys(key_list):
