@@ -5,6 +5,9 @@ from scruf.util import InvalidPreferenceFunctionError, UnregisteredPreferenceFun
 
 class PreferenceFunction(PropertyMixin,ABC):
 
+    def setup(self, input_props, names=None):
+        super().setup(input_props, names=names)
+
     @abstractmethod
     def compute_preferences(self, recommendations: ResultList) -> ResultList:
         pass

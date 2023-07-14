@@ -12,6 +12,8 @@ class AllocationMechanism(PropertyMixin,ABC):
     initialized with a dictionary of property name, value pairs. Each subclass has to specify the
     property names that it expects.
     """
+    def setup(self, input_props, names=None):
+        super().setup(input_props, names=names)
 
     def do_allocation(self, user_info):
         user_id = user_info.get_user()
@@ -91,6 +93,11 @@ class WeightedProductAllocationMechanism(ScoredAllocationMechanism):
 
     def __init__(self):
         super().__init__()
+
+    def setup(self, input_props, names=None):
+        super().setup(input_props,
+                      names=self.configure_names(WeightedProductAllocationMechanism._PROPERTY_NAMES, names))
+
 
     def __str__(self):
         return f"WeightedProductAllocation: fairness = {self.get_propery('fairness_exponent')}, compatibility = {self.get_propery('compatibility_exponent')}"

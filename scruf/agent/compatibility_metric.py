@@ -11,6 +11,9 @@ class CompatibilityMetric (PropertyMixin,ABC):
     def set_agent(self, agent):
         self.agent = agent
 
+    def setup(self, input_props, names=None):
+        super().setup(input_props, names=names)
+
     @abstractmethod
     def compute_compatibility(self, context):
         pass

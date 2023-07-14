@@ -60,6 +60,11 @@ class WeightedProductAllocationLottery(LotteryAllocationMechanism):
     def __init__(self):
         super().__init__()
 
+    def setup(self, input_props, names=None):
+        super().setup(input_props,
+                      names=self.configure_names(WeightedProductAllocationLottery._PROPERTY_NAMES, names))
+
+
     def __str__(self):
         return f"WeightedProductAllocation: fairness = {self.get_propery('fairness_exponent')}, compatibility = {self.get_propery('compatibility_exponent')}"
 
@@ -91,8 +96,9 @@ class StaticAllocationLottery(LotteryAllocationMechanism):
         super().__init__()
         self.lottery = None
 
-    def setup(self, input_properties: dict):
-        super().setup(input_properties)
+    def setup(self, input_properties: dict, names=None):
+        super().setup(input_properties,
+                      names=self.configure_names(StaticAllocationLottery._PROPERTY_NAMES, names))
         weights = self.get_property('weights')
         weights_sum = sum([float(wt) for agent, wt in weights])
         if weights_sum < 1.0:

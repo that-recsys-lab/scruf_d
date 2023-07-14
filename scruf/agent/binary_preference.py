@@ -15,6 +15,10 @@ class BinaryPreferenceFunction(PreferenceFunction):
     def __init__(self):
         super().__init__()
 
+    def setup(self, input_props, names=None):
+        super().setup(input_props, names=self.configure_names(BinaryPreferenceFunction._PROPERTY_NAMES, names))
+
+
     def __str__(self):
         prot_feature = self.get_property('protected_feature')
         delta = self.get_property('delta')

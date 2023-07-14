@@ -9,6 +9,9 @@ class FairnessMetric (PropertyMixin,ABC):
     initialized with a dictionary of property name, value pairs. Each subclass has to specify the
     property names that it expects.
     """
+    def setup(self, input_props, names=None):
+        super().setup(input_props, names=names)
+
     def set_agent(self, agent):
         self.agent = agent
 

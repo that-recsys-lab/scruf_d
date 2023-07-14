@@ -21,6 +21,9 @@ class WhalrusWrapperMechanism (ChoiceMechanism):
         self.whalrus_rule: whalrus.Rule = None
         self.converter = None
 
+    def setup(self, input_props, names=None):
+        super().setup(input_props, names=self.configure_names(WhalrusWrapperMechanism._PROPERTY_NAMES, names))
+
     def __str__(self):
         return f"WhalrusMechanism: whalrus= {self.get_property('whalrus_class')} rec_weight = {self.get_property('recommender_weight')}"
 

@@ -15,13 +15,16 @@ class PropertyCollection:
     def get_property(self, property_name):
         return self.properties[property_name]
 
-    def setup(self, input_properties: dict, names):
+    def setup(self, input_properties: dict, names=None):
         """
         Checks the properties provided with those expected by the object
         :param input_properties:
         :return:
         """
-        self.property_names = names
+        if names is None:
+            self.property_names = []
+        else:
+            self.property_names = names
 
         self.properties = {}
         input_property_names = input_properties.keys()
@@ -46,19 +49,17 @@ class PropertyCollection:
 
 class PropertyMixin():
 
-    _PROPERTY_NAMES = []
-
     def __init__(self):
         self.prop_coll = PropertyCollection()
 
-    def setup(self, input_properties: dict):
-        self.prop_coll.setup(input_properties, self._PROPERTY_NAMES)
+    def setup(self, input_properties: dict, names=None):
+        self.prop_coll.setup(input_properties, names=names)
 
-    def configure_names(self, subclass_props=None):
+    def configure_names(self, thisclass_props, subclass_props):
         if subclass_props is None:
-            names = self._PROPERTY_NAMES
+            names = thisclass_props
         else:
-            names = self._PROPERTY_NAMES + subclass_props
+            names = thisclass_props + subclass_props
         return names
 
 

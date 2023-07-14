@@ -11,6 +11,8 @@ class ChoiceMechanism(PropertyMixin,ABC):
     A ChoiceMechanism takes in a list of weights, a list of agents, a list of recommended items. The agents generate
     their own preference lists and the specific compute_choice method combines the weights and the preferences.
     """
+    def setup(self, input_props, names=None):
+        super().setup(input_props, names=names)
 
     def do_choice(self, allocation_probabilities, recommendations: ResultList):
         agents = scruf.Scruf.state.agents

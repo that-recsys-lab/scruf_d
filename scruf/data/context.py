@@ -8,6 +8,9 @@ import csv
 
 class Context(PropertyMixin,ABC):
 
+    def setup(self, input_props, names=None):
+        super().setup(input_props, names=names)
+
     @abstractmethod
     def get_context(self, user_id):
         pass
@@ -30,8 +33,9 @@ class CSVContext(Context):
         super().__init__()
         self.compatibility_dict = defaultdict(dict)
 
-    def setup(self, config):
-        super().setup(config['context']['properties'])
+    def setup(self, config, names=None):
+        super().setup(config['context']['properties'],
+                      names=self.configure_names(CSVContext._PROPERTY_NAMES, names))
         comp_file = get_path_from_keys(['context', 'properties', 'compatibility_file'], config,
                                        check_exists=True)
 

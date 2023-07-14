@@ -12,6 +12,9 @@ class PostProcessor(PropertyMixin,ABC):
         super().__init__()
         self.history = None
 
+    def setup(self, input_props, names=None):
+        super().setup(input_props, names=names)
+
     @staticmethod
     def read_history(history_file):
         entries = []
@@ -30,7 +33,7 @@ class PostProcessor(PropertyMixin,ABC):
             yield val
 
     def load_history(self):
-        history_path = get_path_from_keys(ConfigKeys.OUTPUT_PATH_KEYS, scruf.Scruf.state.config)
+        history_path = get_path_from_keys(ConfigKeys.OUTPUT_PATH_KEYS, scruf.get_config())
         self.history = self.read_history(history_path)
 
     @abstractmethod

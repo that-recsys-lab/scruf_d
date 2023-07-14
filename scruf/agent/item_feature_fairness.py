@@ -11,6 +11,9 @@ class ItemFeatureFairnessMetric(FairnessMetric):
     def __init__(self):
         super().__init__()
 
+    def setup(self, input_props, names=None):
+        super().setup(input_props, names=self.configure_names(ItemFeatureFairnessMetric._PROPERTY_NAMES, names))
+
     def __str__(self):
         return f"ItemFeatureFairnessMetric: feature = {self.get_property('feature')}"
 
@@ -29,6 +32,10 @@ class ProportionalItemFM(ItemFeatureFairnessMetric):
 
     def __init__(self):
         super().__init__()
+
+    def setup(self, input_props, names=None):
+        super().setup(input_props, \
+                      names=self.configure_names(ProportionalItemFM._PROPERTY_NAMES, names))
 
     def __str__(self):
         return f"ProportionalItemFM: feature = {self.get_property('feature')}"

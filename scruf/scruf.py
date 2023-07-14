@@ -1,4 +1,6 @@
 import random
+
+import scruf
 from scruf.history import ScrufHistory
 from scruf.agent import AgentCollection
 from scruf.allocation import AllocationMechanismFactory, AllocationMechanism
@@ -127,3 +129,9 @@ class Scruf:
     @staticmethod
     def get_path_from_keys(keys, check_exists=False):
         return get_path_from_keys(keys, Scruf.state.config, check_exists=check_exists)
+
+def get_config():
+    return scruf.Scruf.state.config
+
+def get_state():
+    return scruf.Scruf.state

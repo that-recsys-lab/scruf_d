@@ -13,6 +13,10 @@ class WScoringChoiceMechanism(ChoiceMechanism):
     def __init__(self):
         super().__init__()
 
+    def setup(self, input_props, names=None):
+        super().setup(input_props, names=self.configure_names(WScoringChoiceMechanism._PROPERTY_NAMES, names))
+
+
     def __str__(self):
         return f"WScoringChoiceMechanism: rec_weight = {self.get_property('recommender_weight')}"
 

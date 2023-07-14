@@ -1,6 +1,7 @@
 import unittest
 import toml
 from pathlib import Path
+import scruf
 
 from scruf.post import PostProcessorFactory, NullPostProcessor, DefaultPostProcessor
 
@@ -17,6 +18,16 @@ postprocess_class = "default"
 
 [post.properties]
 filename="test-output.csv"
+'''
+
+SAMPLE_PROPERTIES3 = '''
+[post]
+postprocess_class = "ndcg"
+
+[post.properties]
+filename="test-output.csv"
+threshold="none"
+binary="false"
 '''
 
 
@@ -50,6 +61,26 @@ class PostProcessorTestCase(unittest.TestCase):
         self.assertEqual(9, df.shape[1])
 
         self.assertEqual(0.0, df.loc[0, ('Allocation', '1')])
+
+    def test_ndcg(self):
+        fake_state = scruf.Scruf.ScrufState(None)
+        fake_state.output_list_size = 10
+        scruf.Scruf.state = fake_state
+
+        config = toml.loads(SAMPLE_PROPERTIES3)
+        alg_name = config['post']['postprocess_class']
+        post = PostProcessorFactory.create_post_processor(alg_name)
+        post.setup(config['post']['properties'])
+
+        post.history = post.read_history(Path('../../jupyter/sample_output.json'))
+        post.history_to_dataframe()
+        post.compute_ndcg_column()
+
+        ndcg_col = post.dataframe['nDCG']
+
+        ic(ndcg_col)
+
+        self.assertEqual(1.0, ndcg_col[0])
 
 
 if __name__ == '__main__':
