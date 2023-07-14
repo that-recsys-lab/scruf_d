@@ -76,7 +76,7 @@ class PostProcessorTestCase(unittest.TestCase):
         post.history_to_dataframe()
         post.compute_ndcg_column()
 
-        ndcg_col = post.dataframe['nDCG']
+        ndcg_col = post.dataframe[('nDCG', 'All')]
 
         ic(ndcg_col)
 

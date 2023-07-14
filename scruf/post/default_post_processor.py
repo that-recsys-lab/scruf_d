@@ -106,7 +106,7 @@ class NDCGPostProcessor(DefaultPostProcessor):
             threshold = float(threshold_str)
         binary = self.get_property('binary').casefold() == 'true'
 
-        self.dataframe['nDCG'] = \
+        self.dataframe[('nDCG', 'All')] = \
             self.dataframe['Results'].apply(
                 lambda row: NDCGPostProcessor.results_to_ndcg(row['In'], row['Out'], length,
                                                               threshold=threshold,
