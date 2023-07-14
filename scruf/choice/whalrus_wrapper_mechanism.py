@@ -19,16 +19,14 @@ class WhalrusWrapperMechanism (ChoiceMechanism):
         self.whalrus_class = None
         self.tiebreak_class = None
         self.whalrus_rule: whalrus.Rule = None
+        self.ignore_weights = None
         self.converter = None
-
-    def setup(self, input_props, names=None):
-        super().setup(input_props, names=self.configure_names(WhalrusWrapperMechanism._PROPERTY_NAMES, names))
 
     def __str__(self):
         return f"WhalrusMechanism: whalrus= {self.get_property('whalrus_class')} rec_weight = {self.get_property('recommender_weight')}"
 
-    def setup(self, input_properties):
-        super().setup(input_properties)
+    def setup(self, input_props, names=None):
+        super().setup(input_props, names=self.configure_names(WhalrusWrapperMechanism._PROPERTY_NAMES, names))
         self.whalrus_class = self.get_whalrus_mechanism()
         self.tiebreak_class = self.get_tie_breaker()
         self.ignore_weights = self.get_property('ignore_weights')

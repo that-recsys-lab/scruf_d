@@ -58,7 +58,7 @@ def suite():
     score_tests = unittest.defaultTestLoader.loadTestsFromTestCase(ScoreDictTestCase)
     suite.addTest(score_tests)
     post_tests = unittest.defaultTestLoader.loadTestsFromTestCase(PostProcessorTestCase)
-    suite.addTest(score_tests)
+    suite.addTest(post_tests)
     integration_tests = unittest.defaultTestLoader.loadTestsFromTestCase(ScrufIntegrationTestCase)
     suite.addTest(integration_tests)
 
