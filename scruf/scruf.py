@@ -41,7 +41,7 @@ class Scruf:
                 # Post-processing
                 post_class = get_value_from_keys(['post', 'postprocess_class'], config)
                 post = PostProcessorFactory.create_post_processor(post_class)
-                self.post_processor: PostProcessor = amech
+                self.post_processor: PostProcessor = post
 
                 # Parameters
                 self.output_list_size: int = get_value_from_keys(['parameters', 'list_size'], config)
@@ -67,6 +67,9 @@ class Scruf:
         Scruf.state.allocation_mechanism.setup(amech_props)
         cmech_props = Scruf.get_value_from_keys(['choice', 'properties'], default={})
         Scruf.state.choice_mechanism.setup(cmech_props)
+        # Post processing
+        post_props = Scruf.get_value_from_keys(['post', 'properties'], default={})
+        Scruf.state.post_processor.setup(post_props)
         # Bookkeeping
         Scruf.state.history.setup(Scruf.state.config)
 

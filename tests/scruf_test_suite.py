@@ -17,6 +17,7 @@ from util.test_result_list import ResultListTestCase
 from util.test_config_util import ConfigUtilTestCase
 from util.test_score_dict import ScoreDictTestCase
 from util.test_ballot_collection import TestBallotCollection
+from post.test_post_process import PostProcessorTestCase
 from test_scruf_integration import ScrufIntegrationTestCase
 
 
@@ -55,6 +56,8 @@ def suite():
     conf_tests = unittest.defaultTestLoader.loadTestsFromTestCase(ConfigUtilTestCase)
     suite.addTest(conf_tests)
     score_tests = unittest.defaultTestLoader.loadTestsFromTestCase(ScoreDictTestCase)
+    suite.addTest(score_tests)
+    post_tests = unittest.defaultTestLoader.loadTestsFromTestCase(PostProcessorTestCase)
     suite.addTest(score_tests)
     integration_tests = unittest.defaultTestLoader.loadTestsFromTestCase(ScrufIntegrationTestCase)
     suite.addTest(integration_tests)

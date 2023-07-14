@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from scruf.util import PropertyMixin
 import jsonlines
 from pathlib import Path
+import scruf
 from scruf.util import get_path_from_keys, get_value_from_keys, ConfigKeys, InvalidPostProcessorError, \
     UnregisteredPostProcessorError
 
@@ -29,7 +30,7 @@ class PostProcessor(PropertyMixin,ABC):
             yield val
 
     def load_history(self):
-        history_path = get_path_from_keys(ConfigKeys.OUTPUT_PATH_KEYS)
+        history_path = get_path_from_keys(ConfigKeys.OUTPUT_PATH_KEYS, scruf.Scruf.state.config)
         self.history = self.read_history(history_path)
 
     @abstractmethod

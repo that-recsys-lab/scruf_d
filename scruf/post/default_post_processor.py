@@ -1,6 +1,8 @@
 import pandas as pd
 from scruf.util import get_path_from_keys
 from .post_processor import PostProcessor, PostProcessorFactory
+import scruf
+from icecream import ic
 
 
 # Basic post-processing creates a dataframe with the following structure
@@ -39,7 +41,8 @@ class DefaultPostProcessor(PostProcessor):
                                keys=['Fairness', 'Compatibility', 'Allocation', 'Results'])
 
     def save_dataframe(self):
-        dataframe_path = get_path_from_keys(['post', 'properties', 'filename'])
+        dataframe_path = get_path_from_keys(['post', 'properties', 'filename'], scruf.Scruf.state.config)
+        ic(dataframe_path)
         self.dataframe.to_csv(dataframe_path)
 
 
@@ -60,7 +63,3 @@ class DefaultPostProcessor(PostProcessor):
 processor_specs = [("default", DefaultPostProcessor)]
 
 PostProcessorFactory.register_post_processors(processor_specs)
-
-
-def process_results(result_structs):
-    return [(entry['item'], entry['score']) for entry in result_structs]

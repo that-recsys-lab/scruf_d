@@ -52,3 +52,5 @@ def get_path_from_keys(keys, config, check_exists=False):
             return full_path
         else:
             raise PathDoesNotExistError(full_path, keys)
+    else:
+        return full_path
