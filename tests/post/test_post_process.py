@@ -4,6 +4,7 @@ from pathlib import Path
 import scruf
 
 from scruf.post import PostProcessorFactory, NullPostProcessor, DefaultPostProcessor
+from scruf.data import ItemFeatureData
 
 from icecream import ic
 
@@ -30,8 +31,39 @@ threshold="none"
 binary="false"
 '''
 
+SAMPLE_PROPERTIES4 = '''
+[data]
+feature_filename = "items.csv"
+
+[feature]
+
+[feature.one]
+name = "1"
+protected_feature = "1"
+protected_values = [1]
+
+[feature.two]
+name = "2"
+protected_feature = "2"
+protected_values = [1]
+
+[post]
+postprocess_class = "exposure"
+
+[post.properties]
+filename="test-output.csv"
+threshold="none"
+binary="false"
+proportions = [["1", "0.2"], ["2", "0.05"]]
+'''
+
 
 class PostProcessorTestCase(unittest.TestCase):
+    def setUp(self) -> None:
+        self.module_path = module_path = Path(scruf.__file__).parent
+        self.history_path = module_path / Path('../jupyter/sample_output.json')
+        self.feature_path = module_path / Path('../jupyter/items.csv')
+
     def test_post_process_creation(self):
         config = toml.loads(SAMPLE_PROPERTIES)
         alg_name = config['post']['postprocess_class']
@@ -53,7 +85,7 @@ class PostProcessorTestCase(unittest.TestCase):
         post = PostProcessorFactory.create_post_processor(alg_name)
         post.setup(config['post']['properties'])
 
-        post.history = post.read_history(Path('../../jupyter/sample_output.json'))
+        post.history = post.read_history(self.history_path)
         post.history_to_dataframe()
         df = post.dataframe
 
@@ -72,15 +104,42 @@ class PostProcessorTestCase(unittest.TestCase):
         post = PostProcessorFactory.create_post_processor(alg_name)
         post.setup(config['post']['properties'])
 
-        post.history = post.read_history(Path('../../jupyter/sample_output.json'))
+        post.history = post.read_history(self.history_path)
         post.history_to_dataframe()
         post.compute_ndcg_column()
 
         ndcg_col = post.dataframe[('nDCG', 'All')]
 
-        ic(ndcg_col)
-
         self.assertEqual(1.0, ndcg_col[0])
+
+    def test_exposure(self):
+        fake_state = scruf.Scruf.ScrufState(None)
+        fake_state.output_list_size = 10
+        scruf.Scruf.state = fake_state
+
+        config = toml.loads(SAMPLE_PROPERTIES4)
+
+        # Manual setup of the feature data
+        ifd = ItemFeatureData()
+        ifd.feature_file = self.feature_path
+        ifd.load_item_features()
+        ifd.known_features = {}
+        ifd.setup_features(config['feature'])
+        ifd.setup_indices()
+        scruf.Scruf.state.item_features = ifd
+
+        alg_name = config['post']['postprocess_class']
+        post = PostProcessorFactory.create_post_processor(alg_name)
+        post.setup(config['post']['properties'])
+
+        post.history = post.read_history(self.history_path)
+        post.history_to_dataframe()
+        post.compute_ndcg_column()
+        post.compute_fairness_columns()
+
+        fairness_col = post.dataframe[('Fairness', '2')]
+
+        self.assertAlmostEqual(0.1, fairness_col[0], places=3)
 
 
 if __name__ == '__main__':
