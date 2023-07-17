@@ -132,19 +132,13 @@ class NDCGPostProcessor(DefaultPostProcessor):
 # for whatever you need.
 # Or we could implement the original default in the same way ? Apply the decorators line-by-line. Whoa!
 class ExposurePostProcessor(NDCGPostProcessor):
-    # You have to supply these again even though they are in agent definitions. Supoptimal.
-    _PROPERTY_NAMES = ['proportions']
-
     def __init__(self):
         super().__init__()
         self.feature_proportions = None
         self.item_features = None
 
     def setup(self, input_props, names=None):
-        super().setup(input_props, names=self.configure_names(ExposurePostProcessor._PROPERTY_NAMES, names))
-        # These come in as strings.
-        self.feature_proportions = {feature: float(proportion)
-                                        for feature, proportion in self.get_property('proportions')}
+        super().setup(input_props, names=names)
         self.item_features = scruf.Scruf.state.item_features
 
     def count_protected_items(self, feature, results):
@@ -152,15 +146,10 @@ class ExposurePostProcessor(NDCGPostProcessor):
                          results))
         return len(protect)
 
-    def normalize_feature_fairness(self, count, feature, list_len):
-        threshold = self.feature_proportions[feature]
-        return count/list_len
-
     def results_to_fairness(self, results, feature):
 #        ic(results, feature)
         count = self.count_protected_items(feature, results)
-        norm = self.normalize_feature_fairness(count, feature, len(results))
-        return norm
+        return (1.0 * count) / len(results)
 
     def compute_fairness(self, feature):
         result_lists = self.dataframe[('Results', 'Out')]

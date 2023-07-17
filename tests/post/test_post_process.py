@@ -54,7 +54,6 @@ postprocess_class = "exposure"
 filename="test-output.csv"
 threshold="none"
 binary="false"
-proportions = [["1", "0.2"], ["2", "0.05"]]
 '''
 
 
@@ -137,7 +136,7 @@ class PostProcessorTestCase(unittest.TestCase):
         post.compute_ndcg_column()
         post.compute_fairness_columns()
 
-        fairness_col = post.dataframe[('Fairness', '2')]
+        fairness_col = post.dataframe[('Exposure', '2')]
 
         self.assertAlmostEqual(0.1, fairness_col[0], places=3)
 
