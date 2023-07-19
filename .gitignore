@@ -117,8 +117,10 @@ dmypy.json
  poetry.lock
 .idea/scruf.iml
 .idea/scruf.iml
+# IPython
 jupyter/.ipynb_checkpoints/
 doc/.ipynb_checkpoints/
+scruf/.ipynb_checkpoints/
 .ipynb_checkpoints/
 .DS_Store
-.DS_Store
+
