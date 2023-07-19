@@ -1,4 +1,5 @@
 from . import FairnessMetric, FairnessMetricFactory
+from abc import abstractmethod
 import scruf
 
 class ItemFeatureFairnessMetric(FairnessMetric):
@@ -17,8 +18,9 @@ class ItemFeatureFairnessMetric(FairnessMetric):
     def __str__(self):
         return f"ItemFeatureFairnessMetric: feature = {self.get_property('feature')}"
 
+    @abstractmethod
     def compute_fairness(self, history):
-        return float('nan')
+        pass
 
 
 class ProportionalItemFM(ItemFeatureFairnessMetric):
@@ -28,7 +30,7 @@ class ProportionalItemFM(ItemFeatureFairnessMetric):
     is >= the given value, the fairness is 1.0. It linearly interpolates to zero.
     """
 
-    _PROPERTY_NAMES = ['feature', 'proportion']
+    _PROPERTY_NAMES = ['proportion']
 
     def __init__(self):
         super().__init__()
@@ -75,7 +77,6 @@ class ProportionalItemFM(ItemFeatureFairnessMetric):
 
 
 # Register the metrics created above
-metric_specs = [("proportional_item", ProportionalItemFM),
-                ("item_feature", ItemFeatureFairnessMetric)]
+metric_specs = [("proportional_item", ProportionalItemFM)]
 
 FairnessMetricFactory.register_fairness_metrics(metric_specs)

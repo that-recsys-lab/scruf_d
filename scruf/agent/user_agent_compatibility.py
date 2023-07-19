@@ -1,4 +1,6 @@
 from . import CompatibilityMetric, CompatibilityMetricFactory
+from abc import abstractmethod
+
 
 #need explanation of what this does?
 class UserAgentCompatibilityMetric(CompatibilityMetric):
@@ -20,6 +22,7 @@ class UserAgentCompatibilityMetric(CompatibilityMetric):
         # Return the compatibility as the fairness metric
         return compatibility
 
+    @abstractmethod
     def calculate_compatibility(self, context):
         """
         Calculates the compatibility between the user and the fairness agent. This can be done using
@@ -27,8 +30,7 @@ class UserAgentCompatibilityMetric(CompatibilityMetric):
         fairness agent.
         """
         # Example implementation: return a random value between 0 and 1
-        import random
-        return random.uniform(0, 1)
+        pass
 
 
 class ContextCompatibilityMetric(UserAgentCompatibilityMetric):

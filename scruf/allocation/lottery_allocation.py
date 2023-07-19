@@ -86,9 +86,10 @@ class FairnessAllocationLottery(LotteryAllocationMechanism):
 class StaticAllocationLottery(LotteryAllocationMechanism):
 
     # Weights are specified in the config file as a list of pairs:
-    # [ ["Agent 1", 0.5], ["Agent 2", 0.2] ]
+    # [ ["Agent 1", "0.5"], ["Agent 2", "0.2"] ]
     # If the total is less than 1, then a dummy agent is added. If the
     # dummy is selected by the lottery, then no agents are allocated.
+    # Note that you can't have mixed lists in TOML, so everything has to be a string
     _PROPERTY_NAMES = ['weights']
     _DUMMY_AGENT = "__dummy__"
 
