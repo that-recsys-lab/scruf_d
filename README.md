@@ -5,6 +5,11 @@ SCRUF-D stands for "Social Choice for Recommendation Under Fairness - Dynamic".
 This is an implementation of the SCRUF-D architecture, drawn from
 Burke, R., Mattei, N., Grozin, V., Voida, A., & Sonboli, N. (2022, July). Multi-agent Social Choice for Dynamic Fairness-aware Recommendation. In Adjunct Proceedings of the 30th ACM Conference on User Modeling, Adaptation and Personalization (pp. 234-244).
 
+## See also
+
+* [Code Overview](doc/code_overview.md)
+* [Conceptual Overview (incomplete)](doc/paper-summary.md)
+
 ## Configuration
 
 A SCRUF experiment is configured using a TOML file with following section. See example below.
@@ -32,6 +37,10 @@ Specification for the allocation mechanism
 ### Choice
 
 Specification for the choice mechanism
+
+### Post
+
+Specification for post-processing
 
 ```
 [location]
