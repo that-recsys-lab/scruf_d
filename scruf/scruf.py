@@ -41,19 +41,31 @@ class Scruf:
                 cmech = ChoiceMechanismFactory.create_choice_mechanism(cmech_class)
                 self.choice_mechanism: ChoiceMechanism = cmech
 
-                # Click model
-                cmodel_class = get_value_from_keys(['click', 'click_class'], config)
-                cmodel = ClickModelFactory.create_click_model(cmodel_class)
-                self.click_model: ClickModel = cmodel
-
-                # Post-processing
-                post_class = get_value_from_keys(['post', 'postprocess_class'], config)
-                post = PostProcessorFactory.create_post_processor(post_class)
-                self.post_processor: PostProcessor = post
+                self.create_optional_components(config)
 
                 # Parameters
                 self.output_list_size: int = get_value_from_keys(['parameters', 'list_size'], config)
                 self.iterations: int = get_value_from_keys(['parameters', 'iterations'], config)
+
+        def create_optional_components(self, config):
+
+                # Click model
+                click_model_class_keys = ['click', 'click_class']
+                if is_valid_keys(click_model_class_keys, config):
+                    cmodel_class = get_value_from_keys(click_model_class_keys, config)
+                    cmodel = ClickModelFactory.create_click_model(cmodel_class)
+                    self.click_model: ClickModel = cmodel
+                else:
+                    self.click_model = None
+
+                # Post-processing
+                post_class_keys = ['post', 'postprocess_class']
+                if is_valid_keys(post_class_keys, config):
+                    post_class = get_value_from_keys(post_class_keys, config)
+                    post = PostProcessorFactory.create_post_processor(post_class)
+                    self.post_processor: PostProcessor = post
+                else:
+                    self.post_processor = None
 
     state: ScrufState = None
 
@@ -61,6 +73,18 @@ class Scruf:
     def __init__(self, config, post_only=False):
         Scruf.state = Scruf.ScrufState(config)
         # ic(toml.dumps(config))
+
+    @staticmethod
+    def setup_optional_components():
+        # Click model
+        if Scruf.state.click_model is not None:
+            click_props = Scruf.get_value_from_keys(['click', 'properties'], default={})
+            Scruf.state.click_model.setup(click_props)
+
+        # Post processing
+        if Scruf.state.post_processor is not None:
+            post_props = Scruf.get_value_from_keys(['post', 'properties'], default={})
+            Scruf.state.post_processor.setup(post_props)
 
     @staticmethod
     def setup_experiment():
@@ -76,13 +100,7 @@ class Scruf:
         cmech_props = Scruf.get_value_from_keys(['choice', 'properties'], default={})
         Scruf.state.choice_mechanism.setup(cmech_props)
 
-        # Click model
-        click_props = Scruf.get_value_from_keys(['click', 'properties'], default={})
-        Scruf.state.click_model.setup(click_props)
-
-        # Post processing
-        post_props = Scruf.get_value_from_keys(['post', 'properties'], default={})
-        Scruf.state.post_processor.setup(post_props)
+        Scruf.setup_optional_components()
 
         # Bookkeeping
         Scruf.state.history.setup(Scruf.state.config)
@@ -113,7 +131,8 @@ class Scruf:
         for user_info in Scruf.state.user_data.user_iterator(iterations, restart=restart):
             allocation = amech.do_allocation(user_info)
             results = cmech.do_choice(allocation, user_info)
-            cmodel.do_clicks(results, user_info)
+            if cmodel is not None:
+                cmodel.do_clicks(results, user_info)
             history.write_current_state()
 
     @staticmethod
@@ -122,7 +141,8 @@ class Scruf:
 
     @staticmethod
     def post_process():
-        Scruf.state.post_processor.process()
+        if Scruf.state.post_processor is not None:
+            Scruf.state.post_processor.process()
 
     @staticmethod
     def is_valid_keys(key_list):

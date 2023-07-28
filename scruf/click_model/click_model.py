@@ -7,7 +7,10 @@ import random
 
 # RB: It might be more efficient to initialize the click model with a distribution and then
 # select using the distribution, rather than scan the list every time?
-# This implementation returns a list but it is always one item or empty.
+# This implementation returns a list but it is always one item or empty, except for the null
+# model, which returns everything.
+# These models all ignore the original recommendation score, so they are only responding to
+# list position.
 class ClickModel(PropertyMixin,ABC):
     @abstractmethod
     def generate_clicks(self, results: ResultList):

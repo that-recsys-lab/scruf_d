@@ -38,7 +38,10 @@ class ScrufHistory:
         self.allocation_history = HistoryCollection(window_size)
         self.choice_input_history = HistoryCollection(window_size)
         self.choice_output_history = HistoryCollection(window_size)
-        self.click_history = HistoryCollection(window_size)
+        if scruf.Scruf.state.click_model is not None:
+            self.click_history = HistoryCollection(window_size)
+        else:
+            self.click_history = None
         #self.recommendation_input_history = ResultsHistory(window_size)
         #self.recommendation_output_history = ResultsHistory(window_size)
 
@@ -55,7 +58,10 @@ class ScrufHistory:
         alloc = self.allocation_history.get_most_recent()
         choice_input = self.choice_input_history.get_most_recent()
         choice_output = self.choice_output_history.get_most_recent()
-        click = self.click_history.get_most_recent()
+        if self.click_history is not None:
+            click = self.click_history.get_most_recent()
+        else:
+            click = None
 
         output_json = {
             'time': current_time,
@@ -63,8 +69,9 @@ class ScrufHistory:
             'allocation': alloc,
             'choice_in': choice_input,
             'choice_out': choice_output,
-            'click': click
         }
+        if click is not None:
+            output_json['click'] = click
 
         json_str = jsons.dumps(output_json)
         self._history_file.write(json_str)

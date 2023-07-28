@@ -35,7 +35,7 @@ class UserAgentCompatibilityMetric(CompatibilityMetric):
 
 class ContextCompatibilityMetric(UserAgentCompatibilityMetric):
 
-    def compute_compatibility(self, context):
+    def calculate_compatibility(self, context):
         return context[self.agent.name]
 
 # Register the metrics created above
