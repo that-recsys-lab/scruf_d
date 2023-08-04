@@ -54,7 +54,7 @@ class DefaultPostProcessor(PostProcessor):
         self.history_to_dataframe()
         self.save_dataframe()
 
-
+# Note: This is not really NDCG because it doesn't make use of separate test data.
 class NDCGPostProcessor(DefaultPostProcessor):
 
     _PROPERTY_NAMES = ['binary', 'threshold']

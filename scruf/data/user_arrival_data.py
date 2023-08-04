@@ -4,7 +4,7 @@
 # All rows are grouped by userID and there should be the same number of rows for each user.
 # Later on, we might want a streaming method
 from abc import ABC, abstractmethod
-from scruf.util import get_path_from_keys, ConfigKeys
+from scruf.util import get_path_from_keys, get_value_from_keys, ConfigKeys, InputListLengthError
 import csv
 from scruf.util import ResultList, ResultEntry
 from collections import defaultdict
@@ -36,6 +36,7 @@ class BulkLoadedUserData(UserArrivalData):
     def setup(self, config):
         self.data_file = get_path_from_keys(ConfigKeys.DATA_FILENAME_KEYS, config, check_exists=True)
         self._load_data()
+        self.data_check(config)
 
     def _load_data(self):
         self.arrival_sequence = []
@@ -64,6 +65,14 @@ class BulkLoadedUserData(UserArrivalData):
         self.arrival_sequence.append(last_user_id)
 
         self.current_user_index = None
+
+    def data_check(self, config):
+        user = self.arrival_sequence[0]
+        user_data: ResultList = self.user_table[user]
+        rec_list_len = len(user_data.get_results())
+        output_list_len = get_value_from_keys(['parameters', 'list_size'], config)
+        if rec_list_len <= output_list_len:
+            raise InputListLengthError(rec_list_len, output_list_len)
 
     # Default is to go through all users
     # NOT THREAD SAFE. Assumes only one iteration happening at a time

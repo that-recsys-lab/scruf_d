@@ -58,6 +58,12 @@ class ConfigNoAgentsError(ScrufError):
         super().__init__(self.message)
 
 
+class InputListLengthError(ScrufError):
+    def __init__(self, input_len, output_len):
+        self.message = f'Error in user arrival data. Input length: {input_len}, Output length: {output_len}'
+        super().__init__(self.message)
+
+
 class InvalidAllocationMechanismError(ScrufError):
     def __init__(self, name):
         self.message = f'Cannot create allocation mechanism: Class {name} is not a subclass of AllocationMechanism.'

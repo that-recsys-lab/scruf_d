@@ -1,7 +1,7 @@
 from .errors import ScrufError, PropertyMismatchError, \
     InvalidFairnessMetricError, UnregisteredFairnessMetricError, \
     InvalidCompatibilityMetricError, UnregisteredCompatibilityMetricError, \
-    ConfigFileError, ConfigKeyMissingError, \
+    ConfigFileError, ConfigKeyMissingError, InputListLengthError, \
     InvalidAllocationMechanismError, UnregisteredAllocationMechanismError, \
     InvalidChoiceMechanismError, UnregisteredChoiceMechanismError, \
     MismatchedWhalrusRuleError, UnknownWhalrusTiebreakError, \

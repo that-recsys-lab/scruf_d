@@ -3,6 +3,8 @@ import tempfile
 import pathlib
 import toml
 from scruf.data import BulkLoadedUserData
+from scruf.util import InputListLengthError
+import scruf
 from icecream import ic
 
 TEST_USER_DATA = '''user1, item1, 4.0
@@ -24,6 +26,9 @@ path = "."
 
 [data]
 rec_filename = "test-users.csv"
+
+[parameters]
+list_size = 2
 '''
 
 class UserDataTestCase(unittest.TestCase):
@@ -82,6 +87,13 @@ class UserDataTestCase(unittest.TestCase):
             #ic(res_list.get_results()[0])
 
         self.assertEqual(user_data.current_user_index, 1)
+
+    def test_list_length_error(self):
+        user_data = BulkLoadedUserData()
+        self.config['location']['path'] = self.temp_dir_path
+        self.config['parameters']['list_size'] = 3
+        with self.assertRaises(InputListLengthError):
+            user_data.setup(self.config)
 
 if __name__ == '__main__':
     unittest.main()
