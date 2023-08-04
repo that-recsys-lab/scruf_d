@@ -13,6 +13,8 @@ def read_args():
     parser.add_argument('config_file', help='Path to the configuration file.')
     parser.add_argument('-p', '--post', action='store_true',
                         help='Post-processing only. If set, no simulation will be run.')
+    parser.add_argument('-g', '--progress', action='store_true',
+                        help='Shows progress bar if set.')
 
     input_args = parser.parse_args()
     arg_check(vars(input_args))
@@ -39,6 +41,7 @@ if __name__ == '__main__':
     args = read_args()
     config = load_config(args['config_file'])
     post_only = args['post']
+    progress = args['progress']
 
     if config == None:
         raise ConfigFileError(args['config_file'])
@@ -48,6 +51,6 @@ if __name__ == '__main__':
     if post_only:
         scruf.post_process()
 
-    scruf.run_experiment()
+    scruf.run_experiment(progress = progress)
 
     exit(0)

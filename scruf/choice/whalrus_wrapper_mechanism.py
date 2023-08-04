@@ -105,7 +105,7 @@ class WhalrusWrapperScoring (WhalrusWrapperMechanism):
                          'RuleRangeVoting', 'RuleRankedPairs', 'RuleSimplifiedDodgson',
                          'RuleVeto']
 
-    _LEGAL_TIEBREAKERS = ['None']
+    _LEGAL_TIEBREAKERS = ['None', 'Random']
 
     def invoke_whalrus_rule(self, ballots, weights=None):
         if weights is None:

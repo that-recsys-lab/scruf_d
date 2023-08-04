@@ -18,7 +18,7 @@ class UserArrivalData(ABC):
         pass
 
     @abstractmethod
-    def user_iterator(self):
+    def user_iterator(self, iterations=-1, restart=True):
         pass
 
 

@@ -9,6 +9,7 @@ from scruf.post import PostProcessorFactory, PostProcessor
 from scruf.data import ItemFeatureData, UserArrivalData, BulkLoadedUserData, Context, ContextFactory
 from scruf.util import get_value_from_keys, is_valid_keys, check_key_lists, get_working_dir_path, get_path_from_keys
 from icecream import ic
+from tqdm import tqdm
 
 
 class Scruf:
@@ -75,9 +76,9 @@ class Scruf:
         # Bookkeeping
         Scruf.state.history.setup(Scruf.state.config)
 
-    def run_experiment(self):
+    def run_experiment(self, progress=False):
         Scruf.setup_experiment()
-        self.run_loop(iterations=Scruf.state.iterations)
+        self.run_loop(iterations=Scruf.state.iterations, progress=progress)
         Scruf.cleanup_experiment()
         Scruf.post_process()
 
@@ -89,17 +90,24 @@ class Scruf:
     # Produce final recommendation list
     # Update the history log
     # Loop
-    def run_loop(self, iterations=-1, restart=True):
+    def run_loop(self, iterations=-1, restart=True, progress=False):
         agents = Scruf.state.agents
         history = Scruf.state.history
         context = Scruf.state.context
         amech = Scruf.state.allocation_mechanism
         cmech = Scruf.state.choice_mechanism
 
-        for user_info in Scruf.state.user_data.user_iterator(iterations, restart=restart):
+
+        if progress:
+            user_data = tqdm(Scruf.state.user_data.user_iterator(iterations, restart=restart))
+        else:
+            user_data = Scruf.state.user_data.user_iterator(iterations, restart=restart)
+
+        for user_info in user_data:
             allocation = amech.do_allocation(user_info)
             cmech.do_choice(allocation, user_info)
             history.write_current_state()
+
 
 
     @staticmethod
