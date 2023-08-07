@@ -9,6 +9,9 @@ def normalize_score_dict(score_dict: dict, inplace=False):
     if magnitude > 0:
         for key in score_dict.keys():
             score_dict[key] = score_dict[key] / magnitude
+    else:
+        for key in score_dict.keys():
+            score_dict[key] = 0
 
     return score_dict
 

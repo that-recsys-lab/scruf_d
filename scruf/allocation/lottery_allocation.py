@@ -11,10 +11,13 @@ class LotteryAllocationMechanism(AllocationMechanism):
 
     def score_dict_lottery(self, score_dict: dict, agents):
         lottery = normalize_score_dict(score_dict)
-        winner = scruf.Scruf.state.rand.choices(lottery.keys(), lottery.values())
         result = scruf.Scruf.state.agents.agent_value_pairs(default=0.0)
-        result[winner] = 1.0
-        return result
+        if sum([val for val in lottery.values]) == 0:
+            return result
+        else:
+            winner = scruf.Scruf.state.rand.choices(lottery.keys(), lottery.values())
+            result[winner] = 1.0
+            return result
 
     def __init__(self):
         super().__init__()
