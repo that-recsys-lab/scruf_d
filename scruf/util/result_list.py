@@ -13,7 +13,8 @@ class ResultEntry:
     def __repr__(self):
         return f'ResultEntry: U:{self.user}, I:{self.item}, S:{self.score}, R{self.rank}'
 
-
+# TODO: Probably should have some kind of 'dirty' flag, so that when the list is changed but not
+# sorted, some functions can either fail or force sort.
 class ResultList:
 
     def __repr__(self):
@@ -44,6 +45,12 @@ class ResultList:
 
     def get_results(self):
         return self.results
+
+    # Assumes the list is sorted
+    def score_range(self):
+        first_entry = self.results[0]
+        last_entry = self.results[-1]
+        return (first_entry.score, last_entry.score)
 
     def add_result(self, user, item, score, sort=False):
         new_entry = ResultEntry(user=user, item=item, score=score, rank=-1)
