@@ -67,14 +67,29 @@ class NDCGPostProcessor(DefaultPostProcessor):
 
     # calculate ndcg given a list of recommended and ideal scores
     @staticmethod
-    def ndcg(scores1, scores2):
+    def ndcg(scores1, scores2, binary=False, decay=None):
         idealdcg = 0.0
         recdcg = 0.0
-        for index, val in enumerate(scores1):
-            recdcg += (2 ** val - 1) / log2(index + 2)
-        for index, val in enumerate(scores2):
-            idealdcg += (2 ** val - 1) / log2(index + 2)
+        if binary:
+            for index, val in enumerate(scores1):
+                if val > 0:
+                    recdcg += 1 / NDCGPostProcessor.decay_compute_or_return(index, decay=decay)
+            for index, val in enumerate(scores2):
+                if val > 0:
+                    recdcg += 1 / NDCGPostProcessor.decay_compute_or_return(index, decay=decay)
+        else:
+            for index, val in enumerate(scores1):
+                recdcg += (2 ** val - 1) / NDCGPostProcessor.decay_compute_or_return(index, decay=decay)
+            for index, val in enumerate(scores2):
+                idealdcg += (2 ** val - 1) / NDCGPostProcessor.decay_compute_or_return(index, decay=decay)
         return recdcg / idealdcg
+
+    @staticmethod
+    def decay_compute_or_return(index, decay=None):
+        if decay is None:
+            return log2(index + 2)
+        else:
+            return decay[index]
 
     @staticmethod
     def substitute_scores(rec_list, result_list):
@@ -83,7 +98,7 @@ class NDCGPostProcessor(DefaultPostProcessor):
         return rescored_results
 
     @staticmethod
-    def results_to_ndcg(rec_list, result_list, length, threshold=NINF, binary=False):
+    def results_to_ndcg(rec_list, result_list, length, threshold=NINF, binary=False, decay=None):
         recommended = result_list[0:length]
         rec_rescore = NDCGPostProcessor.substitute_scores(rec_list, recommended)
         ideal = rec_list[0:length]
@@ -94,10 +109,12 @@ class NDCGPostProcessor(DefaultPostProcessor):
             rec_thresh = [score if score > threshold else 0 for item, score in rec_rescore]
             ideal_thresh = [score if score > threshold else 0 for item, score in ideal]
 
-        return NDCGPostProcessor.ndcg(rec_thresh, ideal_thresh)
+        return NDCGPostProcessor.ndcg(rec_thresh, ideal_thresh, binary=binary, decay=decay)
 
     def compute_ndcg_column(self):
         length = scruf.Scruf.state.output_list_size
+        decay_array = [NDCGPostProcessor.decay_compute_or_return(index, None) \
+                       for index in range(0,length)]
         threshold_str = self.get_property('threshold')
         if threshold_str.casefold() == 'none'.casefold():
             threshold = NINF
@@ -109,7 +126,8 @@ class NDCGPostProcessor(DefaultPostProcessor):
             self.dataframe['Results'].apply(
                 lambda row: NDCGPostProcessor.results_to_ndcg(row['In'], row['Out'], length,
                                                               threshold=threshold,
-                                                              binary=binary), axis=1)
+                                                              binary=binary,
+                                                              decay=decay_array), axis=1)
 
     def process(self):
         self.load_history()
