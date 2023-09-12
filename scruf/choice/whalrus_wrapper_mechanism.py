@@ -109,9 +109,9 @@ class WhalrusWrapperScoring (WhalrusWrapperMechanism):
 
     def invoke_whalrus_rule(self, ballots, weights=None):
         if weights is None:
-            self.whalrus_rule = self.whalrus_class(ballots)
+            self.whalrus_rule = self.whalrus_class(ballots, tie_break=self.tiebreak_class())
         else:
-            self.whalrus_rule = self.whalrus_class(ballots, weights=weights)
+            self.whalrus_rule = self.whalrus_class(ballots, weights=weights, tie_break=self.tiebreak_class())
 
     def unwrap_result(self, user, list_size):
         scores = self.whalrus_rule.scores_as_floats_

@@ -66,8 +66,8 @@ class ScoredAllocationMechanism(AllocationMechanism):
         :return: a dictionary mapping agent names to allocation probabilities
         """
         # Compute the fairness and compatibility scores for each agent
-        fairness_values = agents.compute_fairness(history)
-        compat_values = agents.compute_compatibility(context)
+        fairness_values = agents.compute_fairnesses(history)
+        compat_values = agents.compute_compatibilities(context)
         scores = {agent_name: self.score(agent_name, fairness_values, compat_values) \
                     for agent_name in agents.agent_names()}
 
@@ -105,8 +105,8 @@ class WeightedProductAllocationMechanism(ScoredAllocationMechanism):
     def score(self, agent_name, fairness_values, compatibility_values):
         fairness_exp = self.get_property('fairness_exponent')
         compat_exp = self.get_property('compatibility_exponent')
-        fairness_term = (1.0 - fairness_values[agent_name]) ^ fairness_exp
-        compat_term =  compatibility_values[agent_name] ^ compat_exp
+        fairness_term = (1.0 - fairness_values[agent_name])**fairness_exp
+        compat_term = compatibility_values[agent_name]**compat_exp
         return fairness_term * compat_term
 
 class LeastFairAllocationMechanism(AllocationMechanism):
