@@ -1,4 +1,5 @@
 from collections import defaultdict
+from util import keyed_delete
 
 
 class ResultEntry:
@@ -23,6 +24,18 @@ class ResultList:
     def __init__(self):
         self.results = []
 
+    def __copy__(self):
+        result_list = ResultList()
+        result_list.results = self.results.copy()
+        return result_list
+
+    def __deepcopy__(self, memodict={}):
+        result_list = ResultList()
+        for entry in self.results:
+            result = ResultEntry(user=entry.user, item=entry.item, score=entry.rating, rank=entry.rank)
+            result_list.results.append(result)
+        return result_list
+
     def setup(self, triples, presorted=False, trim=0):
         self.results = []
         # Test for length of triples. If > 3, signal file format error
@@ -46,6 +59,16 @@ class ResultList:
     def get_results(self):
         return self.results
 
+    def length(self):
+        return len(self.results)
+
+    def remove_result(self, item):
+        self.results = keyed_delete(self.results, item, key=lambda entry: entry.item)
+
+    # Assumes sorted
+    def remove_top(self):
+        self.results = self.results[1:]
+
     # Assumes the list is sorted
     def score_range(self):
         first_entry = self.results[0]
@@ -55,6 +78,11 @@ class ResultList:
     def add_result(self, user, item, score, sort=False):
         new_entry = ResultEntry(user=user, item=item, score=score, rank=-1)
         self.results.append(new_entry)
+        if sort:
+            self.sort()
+
+    def add_result_entry(self, entry: ResultEntry, sort=False):
+        self.results.append(entry)
         if sort:
             self.sort()
 
@@ -121,3 +149,9 @@ class ResultList:
         output.sort()
 
         return output
+
+    def intersection(self, other_results):
+        this_items = {entry.item for entry in self.results}
+        other_items = {entry.item for entry in other_results.results}
+        return this_items.intersection(other_items)
+

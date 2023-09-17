@@ -58,3 +58,13 @@ def maybe_number(s):
         return fl
     except ValueError:
         return s
+
+# Non-destructive
+def keyed_delete(lst, item, key=None):
+    if key is None:
+        new_lst = lst.copy()
+        new_lst.remove(item)
+        return new_lst
+    else:
+        return [entry for entry in lst if not key(entry)==item]
+

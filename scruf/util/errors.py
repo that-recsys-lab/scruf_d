@@ -87,6 +87,10 @@ class UnregisteredChoiceMechanismError(ScrufError):
         self.message = f'Cannot create choice mechanism: Class {name} is not registered and may not exist.'
         super().__init__(self.message)
 
+class MultipleBallotsGreedyError(ScrufError):
+    def __init__(self, name):
+        self.message = f'Cannot score lists: Multiple ballots for this reranker are not supported.'
+        super().__init__(self.message)
 
 class MismatchedWhalrusRuleError(ScrufError):
     def __init__(self, name, wrapper_name):
