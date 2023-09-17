@@ -1,5 +1,5 @@
 import random
-from scruf.util import UnknownCollapseParameterError
+from .errors import UnknownCollapseParameterError
 
 # Note: possibly destructive
 def normalize_score_dict(score_dict: dict, inplace=False):
@@ -59,12 +59,4 @@ def maybe_number(s):
     except ValueError:
         return s
 
-# Non-destructive
-def keyed_delete(lst, item, key=None):
-    if key is None:
-        new_lst = lst.copy()
-        new_lst.remove(item)
-        return new_lst
-    else:
-        return [entry for entry in lst if not key(entry)==item]
 

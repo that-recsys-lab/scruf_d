@@ -10,6 +10,9 @@ class BallotCollection:
     def get_count(self):
         return len(self.ballots)
 
+    def get_names(self):
+        return list(self.ballots.keys())
+
     def get_weights(self):
         return {bal.name: bal.weight for bal in self.ballots.values()}
 

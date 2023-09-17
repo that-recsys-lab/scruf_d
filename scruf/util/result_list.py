@@ -1,5 +1,4 @@
 from collections import defaultdict
-from util import keyed_delete
 
 
 class ResultEntry:
@@ -59,7 +58,7 @@ class ResultList:
     def get_results(self):
         return self.results
 
-    def length(self):
+    def get_length(self):
         return len(self.results)
 
     def remove_result(self, item):
@@ -109,7 +108,9 @@ class ResultList:
             result.score = new_score
 
     def filter_results(self, filter_fn):
-        return filter(filter_fn, self.results)
+        output = ResultList()
+        output.results = list(filter(filter_fn, self.results))
+        return output
 
     @staticmethod
     # Assumes all the same user. Maybe should check for this
@@ -155,3 +156,12 @@ class ResultList:
         other_items = {entry.item for entry in other_results.results}
         return this_items.intersection(other_items)
 
+
+# Non-destructive
+def keyed_delete(lst, item, key=None):
+    if key is None:
+        new_lst = lst.copy()
+        new_lst.remove(item)
+        return new_lst
+    else:
+        return [entry for entry in lst if not key(entry)==item]
