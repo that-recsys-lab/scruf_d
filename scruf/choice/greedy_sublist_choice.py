@@ -50,34 +50,129 @@ class GreedySublistChoiceMechanism(ChoiceMechanism):
         pass
 
 # xQuad says that if there is already one item in the list that is in the protected class then
-# there no benefit otherwise we give a bonus to the items. We will use delta for this. Could
-# extend to multiple ballots
+# there no benefit otherwise we give a bonus to the items.
+# Original definition of xQUAD
+# xQuAD(u,v, R, S) △= arg max_{v ∈R\S} [λ(rec(v,u) + (1 − λ) max_{v′∈S} I_{x_v∩x_v′=∅}]
+# where I is the indicator function.
+# So, we add the v (not already in the output list) that maximizes the sum. The first term of the
+# sum is λ rec(v,u) and the second term is (1 − λ) and identifies an item whose features represented by
+# x do not overlap with existing items.
+# In our implementation, rec_weight serves as lambda. Multiple ballots correspond to multiple
+# protected features. Is this what Nasim did in the OFaiR experiments?
+
 class xQuadChoiceMechanism(GreedySublistChoiceMechanism):
 
     def sublist_scorer(self, list_so_far: ResultList, candidates: ResultList, ballots: BallotCollection):
-        if ballots.get_count() > 2:
-            raise MultipleBallotsGreedyError()
+        # Drop the recommender from the agents
+        drop_rec = ballots.subset([BallotCollection.REC_NAME], copy=True, inverse=True)
+        # Merge the ballots. Scores don't matter; only > 0
+        # TODO: get_user as an argument is bogus
+        merged = drop_rec.merge(candidates.get_user())
+        # Grab the weight
+        rec_weight = ballots.get_ballot(BallotCollection.REC_NAME).weight
+        # Filter for the the non-zero items
+        protected_items = merged.prefs.filter_results(lambda entry: entry.score > 0)
+        # If there were non-zero items
+        if len(protected_items.intersection(list_so_far)) == 0:
+            # Score them all with 1 - re
+            merged.prefs.rescore(lambda entry: 1 - rec_weight)
+            # Add the recommender back in
+            ballots.set_ballot(BallotCollection.REC_NAME, candidates, rec_weight)
+            final_scoring = ballots.merge(candidates.get_user())
+            return final_scoring
         else:
-            # Get the protected ballot
-            key = [key for key in ballots.get_names() if key != BallotCollection.REC_NAME][0]
-            prot_ballot = ballots.subset([key])
-            # Get the recommender weight
-            rec_weight = ballots.get_ballot(BallotCollection.REC_NAME).weight
-            # If no items in the ballot are on the list so far
-            protected_items = prot_ballot.get_ballot(key).prefs.filter_results(lambda entry: entry.score > 0)
-            if len(protected_items.intersection(list_so_far)) == 0:
-                # Kind of abusing the REC_NAME but that's what merge() uses
-                ballots.set_ballot(BallotCollection.REC_NAME, candidates, rec_weight)
-                merged = ballots.merge(candidates.get_user())
-                return merged
-            else:
-                return candidates
+            return candidates
+
+# TODO: Add the non-binary version of xQuad. In this version, the indicator function is replaced
+# with a measure of unfairness, which maxes out at 1. This information isn't in the ballot.
+
+# In the PFAR paper, we use this definition of MMR
+# MMR(u,v, R, S) △= arg max_{v∈R\S} [λ(rec(v,u) − (1 − λ) Sum_{v′∈S} sim(v,v′)]
+# We sum the similarities and find the item which has a large similarity in aggregate. Maybe
+# this should be the mean?
+#
+# But the original definition of MMR from Carbonell and Goldstein, 1998 is this:
+# MMR(u,v, R, S) △= arg max_{v∈R\S} [λ(rec(v,u) − (1 − λ) max_{v′∈S} sim(v,v′)]
+# So, we find the single item where we have the biggest difference and use that as the
+# discount.
+
+class MMRAbstractChoiceMechanism(GreedySublistChoiceMechanism):
+
+    def create_feature_dict(self, ballots: BallotCollection):
+        self.feature_dict = {}
+        for ballot in ballots.get_ballots():
+            feature_entries = {}
+            for entry in ballot.prefs:
+                if entry.score > 0:
+                    feature_entries.add(entry.item)
+                else:
+                    feature_entries.add("~" + entry.item)
+            self.feature_dict[ballot.name] = feature_entries
+
+    def create_item_dict(self):
+        # Create a dictionary of feature sets
+        self.candidate_features = defaultdict(set)
+        for feature, item_set in self.feature_dict.values():
+            for item in item_set:
+                self.candidate_features[item].add(feature)
+
+    def ballot_jaccard(self, item1, item2):
+        features1 = self.candidate_features[item1]
+        features2 = self.candidate_features[item2]
+        inter = features1.intersection(features2)
+        uni = features1.union(features2)
+        return float(len(inter)) / len(uni)
+
+    @abstractmethod
+    def candidates_vs_list_score(self, candidates, list_so_far):
+        pass
+
+    def sublist_scorer(self, list_so_far: ResultList, candidates: ResultList, ballots: BallotCollection):
+        # Drop the recommender from the agents
+        drop_rec = ballots.subset([BallotCollection.REC_NAME], copy=True, inverse=True)
+        # Create a dictionary mapping features/ballots -> {items} with that feature
+        # Use ~feature to represent the absence
+        self.create_feature_dict(drop_rec)
+        # Create a dictionary mapping items -> {features}
+        self.create_item_dict()
+
+        scored = self.candidates_vs_list_score(candidates, list_so_far)
+
+        return scored
+
+class MMRSumChoiceMechanism(MMRAbstractChoiceMechanism):
+
+    def sum_similarity(self, item, list_so_far: ResultList):
+        similarity = 0
+        for output_item in list_so_far.result_item_iter():
+            similarity += self.ballot_jaccard(item, output_item)
+        return similarity
+
+    def candidates_vs_list_score(self, candidates, list_so_far):
+        # For each candidate, score it based on sum of similarities with output items so far
+        scored = copy(candidates)
+        scored.rescore(lambda entry: self.sum_similarity(entry.item, list_so_far))
+
+        return scored
+
+
+class MMRClassicChoiceMechanism(MMRAbstractChoiceMechanism):
+
+    def max_similarity(self, item, list_so_far: ResultList):
+        return max([self.ballot_jaccard(item, output_item)
+                    for output_item in list_so_far.result_item_iter()])
+
+    def candidates_vs_list_score(self, candidates, list_so_far):
+        scored = copy(candidates)
+        scored.rescore(lambda entry: self.max_similarity(entry.item, list_so_far))
+
+        return scored
 
 
 # Register the mechanisms created above
-mechanism_specs = [("xquad", xQuadChoiceMechanism)]
+mechanism_specs = [("xquad", xQuadChoiceMechanism),
+                   ("mmr_sum", MMRSumChoiceMechanism),
+                   ("mmr_max", MMRClassicChoiceMechanism)]
 
 ChoiceMechanismFactory.register_choice_mechanisms(mechanism_specs)
-
-
 

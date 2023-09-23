@@ -26,8 +26,10 @@ class BallotCollection:
         bal = Ballot(name, prefs, weight)
         self.ballots[name] = bal
 
-    def subset(self, names, copy=False):
+    def subset(self, names, copy=False, inverse=False):
         new_bcoll = BallotCollection()
+        if inverse:
+            names = set(self.get_names()).difference(names)
         for name in names:
             if copy:
                 ballot = self.ballots[name]
@@ -48,11 +50,16 @@ class BallotCollection:
         output.setup(triples_list, presorted=False)
         return output
 
+
+
 class Ballot:
     def __init__(self, name, prefs: ResultList, weight=1.0):
-        self.name = name
-        self.weight = weight
-        self.prefs = prefs
+        self.name: str = name
+        self.weight: float = weight
+        self.prefs: ResultList = prefs
 
     def intersect_results(self, results: ResultList):
         return self.prefs.intersection(results)
+
+    def rescore(self, scoring_fn):
+        self.prefs.rescore(scoring_fn)

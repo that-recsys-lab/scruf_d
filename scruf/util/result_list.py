@@ -58,6 +58,10 @@ class ResultList:
     def get_results(self):
         return self.results
 
+    def result_item_iter(self):
+        for entry in self.results:
+            yield entry.item
+
     def get_length(self):
         return len(self.results)
 
