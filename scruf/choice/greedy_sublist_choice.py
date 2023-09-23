@@ -71,11 +71,11 @@ class xQuadChoiceMechanism(GreedySublistChoiceMechanism):
         # Grab the weight
         rec_weight = ballots.get_ballot(BallotCollection.REC_NAME).weight
         # Filter for the the non-zero items
-        protected_items = merged.prefs.filter_results(lambda entry: entry.score > 0)
+        protected_items = merged.filter_results(lambda entry: entry.score > 0)
         # If there were non-zero items
         if len(protected_items.intersection(list_so_far)) == 0:
             # Score them all with 1 - re
-            merged.prefs.rescore(lambda entry: 1 - rec_weight)
+            merged.rescore(lambda entry: 1 - rec_weight)
             # Add the recommender back in
             ballots.set_ballot(BallotCollection.REC_NAME, candidates, rec_weight)
             final_scoring = ballots.merge(candidates.get_user())
@@ -101,18 +101,20 @@ class MMRAbstractChoiceMechanism(GreedySublistChoiceMechanism):
     def create_feature_dict(self, ballots: BallotCollection):
         self.feature_dict = {}
         for ballot in ballots.get_ballots():
-            feature_entries = {}
-            for entry in ballot.prefs:
+            feature_entries = set()
+            non_feature_entries = set()
+            for entry in ballot.entry_iterator():
                 if entry.score > 0:
                     feature_entries.add(entry.item)
                 else:
-                    feature_entries.add("~" + entry.item)
+                    non_feature_entries.add(entry.item)
             self.feature_dict[ballot.name] = feature_entries
+            self.feature_dict['~'+ballot.name] = non_feature_entries
 
     def create_item_dict(self):
         # Create a dictionary of feature sets
         self.candidate_features = defaultdict(set)
-        for feature, item_set in self.feature_dict.values():
+        for feature, item_set in self.feature_dict.items():
             for item in item_set:
                 self.candidate_features[item].add(feature)
 
@@ -124,21 +126,28 @@ class MMRAbstractChoiceMechanism(GreedySublistChoiceMechanism):
         return float(len(inter)) / len(uni)
 
     @abstractmethod
-    def candidates_vs_list_score(self, candidates, list_so_far):
+    def candidates_vs_list_score(self, candidates, list_so_far, weight):
         pass
 
     def sublist_scorer(self, list_so_far: ResultList, candidates: ResultList, ballots: BallotCollection):
-        # Drop the recommender from the agents
+         # Drop the recommender from the agents
         drop_rec = ballots.subset([BallotCollection.REC_NAME], copy=True, inverse=True)
         # Create a dictionary mapping features/ballots -> {items} with that feature
         # Use ~feature to represent the absence
         self.create_feature_dict(drop_rec)
         # Create a dictionary mapping items -> {features}
         self.create_item_dict()
+        # Grab the weight
+        rec_weight = ballots.get_ballot(BallotCollection.REC_NAME).weight
 
         scored = self.candidates_vs_list_score(candidates, list_so_far)
+        rescored_ballots = BallotCollection()
+        rescored_ballots.set_ballot('mmr', scored, -(1 - rec_weight))
 
-        return scored
+        # Add the recommender back in
+        rescored_ballots.set_ballot(BallotCollection.REC_NAME, candidates, rec_weight)
+        final_scoring = rescored_ballots.merge(candidates.get_user())
+        return final_scoring
 
 class MMRSumChoiceMechanism(MMRAbstractChoiceMechanism):
 
@@ -168,6 +177,7 @@ class MMRClassicChoiceMechanism(MMRAbstractChoiceMechanism):
 
         return scored
 
+# TODO: New algorithm. We have the allocation scores. We could use this as input to a weighted similarity.
 
 # Register the mechanisms created above
 mechanism_specs = [("xquad", xQuadChoiceMechanism),

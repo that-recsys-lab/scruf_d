@@ -1,5 +1,6 @@
 from .result_list import ResultList
 from collections import defaultdict
+from icecream import ic
 
 class BallotCollection:
     REC_NAME = '__rec'
@@ -41,11 +42,13 @@ class BallotCollection:
     def merge(self, user):
         output = ResultList()
         score_table = defaultdict(float)
+        ballot_name = BallotCollection.REC_NAME
         for ballot in self.get_ballots():
+            ballot_name = ballot.name
             for entry in ballot.prefs.get_results():
                 score_table[entry.item] += entry.score * ballot.weight
 
-        item_set = {entry.item for entry in self.get_ballot(BallotCollection.REC_NAME).prefs.get_results()}
+        item_set = {entry.item for entry in self.get_ballot(ballot_name).entry_iterator()}
         triples_list = [(user, item, score_table[item]) for item in item_set]
         output.setup(triples_list, presorted=False)
         return output
@@ -63,3 +66,7 @@ class Ballot:
 
     def rescore(self, scoring_fn):
         self.prefs.rescore(scoring_fn)
+
+    def entry_iterator(self):
+        for entry in self.prefs.get_results():
+            yield entry
