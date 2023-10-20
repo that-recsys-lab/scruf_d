@@ -116,6 +116,9 @@ class ResultList:
         output.results = list(filter(filter_fn, self.results))
         return output
 
+    def contains_item(self, item):
+        return item in [entry.item for entry in self.results]
+
     @staticmethod
     # Assumes all the same user. Maybe should check for this
     # Does not require the result lists be in the same order

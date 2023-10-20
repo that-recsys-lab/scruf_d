@@ -130,3 +130,4 @@ poetry.lock
 .idea/misc.xml
 .idea/modules.xml
 .idea/scruf_d.iml
+.idea/csv-plugin.xml

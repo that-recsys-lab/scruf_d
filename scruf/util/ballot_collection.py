@@ -39,14 +39,17 @@ class BallotCollection:
                 new_bcoll.ballots[name] = self.ballots[name]
         return new_bcoll
 
-    def merge(self, user):
+    def merge(self, user, ignore_weight=False):
         output = ResultList()
         score_table = defaultdict(float)
         ballot_name = BallotCollection.REC_NAME
         for ballot in self.get_ballots():
             ballot_name = ballot.name
             for entry in ballot.prefs.get_results():
-                score_table[entry.item] += entry.score * ballot.weight
+                if ignore_weight:
+                    score_table[entry.item] += entry.score
+                else:
+                    score_table[entry.item] += entry.score * ballot.weight
 
         item_set = {entry.item for entry in self.get_ballot(ballot_name).entry_iterator()}
         triples_list = [(user, item, score_table[item]) for item in item_set]
@@ -54,12 +57,14 @@ class BallotCollection:
         return output
 
 
-
 class Ballot:
     def __init__(self, name, prefs: ResultList, weight=1.0):
         self.name: str = name
         self.weight: float = weight
         self.prefs: ResultList = prefs
+
+    def __repr__(self):
+        return f'Ballot {self.name} ({self.weight}): {self.prefs}'
 
     def intersect_results(self, results: ResultList):
         return self.prefs.intersection(results)
@@ -70,3 +75,6 @@ class Ballot:
     def entry_iterator(self):
         for entry in self.prefs.get_results():
             yield entry
+
+    def is_recommender(self):
+        return self.name == BallotCollection.REC_NAME

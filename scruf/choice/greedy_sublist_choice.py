@@ -4,6 +4,7 @@ from scruf.agent import AgentCollection
 from scruf.util import ResultList, BallotCollection, MultipleBallotsGreedyError
 from collections import defaultdict
 from copy import copy
+from numpy import array
 from abc import abstractmethod
 
 # This is a sublist optimization choice mechanism. The subclasses define a list scoring metric
@@ -67,7 +68,7 @@ class xQuadChoiceMechanism(GreedySublistChoiceMechanism):
         drop_rec = ballots.subset([BallotCollection.REC_NAME], copy=True, inverse=True)
         # Merge the ballots. Scores don't matter; only > 0
         # TODO: get_user as an argument is bogus
-        merged = drop_rec.merge(candidates.get_user())
+        merged = drop_rec.merge(candidates.get_user(), ignore_weight=True)
         # Grab the weight
         rec_weight = ballots.get_ballot(BallotCollection.REC_NAME).weight
         # Filter for the the non-zero items
@@ -95,6 +96,7 @@ class xQuadChoiceMechanism(GreedySublistChoiceMechanism):
 # MMR(u,v, R, S) △= arg max_{v∈R\S} [λ(rec(v,u) − (1 − λ) max_{v′∈S} sim(v,v′)]
 # So, we find the single item where we have the biggest difference and use that as the
 # discount.
+# TODO: Maybe this should draw from the item data rather than the agents / ballots?
 
 class MMRAbstractChoiceMechanism(GreedySublistChoiceMechanism):
 
@@ -146,7 +148,7 @@ class MMRAbstractChoiceMechanism(GreedySublistChoiceMechanism):
 
         # Add the recommender back in
         rescored_ballots.set_ballot(BallotCollection.REC_NAME, candidates, rec_weight)
-        final_scoring = rescored_ballots.merge(candidates.get_user())
+        final_scoring = rescored_ballots.merge(candidates.get_user(), ignore_weight=False)
         return final_scoring
 
 class MMRSumChoiceMechanism(MMRAbstractChoiceMechanism):
@@ -177,7 +179,7 @@ class MMRClassicChoiceMechanism(MMRAbstractChoiceMechanism):
 
         return scored
 
-# TODO: New algorithm. We have the allocation scores. We could use this as input to a weighted similarity.
+# TODO: New algorithm idea. We have the allocation scores. We could use this as input to a weighted similarity.
 
 # Register the mechanisms created above
 mechanism_specs = [("xquad", xQuadChoiceMechanism),
