@@ -16,4 +16,5 @@ from .config_util import is_valid_keys, get_value_from_keys, check_key_lists, Co
     get_path_from_keys
 from .property_collection import PropertyCollection, PropertyMixin
 from .ballot_collection import Ballot, BallotCollection
-from .util import normalize_score_dict, collapse_score_dict, ensure_list, maybe_number
+from .util import normalize_score_dict, collapse_score_dict, ensure_list, maybe_number, \
+    dict_vector_dot, dict_vector_multiply, dict_vector_scale

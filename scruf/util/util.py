@@ -59,4 +59,48 @@ def maybe_number(s):
     except ValueError:
         return s
 
+####
+# Some functions for handling dictionaries treated as feature vectors.
+####
 
+
+# Element-by-element multiplication of two dictionaries
+# Returns another such dictionary
+def dict_vector_multiply(dict1: dict, dict2: dict):
+    output = dict()
+    keys1 = list(dict1.keys())
+    keys2 = list(dict2.keys())
+    if len(keys1) != len(keys2):
+        raise KeyError(f'Mismatched keys in {dict1} and {dict2}')
+
+    for key, val in dict1.items():
+        if key not in dict2:
+            raise KeyError(f'Feature {key} missing in {dict2}')
+        else:
+            output[key] = val * dict2[key]
+    return output
+
+
+def dict_vector_dot(dict1: dict, dict2: dict):
+    output = 0
+    keys1 = list(dict1.keys())
+    keys2 = list(dict2.keys())
+    if len(keys1) != len(keys2):
+        raise KeyError(f'Mismatched keys in {dict1} and {dict2}')
+
+    for key, val in dict1.items():
+        if key not in dict2:
+            raise KeyError(f'Feature {key} missing in {dict2}')
+        else:
+            output += val * dict2[key]
+
+    return output
+
+
+def dict_vector_scale(factor, dict1: dict):
+    output = dict()
+    keys1 = list(dict1.keys())
+
+    for key, val in dict1.items():
+        output[key] = val * factor
+    return output

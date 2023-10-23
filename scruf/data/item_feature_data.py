@@ -9,14 +9,14 @@ from collections import defaultdict
 class ItemFeatureData:
 
     def __init__(self):
-        self.known_features = None
+        self.known_features: dict = None
         self.feature_file = None
         # feature id -> dict mapping value -> set of items
-        self.feature_value_index = None
+        self.feature_value_index: dict = None
         # item id -> dict mapping feature -> value
-        self.item_feature_index = None
+        self.item_feature_index: dict = None
         # feature id -> set of items with protected values for it
-        self.protected_item_index = None
+        self.protected_item_index: dict = None
 
     def setup(self, config):
         self.feature_file = get_path_from_keys(ConfigKeys.FEATURE_FILENAME_KEYS, check_exists=True, config=config)
@@ -66,3 +66,40 @@ class ItemFeatureData:
 
     def is_protected(self, feature_name, item):
         return item in self.protected_item_index[feature_name]
+
+    def get_sensitive_features(self):
+        return list(self.protected_item_index.keys())
+
+    def get_item_features(self, item):
+        return self.item_feature_index[item]
+
+    # This is needed for OFAIR.
+    # we convert the feature vector ϕ® to a smoothed binary vector of dummy variables bi with one dimension
+    # for each possible feature value.
+    # We are going to treat this in a binary fashion where the only distinction is protected vs unprotected
+    # value. If the value is missing or unprotected , we create a "~" feature and set its value to 1. We set
+    # original (protected) feature to epsilon. If the value is protected, we set the feature value to 1 and
+    # set the unprotected feature to epsilon.
+    def get_item_features_dummify(self, item, epsilon=0):
+        dummified_features = {}
+        item_features = self.get_item_features(item)
+        for feature, status in self.known_features.keys():
+            not_feature = f'~{feature}'
+            # If the item has the feature
+            if feature in item_features:
+                val = item_features[feature]
+                # If the feature is protected
+                if status[0]:
+                    # And the item's value is protected
+                    if val in status[1]:
+                        dummified_features[feature] = 1
+                        dummified_features[not_feature] = epsilon
+                        continue
+
+            # Other cases: Unprotected value, uprotected feature, feature absent
+            dummified_features[feature] = epsilon
+            dummified_features[not_feature] = 1
+        return dummified_features
+
+
+

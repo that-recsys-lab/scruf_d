@@ -1,11 +1,13 @@
 from icecream import ic
 from .choice_mechanism import ChoiceMechanism, ChoiceMechanismFactory
 from scruf.agent import AgentCollection
-from scruf.util import ResultList, BallotCollection, Ballot
+from scruf.util import ResultList, BallotCollection, Ballot, \
+    dict_vector_dot, dict_vector_multiply, dict_vector_scale
+from scruf.data import ItemFeatureData, Context
 from collections import defaultdict
 from copy import copy
 from abc import abstractmethod
-from numpy import dot, sqrt, array
+import numpy as np
 from .greedy_sublist_choice import GreedySublistChoiceMechanism, MMRAbstractChoiceMechanism
 import scruf
 
@@ -142,9 +144,18 @@ class PFARChoiceMechanism(FARChoiceMechanism):
 # * The weights come from the product of user tolerance / compatibility and a weighting function
 # where unprotected features have score alpha/100 and protected features alpha. alpha was equal
 # to 1 in the original experiments. Epsilon was ϵ = 2.2e−16
+# MMR(u,v, R, S) △= arg max_{v∈R\S} [λ(rec(v,u) − (1 − λ) max_{v′∈S} sim(v,v′)]
 # TODO: This does not work. Needs to access item representations, not just agent information.
 class OFairChoiceMechanism(MMRAbstractChoiceMechanism):
     _PROPERTY_NAMES = ['alpha', 'epsilon', 'non_sensitive_discount']
+
+    def __init__(self):
+        super().__init__()
+        self.alpha = None
+        self.epsilon = None
+        self.discount = None
+        self.item_features : ItemFeatureData = None
+        self.context : Context = None
 
     def setup(self, input_props, names=None):
         super().setup(input_props,
@@ -152,59 +163,63 @@ class OFairChoiceMechanism(MMRAbstractChoiceMechanism):
         self.alpha = float(self.get_property('alpha'))
         self.epsilon = float(self.get_property('epsilon'))
         self.discount = float(self.get_property('non_sensitive_discount'))
+        # Just sugar to save some typing
+        self.item_features = scruf.Scruf.state.item_features
+        self.context = scruf.Scruf.state.context
 
-    def ballots_2_weights(self, ballots):
-        pass
+    # Efficiency might require switching to a more vector-oriented representation.
+    # Let's see if it's an issue.
+    def ballot_weighted_cosine(self, item1, item2, weights):
+        feature_vector1 = self.item_features.get_item_features_dummify(item1, self.epsilon)
+        feature_vector2 = self.item_features.get_item_features_dummify(item2, self.epsilon)
 
-    def feature_set_2_vector(self, item):
-        features = self.candidate_features[item]
-        feature_vector_list = []
-        for feature_name in sorted(self.feature_dict.keys()):
-            feature_present = 1 if feature_name in features else self.epsilon
-            feature_vector_list.append(feature_present)
-        return array(feature_vector_list)
-
-    def ballot_weighted_cosine(self, item1, item2):
-        feature_vector1 = self.feature_set_2_vector(item1)
-        feature_vector2 = self.feature_set_2_vector(item2)
-        wts
-        numer = dot(feature_vector1, feature_vector2)
-        denom = sqrt(dot(feature_vector1, feature_vector1) * \
-                     dot(feature_vector2, feature_vector2))
+        numer = dict_vector_dot(dict_vector_multiply(weights, feature_vector1), feature_vector2)
+        wsq_len1 = dict_vector_dot(dict_vector_multiply(weights, feature_vector1), feature_vector1)
+        wsq_len2 = dict_vector_dot(dict_vector_multiply(weights, feature_vector2), feature_vector2)
+        denom = np.sqrt(wsq_len1 * wsq_len2)
 
         return numer / denom
 
-    def sum_similarity(self, item, list_so_far: ResultList):
-        similarity = 0
-        for output_item in list_so_far.result_item_iter():
-            similarity += self.ballot_jaccard(item, output_item)
-        return similarity
+    # Project the context into the dummy feature vector space
+    def project_context(self, item, list_so_far: ResultList):
+        projected_context = dict()
+        user_id = list_so_far.get_user()
+        for feature, val in self.context.get_context(user_id).items():
+            projected_context[feature] = val
+            projected_context[f'~{feature}'] = val
+        return projected_context
+
+    # Compatibility weights. This is a vector where the feature and ~feature entries are set to the
+    # the entropy values for the associated features, if any. We can't get this from compatibility
+    # because we need entropy for all features, not just sensitive ones.
+    # Protected weights. This is a vector where the feature and ~feature entries are set to alpha for
+    # sensitive VALUES or alpha/discount for non-sensitive values. (This is a bit unclear in the paper,
+    # TBH but because values are supposed to == features in the dummified feature space, maybe this
+    # is equivalent.)
+
+    def max_similarity(self, item, list_so_far: ResultList):
+        # tolerance weights are compatibility projected in the feature/~feature space
+        tolerance_weights = self.project_context(item, list_so_far)
+        protected_weights = self.item_features.get_item_features_dummify(item, 1/self.discount)
+        protected_weights = dict_vector_scale(self.alpha, protected_weights)
+        weights = dict_vector_multiply(protected_weights, tolerance_weights)
+        return max([self.ballot_weighted_cosine(item, output_item, weights)
+                    for output_item in list_so_far.result_item_iter()])
 
     def candidates_vs_list_score(self, candidates, list_so_far):
         # For each candidate, score it based on sum of similarities with output items so far
         scored = copy(candidates)
-        scored.rescore(lambda entry: self.sum_similarity(entry.item, list_so_far))
+        scored.rescore(lambda entry: self.max_similarity(entry.item, list_so_far))
 
         return scored
 
     # Have to have our own sublist scorer so that we can create the ballot weights.
     def sublist_scorer(self, list_so_far: ResultList, candidates: ResultList, ballots: BallotCollection):
 
-        # Compatibility weights. This is a vector where the feature and ~feature entries are set to the
-        # the entropy values for the associated features, if any. We can't get this from compatibility
-        # because we need entropy for all features, not just sensitive ones.
-        # Importance weights. This is a vector where the feature and ~feature entries are set to alpha for
-        # sensitive VALUES or alpha/discount for non-sensitive values. (This is a bit unclear in the paper,
-        # TBH.)
-        # Stopping here because we don't have the data that we need to calculate these.
-
         # Drop the recommender from the agents
         drop_rec = ballots.subset([BallotCollection.REC_NAME], copy=True, inverse=True)
-        # Create a dictionary mapping features/ballots -> {items} with that feature
-        # Use ~feature to represent the absence
-        self.create_feature_dict(drop_rec)
-        # Create a dictionary mapping items -> {features}
-        self.create_item_dict()
+        # Drop the list so far from the candidates
+
         # Grab the weight
         rec_weight = ballots.get_ballot(BallotCollection.REC_NAME).weight
 
