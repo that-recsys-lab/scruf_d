@@ -128,7 +128,7 @@ class MMRAbstractChoiceMechanism(GreedySublistChoiceMechanism):
         return float(len(inter)) / len(uni)
 
     @abstractmethod
-    def candidates_vs_list_score(self, candidates, list_so_far, weight):
+    def candidates_vs_list_score(self, candidates, list_so_far):
         pass
 
     def sublist_scorer(self, list_so_far: ResultList, candidates: ResultList, ballots: BallotCollection):
