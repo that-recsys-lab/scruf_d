@@ -27,6 +27,9 @@ class GreedySublistChoiceMechanism(ChoiceMechanism):
 
     def compute_choice(self, agents: AgentCollection, bcoll: BallotCollection, recommendations: ResultList,
                        list_size):
+        rec_weight = float(self.get_property('recommender_weight'))
+        bcoll.set_ballot('__rec', recommendations, rec_weight)
+
         output = ResultList()
         candidates = copy(recommendations)
         score = list_size

@@ -8,6 +8,10 @@ class BallotCollection:
     def __init__(self):
         self.ballots = {}
 
+    def __repr__(self):
+        ballots = [ballot.__repr__() for ballot in self.ballots.values()]
+        return f'BallotColl: {ballots}'
+
     def get_count(self):
         return len(self.ballots)
 

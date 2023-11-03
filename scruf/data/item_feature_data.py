@@ -1,6 +1,7 @@
 from scruf.util import is_valid_keys, get_path_from_keys, ConfigKeys, ensure_list, maybe_number
 import csv
 from collections import defaultdict
+from icecream import ic
 
 # Reads in item, feature, value triples.
 # Allows lookup: what features does this item have? what items have this feature? etc.
@@ -32,7 +33,10 @@ class ItemFeatureData:
         for feature in feature_config.keys():
             feature_name = feature_config[feature]['name']
             protected = feature_config[feature]['protected_feature']
-            vals = feature_config[feature]['protected_values']
+            if protected:
+                vals = feature_config[feature]['protected_values']
+            else:
+                vals = None
             self.known_features[feature_name] = (protected, vals)
 
     # Item features in triple format: item id, feature name, value
@@ -83,7 +87,7 @@ class ItemFeatureData:
     def get_item_features_dummify(self, item, epsilon=0):
         dummified_features = {}
         item_features = self.get_item_features(item)
-        for feature, status in self.known_features.keys():
+        for feature, status in self.known_features.items():
             not_feature = f'~{feature}'
             # If the item has the feature
             if feature in item_features:
@@ -91,7 +95,7 @@ class ItemFeatureData:
                 # If the feature is protected
                 if status[0]:
                     # And the item's value is protected
-                    if val in status[1]:
+                    if val == status[1]:
                         dummified_features[feature] = 1
                         dummified_features[not_feature] = epsilon
                         continue

@@ -203,8 +203,9 @@ class OFairChoiceMechanism(MMRAbstractChoiceMechanism):
         protected_weights = self.item_features.get_item_features_dummify(item, 1/self.discount)
         protected_weights = dict_vector_scale(self.alpha, protected_weights)
         weights = dict_vector_multiply(protected_weights, tolerance_weights)
-        return max([self.ballot_weighted_cosine(item, output_item, weights)
-                    for output_item in list_so_far.result_item_iter()])
+        cosines = [self.ballot_weighted_cosine(item, output_item, weights)
+                    for output_item in list_so_far.result_item_iter()]
+        return max(cosines)
 
     def candidates_vs_list_score(self, candidates, list_so_far):
         # For each candidate, score it based on sum of similarities with output items so far
@@ -218,7 +219,6 @@ class OFairChoiceMechanism(MMRAbstractChoiceMechanism):
 
         # Drop the recommender from the agents
         drop_rec = ballots.subset([BallotCollection.REC_NAME], copy=True, inverse=True)
-        # Drop the list so far from the candidates
 
         # Grab the weight
         rec_weight = ballots.get_ballot(BallotCollection.REC_NAME).weight
@@ -226,10 +226,12 @@ class OFairChoiceMechanism(MMRAbstractChoiceMechanism):
         scored = self.candidates_vs_list_score(candidates, list_so_far)
         rescored_ballots = BallotCollection()
         rescored_ballots.set_ballot('mmr', scored, -(1 - rec_weight))
+        #ic(rescored_ballots.get_ballot('mmr'))
 
         # Add the recommender back in
         rescored_ballots.set_ballot(BallotCollection.REC_NAME, candidates, rec_weight)
         final_scoring = rescored_ballots.merge(candidates.get_user(), ignore_weight=False)
+        #ic(final_scoring)
         return final_scoring
 
 # Register the mechanisms created above
