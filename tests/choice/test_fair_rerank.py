@@ -40,18 +40,18 @@ alpha = 1.0
 # Not testing OFAIR with other than binary features
 SAMPLE_FEATURE_CONFIG = '''
 [f1]
-name = "f1"
-protected_feature = true
+name = "Feature 1"
+protected_feature = "f1"
 protected_values = 1
 
 [f2]
-name = "f2"
-protected_feature = true
+name = "Feature 2"
+protected_feature = "f2"
 protected_values = 1
 
 [f3]
-name = "f3"
-protected_feature = false 
+name = "Feature 3"
+protected_feature = "f3"
 '''
 
 SAMPLE_COMPATIBILITIES = {'u1': {'f1': 0.8, 'f2': 0.0, 'f3': 0.5},
