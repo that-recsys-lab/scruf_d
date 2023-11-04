@@ -228,7 +228,7 @@ class FARTestCase(unittest.TestCase):
         # ic(output)
         self.assertEqual(output.get_length(), 4)
         self.assertEqual('i5', output.results[0].item)
-        self.assertEqual('i3', output.results[1].item)
+        self.assertEqual('i1', output.results[1].item)
 
 
 if __name__ == '__main__':

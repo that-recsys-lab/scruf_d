@@ -31,7 +31,7 @@ class ResultList:
     def __deepcopy__(self, memodict={}):
         result_list = ResultList()
         for entry in self.results:
-            result = ResultEntry(user=entry.user, item=entry.item, score=entry.rating, rank=entry.rank)
+            result = ResultEntry(user=entry.user, item=entry.item, score=entry.score, rank=entry.rank)
             result_list.results.append(result)
         return result_list
 
