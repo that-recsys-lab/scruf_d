@@ -14,6 +14,8 @@ class FairnessAgent:
         self.fairness_metric = None
         self.compatibility_metric = None
         self.preference_function = None
+        self.recent_fairness = 1.0
+        self.recent_compatibility = 1.0
 
     def setup(self, properties):
         # Set up fairness metric
@@ -46,10 +48,12 @@ class FairnessAgent:
             self.preference_function.setup(dict())
 
     def compute_fairness(self, history):
-        return self.fairness_metric.compute_fairness(history)
+        self.recent_fairness = self.fairness_metric.compute_fairness(history)
+        return self.recent_fairness
 
     def compute_compatibility(self, context):
-        return self.compatibility_metric.compute_compatibility(context)
+        self.recent_compatibility = self.compatibility_metric.compute_compatibility(context)
+        return self.recent_compatibility
 
     def compute_preferences(self, recommendations):
         return self.preference_function.compute_preferences(recommendations)

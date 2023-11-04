@@ -48,6 +48,7 @@ class WhalrusWrapperMechanism (ChoiceMechanism):
         if self.check_tiebreak_type(tiebreak_property):
             module = importlib.import_module('whalrus')
             return getattr(module, tiebreak_name)
+
         else:
             raise UnknownWhalrusTiebreakError(tiebreak_name)
 
@@ -105,13 +106,19 @@ class WhalrusWrapperScoring (WhalrusWrapperMechanism):
                          'RuleRangeVoting', 'RuleRankedPairs', 'RuleSimplifiedDodgson',
                          'RuleVeto']
 
-    _LEGAL_TIEBREAKERS = ['None', 'Random']
+    _LEGAL_TIEBREAKERS = ['None', 'Random', 'Unambiguous']
 
     def invoke_whalrus_rule(self, ballots, weights=None):
         if weights is None:
-            self.whalrus_rule = self.whalrus_class(ballots, tie_break=self.tiebreak_class())
+            if self.tiebreak_class is None:
+                self.whalrus_rule = self.whalrus_class(ballots)
+            else:
+                self.whalrus_rule = self.whalrus_class(ballots, tie_break=self.tiebreak_class)
         else:
-            self.whalrus_rule = self.whalrus_class(ballots, weights=weights, tie_break=self.tiebreak_class())
+            if self.tiebreak_class is None:
+                self.whalrus_rule = self.whalrus_class(ballots, weights=weights)
+            else:
+                self.whalrus_rule = self.whalrus_class(ballots, weights=weights, tie_break=self.tiebreak_class)
 
     def unwrap_result(self, user, list_size):
         scores = self.whalrus_rule.scores_as_floats_
@@ -134,9 +141,15 @@ class WhalrusWrapperOrdinal (WhalrusWrapperMechanism):
 
     def invoke_whalrus_rule(self, ballots, weights=None):
         if weights is None:
-            self.whalrus_rule = self.whalrus_class(ballots, tie_break=self.tiebreak_class())
+            if self.tiebreak_class is None:
+                self.whalrus_rule = self.whalrus_class(ballots)
+            else:
+                self.whalrus_rule = self.whalrus_class(ballots, tie_break=self.tiebreak_class())
         else:
-            self.whalrus_rule = self.whalrus_class(ballots, weights=weights,
+            if self.tiebreak_class is None:
+                self.whalrus_rule = self.whalrus_class(ballots, weights=weights)
+            else:
+                self.whalrus_rule = self.whalrus_class(ballots, weights=weights,
                                                tie_break=self.tiebreak_class())
 
     # Score range is 0..length of list. This is also something we might want to make configurable

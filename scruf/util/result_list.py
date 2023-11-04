@@ -23,6 +23,18 @@ class ResultList:
     def __init__(self):
         self.results = []
 
+    def __copy__(self):
+        result_list = ResultList()
+        result_list.results = self.results.copy()
+        return result_list
+
+    def __deepcopy__(self, memodict={}):
+        result_list = ResultList()
+        for entry in self.results:
+            result = ResultEntry(user=entry.user, item=entry.item, score=entry.score, rank=entry.rank)
+            result_list.results.append(result)
+        return result_list
+
     def setup(self, triples, presorted=False, trim=0):
         self.results = []
         # Test for length of triples. If > 3, signal file format error
@@ -46,6 +58,20 @@ class ResultList:
     def get_results(self):
         return self.results
 
+    def result_item_iter(self):
+        for entry in self.results:
+            yield entry.item
+
+    def get_length(self):
+        return len(self.results)
+
+    def remove_result(self, item):
+        self.results = keyed_delete(self.results, item, key=lambda entry: entry.item)
+
+    # Assumes sorted
+    def remove_top(self):
+        self.results = self.results[1:]
+
     # Assumes the list is sorted
     def score_range(self):
         first_entry = self.results[0]
@@ -55,6 +81,11 @@ class ResultList:
     def add_result(self, user, item, score, sort=False):
         new_entry = ResultEntry(user=user, item=item, score=score, rank=-1)
         self.results.append(new_entry)
+        if sort:
+            self.sort()
+
+    def add_result_entry(self, entry: ResultEntry, sort=False):
+        self.results.append(entry)
         if sort:
             self.sort()
 
@@ -81,7 +112,12 @@ class ResultList:
             result.score = new_score
 
     def filter_results(self, filter_fn):
-        return filter(filter_fn, self.results)
+        output = ResultList()
+        output.results = list(filter(filter_fn, self.results))
+        return output
+
+    def contains_item(self, item):
+        return item in [entry.item for entry in self.results]
 
     @staticmethod
     # Assumes all the same user. Maybe should check for this
@@ -121,3 +157,18 @@ class ResultList:
         output.sort()
 
         return output
+
+    def intersection(self, other_results):
+        this_items = {entry.item for entry in self.results}
+        other_items = {entry.item for entry in other_results.results}
+        return this_items.intersection(other_items)
+
+
+# Non-destructive
+def keyed_delete(lst, item, key=None):
+    if key is None:
+        new_lst = lst.copy()
+        new_lst.remove(item)
+        return new_lst
+    else:
+        return [entry for entry in lst if not key(entry)==item]

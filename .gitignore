@@ -123,3 +123,11 @@ doc/.ipynb_checkpoints/
 .DS_Store
 .DS_Store
 poetry.lock
+.idea/workspace.xml
+.idea/.Rhistory
+.idea/vcs.xml
+.idea/inspectionProfiles/profiles_settings.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/scruf_d.iml
+.idea/csv-plugin.xml

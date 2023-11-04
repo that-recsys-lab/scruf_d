@@ -36,7 +36,7 @@ class ResultListTestCase(unittest.TestCase):
     def test_filter(self):
         rlist = ResultList()
         rlist.setup(RESULT_TRIPLES)
-        filtered = list(rlist.filter_results(lambda result: result.score > 3.5))
+        filtered = list(rlist.filter_results(lambda result: result.score > 3.5).results)
         self.assertEqual(len(filtered), 2)
         self.assertEqual(filtered[0].item, 'i5')
 
