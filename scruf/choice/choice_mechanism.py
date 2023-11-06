@@ -14,6 +14,8 @@ class ChoiceMechanism(PropertyMixin,ABC):
     def setup(self, input_props, names=None):
         super().setup(input_props, names=names)
 
+    # TODO: It would be better to copy the recommender ballot into bcoll here and save to the history,
+    # rather than rely on compute_choice not to alter it.
     def do_choice(self, allocation_probabilities, recommendations: ResultList):
         agents = scruf.Scruf.state.agents
         list_size = scruf.Scruf.state.output_list_size

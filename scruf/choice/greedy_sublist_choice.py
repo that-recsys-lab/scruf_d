@@ -3,7 +3,7 @@ from .choice_mechanism import ChoiceMechanism, ChoiceMechanismFactory
 from scruf.agent import AgentCollection
 from scruf.util import ResultList, BallotCollection, MultipleBallotsGreedyError
 from collections import defaultdict
-from copy import copy
+from copy import copy, deepcopy
 from numpy import array
 from abc import abstractmethod
 
@@ -30,6 +30,8 @@ class GreedySublistChoiceMechanism(ChoiceMechanism):
         rec_weight = float(self.get_property('recommender_weight'))
         bcoll.set_ballot('__rec', recommendations, rec_weight)
 
+        ballots = deepcopy(bcoll)
+
         output = ResultList()
         candidates = copy(recommendations)
         score = list_size
@@ -37,7 +39,7 @@ class GreedySublistChoiceMechanism(ChoiceMechanism):
             # If output has nothing, you can't score, just add top current candidate
             if output.get_length() > 0:
                 # score recommendation list
-                candidates = self.sublist_scorer(output, candidates, bcoll)
+                candidates = self.sublist_scorer(output, candidates, ballots)
             # remove top item and add to output
             top_item = candidates.get_results()[0]
             candidates.remove_top()
@@ -47,7 +49,7 @@ class GreedySublistChoiceMechanism(ChoiceMechanism):
             score -= 1
             output.add_result_entry(top_item, sort=False)
 
-        return output
+        return bcoll, output
 
     @abstractmethod
     def sublist_scorer(self, list_so_far: ResultList, candidates: ResultList, ballots: BallotCollection):
