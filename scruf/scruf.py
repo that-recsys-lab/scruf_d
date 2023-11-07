@@ -116,6 +116,12 @@ class Scruf:
 
     @staticmethod
     def post_process():
+        # Post processing jneeds setup
+        post_props = Scruf.get_value_from_keys(['post', 'properties'], default={})
+        Scruf.state.post_processor.setup(post_props)
+        # Also need item features
+        Scruf.state.item_features.setup(Scruf.state.config)
+        # Do the evaluation
         Scruf.state.post_processor.process()
 
     @staticmethod

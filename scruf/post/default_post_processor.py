@@ -177,9 +177,11 @@ class ExposurePostProcessor(NDCGPostProcessor):
 
     def compute_fairness_columns(self):
         fairness_df = pd.DataFrame()
-        for feature in scruf.Scruf.state.item_features.known_features.keys():
-            # build list-level fairness series
-            fairness_df[('Exposure', feature)] = self.compute_fairness(feature)
+        for feature, tuple in scruf.Scruf.state.item_features.known_features.items():
+            # if the feature representation has no protected values, then it isn't a sensitive feature
+            if tuple[1] is not None:
+                # build list-level fairness series
+                fairness_df[('Exposure', feature)] = self.compute_fairness(feature)
 
         self.dataframe = pd.concat([self.dataframe, fairness_df], axis=1)
 
