@@ -1,5 +1,6 @@
 from .result_list import ResultList
 from collections import defaultdict
+from copy import deepcopy
 from icecream import ic
 
 class BallotCollection:
@@ -11,6 +12,14 @@ class BallotCollection:
     def __repr__(self):
         ballots = [ballot.__repr__() for ballot in self.ballots.values()]
         return f'BallotColl: {ballots}'
+
+    # Don't have to worry about recursion because a ballot collection cannot contain another one.
+    def __deepcopy__(self, memo):
+        cls = self.__class__
+        result = cls.__new__(cls)
+        memo[id(self)] = result
+        result.ballots = deepcopy(self.ballots, memo)
+        return result
 
     def get_count(self):
         return len(self.ballots)
@@ -69,6 +78,15 @@ class Ballot:
 
     def __repr__(self):
         return f'Ballot {self.name} ({self.weight}): {self.prefs}'
+
+    def __deepcopy__(self, memo):
+        cls = self.__class__
+        result = cls.__new__(cls)
+        memo[id(self)] = result
+        result.name = self.name
+        result.weight = self.weight
+        result.prefs = deepcopy(self.prefs, memo)
+        return result
 
     def intersect_results(self, results: ResultList):
         return self.prefs.intersection(results)
