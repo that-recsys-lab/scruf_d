@@ -54,6 +54,7 @@ class NullChoiceMechanism(ChoiceMechanism):
         :return: selected agent for each user
         """
         bcoll = BallotCollection()
+        recommended_items.sort()
         bcoll.set_ballot(BallotCollection.REC_NAME, recommended_items, 1.0)
         output = copy.deepcopy(recommended_items)
         output.trim(list_size)
