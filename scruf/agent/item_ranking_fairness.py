@@ -15,24 +15,21 @@ class MeanReciprocalRankFM(ItemFeatureFairnessMetric):
         The fairness is computed as the average of reciprocal ranks of the first relevant (protected) item
         encountered in the list of recommendations.
         """
-        mrr_total = 0
+
+        max_mrr = 0  # To track the maximum MRR across all queries
         protected_feature = self.get_property('feature')
         item_data = scruf.Scruf.state.item_features
-        num_queries = 0
 
         for result in history.choice_output_history.get_recent(-1):
+            mrr_for_query = 0  # MRR for the current query
             for idx, recommendation in enumerate(result.get_results(), start=1):
                 if item_data.is_protected(protected_feature, recommendation.item):
-                    mrr_total += 1 / idx
-                    break
-            num_queries += 1
+                    mrr_for_query = max(mrr_for_query, 1 / idx)
+            max_mrr = max(max_mrr, mrr_for_query)
 
-        # Avoid division by zero if there are no queries
-        if num_queries == 0:
-            return 1.0
+        # If there are no queries or no protected items were found, max_mrr remains 0, indicating no fairness issue.
+        return max_mrr if max_mrr > 0 else 1.0
 
-        mrr_score = mrr_total / num_queries
-        return mrr_score
 
 class DisparateExposureFM(ItemFeatureFairnessMetric):
     """
