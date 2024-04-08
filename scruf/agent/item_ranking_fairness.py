@@ -2,25 +2,6 @@ from . import FairnessMetric, FairnessMetricFactory, ItemFeatureFairnessMetric
 from abc import abstractmethod
 import numpy as np
 import scruf
-class ItemFeatureFairnessMetric(FairnessMetric):
-    """
-    An ItemFeatureFairnessMetric is one where recommended items are associated with a protected
-    feature defined in the feature section.
-    """
-    _PROPERTY_NAMES = ['feature']
-
-    def __init__(self):
-        super().__init__()
-
-    def setup(self, input_props, names=None):
-        super().setup(input_props, names=self.configure_names(ItemFeatureFairnessMetric._PROPERTY_NAMES, names))
-
-    def __str__(self):
-        return f"ItemFeatureFairnessMetric: feature = {self.get_property('feature')}"
-
-    @abstractmethod
-    def compute_fairness(self, history):
-        pass
 
 # Calculation is average of (for each list, 1/rank of highest ranked protected item)
 class MeanReciprocalRankFM(ItemFeatureFairnessMetric):
