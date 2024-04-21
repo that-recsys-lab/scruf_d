@@ -58,6 +58,8 @@ class FairnessAgent:
     def compute_preferences(self, recommendations):
         return self.preference_function.compute_preferences(recommendations)
 
+    def compute_test_fairness(self, history, test_data):
+        return self.fairness_metric.compute_test_fairness(history, test_data)
 class AgentCollection:
 
     @classmethod
@@ -79,6 +81,7 @@ class AgentCollection:
     def get_agent(self, name):
         agent = None
         for ag in self.agents:
+           # if ag.postprocessonly == True:
             if ag.name == name:
                 agent = ag
         return agent
