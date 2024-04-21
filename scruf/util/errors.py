@@ -163,5 +163,6 @@ class UnregisteredPostProcessorError(ScrufError):
 
 class FeatureFileFormatError(ScrufError):
     def __init__(self, file, row):
+
         self.message = f'Error in item feature file {file} Row representation: {row}.'
         super().__init__(self.message)
