@@ -160,3 +160,8 @@ class UnregisteredPostProcessorError(ScrufError):
     def __init__(self, name):
         self.message = f'Cannot create post processor: Class {name} is not registered and may not exist.'
         super().__init__(self.message)
+
+class FeatureFileFormatError(ScrufError):
+    def __init__(self, file, row):
+        self.message = f'Error in item feature file {file} Row representation: {row}.'
+        super().__init__(self.message)
