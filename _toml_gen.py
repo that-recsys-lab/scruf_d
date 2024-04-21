@@ -5,11 +5,11 @@ import pathlib
 from ruamel.yaml import YAML
 
 yaml = YAML(typ="safe")
-params = yaml.load(open("../dvc_test_1/params.yaml", encoding="utf-8"))
+params = yaml.load(open("../scruf-dvc-experiments/params.yaml", encoding="utf-8"))
 
+folder_path = params["config"]["folder_path"]
 
-folder_path = "../dvc_test_1/"
-
+base_toml = params["config"]["base_toml"]
 def remove_suffix(input_string, suffix):
     if suffix and input_string.endswith(suffix):
         return input_string[:-len(suffix)]
@@ -19,8 +19,18 @@ def generate_config(base, config_number, rec_weight, choice, allocation, filenam
     base_toml = toml.load(base)
     new_filename = remove_suffix(base_toml["output"]["filename"], ".json") + f"_{filename_suffix}_{config_number}.json"
     base_toml["output"]["filename"] = new_filename
-    base_toml["choice"]["properties"]["whalrus_rule"] = choice
+    # Check if the choice is "weighted_scoring"
+    if choice == "weighted_scoring":
+        base_toml["choice"]["choice_class"] = choice
+    else:
+        base_toml["choice"]["properties"]["whalrus_rule"] = choice
+        base_toml["choice"]["properties"]["tie_breaker"] = "Random"
+        base_toml["choice"]["properties"]["ignore_weights"] = "false"
+        base_toml["choice"]['choice_class'] = "whalrus_scoring"
     base_toml["allocation"]["allocation_class"] = allocation
+    if allocation == "weighted_product_allocation":
+        base_toml["allocation"]["properties"]["compatibility_exponent"] = 2
+        base_toml["allocation"]["properties"]["fairness_exponent"] = 1
     base_toml["choice"]["properties"]["recommender_weight"] = rec_weight
 
 
@@ -29,7 +39,7 @@ def generate_config(base, config_number, rec_weight, choice, allocation, filenam
         toml.dump(base_toml, f)
     return name, new_filename
 
-base_toml = "../dvc_test_1/kiva/least_fair.toml"
+
 
 config_number_counter = 0
 path_list = []

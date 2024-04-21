@@ -1,6 +1,7 @@
 from . import FairnessMetric, FairnessMetricFactory
 from abc import abstractmethod
 import scruf
+import numpy as np
 
 class ItemFeatureFairnessMetric(FairnessMetric):
     """
