@@ -1,6 +1,7 @@
 from . import FairnessMetric, FairnessMetricFactory, ItemFeatureFairnessMetric
 from abc import abstractmethod
 import numpy as np
+from statistics import mean
 import scruf
 
 # Calculation is average of (for each list, 1/rank of highest ranked protected item)
@@ -35,16 +36,21 @@ class MeanReciprocalRankFM(ItemFeatureFairnessMetric):
         protected_feature = self.get_property('feature')
         item_data = scruf.Scruf.state.item_features
         target_mrr = float(self.get_property('target'))
+        mrr = []
 
         for result in history.choice_output_history.get_recent(-1):
             mrr_for_query = 0  # MRR for the current query
             for idx, recommendation in enumerate(result.get_results(), start=1):
                 if item_data.is_protected(protected_feature, recommendation.item):
                     mrr_for_query = max(mrr_for_query, 1 / idx)
-            max_mrr = max(max_mrr, mrr_for_query)
+                    mrr.append(mrr_for_query)
+                    break
+                if idx == 10:
+                    mrr.append(0)
+        avg_mrr = mean(mrr)
 
 
-        return max_mrr/target_mrr
+        return avg_mrr/target_mrr
 class DisparateExposureFM(ItemFeatureFairnessMetric):
     """
     DisparateExposureFM computes fairness by ensuring that protected and non-protected groups receive
