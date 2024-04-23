@@ -48,9 +48,10 @@ class MeanReciprocalRankFM(ItemFeatureFairnessMetric):
                 if idx == 10:
                     mrr.append(0)
         avg_mrr = mean(mrr)
+        fair_mrr = avg_mrr/target_mrr
+        fairness_score = max(1, fair_mrr)
 
-
-        return avg_mrr/target_mrr
+        return fairness_score
 class DisparateExposureFM(ItemFeatureFairnessMetric):
     """
     DisparateExposureFM computes fairness by ensuring that protected and non-protected groups receive
@@ -100,7 +101,9 @@ class DisparateExposureFM(ItemFeatureFairnessMetric):
 
         # the proportion of exposure between protected and non-protected items has been considered.
         # Adjust this formula based on fairness definition.
-        fairness_score = ((utility_protected/n_prot) / (utility_non_protected/n_unprot))/target
+        exposure = ((utility_protected/n_prot) / (utility_non_protected/n_unprot))
+        fair_exposure = exposure/target
+        fairness_score = max(1, fair_exposure)
 
         return fairness_score
 
