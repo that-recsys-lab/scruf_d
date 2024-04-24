@@ -1,6 +1,7 @@
 from . import FairnessMetric, FairnessMetricFactory
 from abc import abstractmethod
 import scruf
+from icecream import ic
 import numpy as np
 
 class ItemFeatureFairnessMetric(FairnessMetric):
@@ -21,6 +22,10 @@ class ItemFeatureFairnessMetric(FairnessMetric):
 
     @abstractmethod
     def compute_fairness(self, history):
+        pass
+
+    @abstractmethod
+    def compute_test_fairness(self, history):
         pass
 
 
@@ -60,6 +65,18 @@ class ProportionalItemFM(ItemFeatureFairnessMetric):
             fairness_value = protected_ratio / target_proportion
             return fairness_value
 
+    def compute_test_fairness(self, history):
+
+        target_proportion = float(self.get_property('proportion'))
+        protected, total_items = self.count_test_protected(history)
+        protected_ratio = float(protected) / total_items
+        # If protected ratio is at or above
+        if protected_ratio > target_proportion:
+            protected_ratio = target_proportion
+            # 1.0 is ratio = target
+        fairness_value = protected_ratio / target_proportion
+        return fairness_value
+
 
     def count_protected(self, history_entries):
         feature = self.get_property('feature')
@@ -72,6 +89,19 @@ class ProportionalItemFM(ItemFeatureFairnessMetric):
                                     for result_entry in result.get_results()]
             protected_count += sum(protected_vector)
             total_count += len(result.get_results())
+
+        return protected_count, total_count
+
+    def count_test_protected(self, history_entries):
+        feature = self.get_property('feature')
+        item_data = scruf.Scruf.state.item_features
+        protected_count = 0
+        results = [item for sublist in history_entries for item in sublist]
+        for result in results:
+            #result = history_entry['output']
+            protected_vector = [1 if item_data.is_protected(feature, result) else 0]
+            protected_count += sum(protected_vector)
+        total_count = len(results)
 
         return protected_count, total_count
 

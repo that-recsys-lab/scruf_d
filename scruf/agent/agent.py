@@ -7,6 +7,7 @@ from scruf.util import ResultList
 import scruf
 from icecream import ic
 
+
 class FairnessAgent:
 
     def __init__(self, name):
@@ -32,7 +33,7 @@ class FairnessAgent:
         compatibility_metric_name = properties['compatibility_class']
         self.compatibility_metric = CompatibilityMetricFactory.create_compatibility_metric(compatibility_metric_name)
 
-        if 'compatibility' in properties: #If the metric key is present in the properties dictionary, the setup() method of the fairness metric object is called with the value of the metric key as the parameter. Does the metric key have multiple values?
+        if 'compatibility' in properties:  # If the metric key is present in the properties dictionary, the setup() method of the fairness metric object is called with the value of the metric key as the parameter. Does the metric key have multiple values?
             self.compatibility_metric.setup(properties['compatibility'])
         else:
             self.compatibility_metric.setup(dict())
@@ -58,8 +59,10 @@ class FairnessAgent:
     def compute_preferences(self, recommendations):
         return self.preference_function.compute_preferences(recommendations)
 
-    def compute_test_fairness(self, history, test_data):
-        return self.fairness_metric.compute_test_fairness(history, test_data)
+    def compute_test_fairness(self, history):
+        return self.fairness_metric.compute_test_fairness(history)
+
+
 class AgentCollection:
 
     @classmethod
@@ -81,14 +84,13 @@ class AgentCollection:
     def get_agent(self, name):
         agent = None
         for ag in self.agents:
-           # if ag.postprocessonly == True:
+            # if ag.postprocessonly == True:
             if ag.name == name:
                 agent = ag
         return agent
 
-
     def agent_value_pairs(self, default=0.0):
-        return {name:default for name in self.agent_names()}
+        return {name: default for name in self.agent_names()}
 
     # Note: Overwrites the agent list
     def setup(self, config=None):
@@ -110,9 +112,11 @@ class AgentCollection:
     def compute_fairnesses(self, history):
         return {agent.name: agent.compute_fairness(history) for agent in self.agents}
 
+    def compute_test_fairnesses(self, history):
+        return {agent.name: agent.compute_test_fairness(history) for agent in self.agents}
+
     def compute_compatibilities(self, context):
         return {agent.name: agent.compute_compatibility(context) for agent in self.agents}
 
     def compute_preference_lists(self, recommendations):
         return {agent.name: agent.compute_preferences(recommendations) for agent in self.agents}
-
