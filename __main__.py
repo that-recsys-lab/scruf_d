@@ -2,6 +2,8 @@ import argparse
 import logging
 import os
 import toml
+import yaml
+from yaml import Loader
 from scruf.util.errors import ConfigFileError
 from scruf import Scruf
 
@@ -32,7 +34,10 @@ def arg_check(input_args):
 
 def load_config(config_file):
     with open(config_file, 'r') as f:
-        config = toml.load(f)
+        if config_file.lower().endswith('.toml'):
+            config = toml.load(f)
+        elif config_file.lower().endswith(('.yaml', '.yml')):
+            config = yaml.load(f, Loader=Loader)
     return config
 
 
