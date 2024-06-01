@@ -1,0 +1,11 @@
+---
+one:
+  name: "women_writer_director"
+  protected_feature: "women_writer_director"
+  protected_values:
+  - 1
+two:
+  name: "non-en"
+  protected_feature: "non-en"
+  protected_values:
+  - 1

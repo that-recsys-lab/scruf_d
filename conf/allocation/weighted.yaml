@@ -1,0 +1,5 @@
+---
+allocation_class: "weighted_product_allocation"
+properties:
+  compatibility_exponent: 2
+  fairness_exponent: 1

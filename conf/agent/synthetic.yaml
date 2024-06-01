@@ -1,0 +1,19 @@
+---
+one:
+  name: "0"
+  metric_class: "proportional_item"
+  compatibility_class: "context_compatibility"
+  preference_function_class: "cascade_preference"
+  metric:
+    feature: "0"
+  preference:
+    feature: "0"
+two:
+  name: "1"
+  metric_class: "proportional_item"
+  compatibility_class: "context_compatibility"
+  preference_function_class: "cascade_preference"
+  metric:
+    feature: "1"
+  preference:
+    feature: "1"

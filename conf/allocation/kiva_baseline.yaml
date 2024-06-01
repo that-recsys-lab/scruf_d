@@ -1,0 +1,8 @@
+---
+allocation_class: "static_lottery"
+properties:
+  weights: 
+  - - "loan_buck_5"
+    - "0.0"
+  - - "COUNTRY_low_pfr"
+    - "0.0"

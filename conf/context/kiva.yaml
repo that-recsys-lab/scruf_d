@@ -1,0 +1,4 @@
+---
+context_class: "csv_context"
+properties:
+  compatibility_file: "kiva_compat_dynamic.csv"

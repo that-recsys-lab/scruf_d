@@ -1,0 +1,35 @@
+---
+defaults:
+  - agent: kiva
+  - allocation: kiva_baseline
+  - choice: baseline
+  - context: kiva
+  - data: kiva
+  - feature: kiva
+  - post: default
+  - _self_
+
+location:
+  path: "data"
+  overwrite: "true"
+output:
+  filename: "history.json"
+parameters:
+  list_size: 10
+  iterations: -1
+  initialize: "skip"
+  history_window_size: 100
+choice:
+  properties:
+    recommender_weight: 0.8
+agent:
+  one:
+    metric:
+      proportion: 0.15
+    preference:
+      delta: 0.1
+  two:
+    metric:
+      proportion: 0.15
+    preference:
+      delta: 0.1

@@ -1,0 +1,11 @@
+---
+one:
+  name: "COUNTRY_low_pfr"
+  protected_feature: "COUNTRY_low_pfr"
+  protected_values:
+  - 1
+two:
+  name: "loan_buck_5"
+  protected_feature: "loan_buck_5"
+  protected_values:
+  - 1

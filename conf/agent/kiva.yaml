@@ -1,0 +1,19 @@
+---
+one:
+  name: "COUNTRY_low_pfr"
+  metric_class: "proportional_item"
+  compatibility_class: "context_compatibility"
+  preference_function_class: "cascade_preference"
+  metric:
+    feature: "COUNTRY_low_pfr"
+  preference:
+    feature: "COUNTRY_low_pfr"
+two:
+  name: "loan_buck_5"
+  metric_class: "proportional_item"
+  compatibility_class: "context_compatibility"
+  preference_function_class: "cascade_preference"
+  metric:
+    feature: "loan_buck_5"
+  preference:
+    feature: "loan_buck_5"

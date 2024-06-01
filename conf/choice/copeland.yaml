@@ -1,0 +1,6 @@
+---
+choice_class: "whalrus_scoring"
+properties:
+  whalrus_rule: "RuleCopeland"
+  tie_breaker: "Random"
+  ignore_weights: false

@@ -1,0 +1,19 @@
+---
+one:
+  name: "women_writer_director"
+  metric_class: "proportional_item"
+  compatibility_class: "context_compatibility"
+  preference_function_class: "cascade_preference"
+  metric:
+    feature: "women_writer_director"
+  preference:
+    feature: "women_writer_director"
+two:
+  name: "non-en"
+  metric_class: "proportional_item"
+  compatibility_class: "context_compatibility"
+  preference_function_class: "cascade_preference"
+  metric:
+    feature: "non-en"
+  preference:
+    feature: "non-en"

@@ -1,0 +1,8 @@
+---
+allocation_class: "static_lottery"
+properties:
+  weights: 
+  - - "women_writer_director"
+    - "0.0"
+  - - "non-en"
+    - "0.0"

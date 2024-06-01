@@ -1,0 +1,6 @@
+---
+postprocess_class: "exposure"
+properties:
+  filename: "history.csv"
+  threshold: "none"
+  binary: "false"

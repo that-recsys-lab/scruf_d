@@ -1,0 +1,11 @@
+---
+one:
+  name: "0"
+  protected_feature: "0"
+  protected_values:
+  - 1
+two:
+  name: "1"
+  protected_feature: "1"
+  protected_values:
+  - 1

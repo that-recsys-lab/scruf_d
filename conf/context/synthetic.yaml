@@ -1,0 +1,4 @@
+---
+context_class: "csv_context"
+properties:
+  compatibility_file: "compat_s1.csv"

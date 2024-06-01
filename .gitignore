@@ -133,6 +133,5 @@ poetry.lock
 .idea/csv-plugin.xml
 
 #debugging
-data/
 configs/
 .vscode/

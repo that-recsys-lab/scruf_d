@@ -1,0 +1,8 @@
+---
+allocation_class: "static_lottery"
+properties:
+  weights: 
+  - - "0"
+    - "0.0"
+  - - "1"
+    - "0.0"

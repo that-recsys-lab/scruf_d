@@ -1,0 +1,6 @@
+---
+choice_class: "whalrus_scoring"
+properties:
+  whalrus_rule: "RuleBorda"
+  tie_breaker: "None"
+  ignore_weights: false
