@@ -55,7 +55,7 @@ if __name__ == '__main__':
 
     if post_only:
         scruf.post_process()
-
+                
     scruf.run_experiment(progress = progress)
 
     exit(0)

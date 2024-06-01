@@ -1,0 +1,5 @@
+outs:
+- md5: 877e690a948ddfa821f26c2447a06728
+  size: 527937
+  hash: md5
+  path: kiva_compat_dynamic.csv
