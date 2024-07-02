@@ -1,2 +1,6 @@
 [hydra]
     enabled = True
+[core]
+    remote = experiment_results
+['remote "experiment_results"']
+    url = ../..
