@@ -18,6 +18,9 @@ class FairnessMetric (PropertyMixin,ABC):
     @abstractmethod
     def compute_fairness(self, history):
         pass
+   # @abstractmethod
+   # def compute_test_fairness(self, history, test_data):
+    #    pass
 
 class AlwaysOneFairnessMetric(FairnessMetric):
 

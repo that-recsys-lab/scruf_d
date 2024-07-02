@@ -1,0 +1,21 @@
+Index: scruf/__main__.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/scruf/__main__.py b/__main__.py
+rename from scruf/__main__.py
+rename to __main__.py
+--- a/scruf/__main__.py	
++++ b/__main__.py	
+@@ -2,8 +2,8 @@
+ import logging
+ import os
+ import toml
+-from .util.errors import ConfigFileError
+-from .scruf import Scruf
++from scruf.util.errors import ConfigFileError
++from scruf.scruf import Scruf
+ 
+ 
+ def read_args():

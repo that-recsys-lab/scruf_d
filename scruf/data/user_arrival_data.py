@@ -71,7 +71,7 @@ class BulkLoadedUserData(UserArrivalData):
         user_data: ResultList = self.user_table[user]
         rec_list_len = len(user_data.get_results())
         output_list_len = get_value_from_keys(['parameters', 'list_size'], config)
-        if rec_list_len <= output_list_len:
+        if rec_list_len < output_list_len:
             raise InputListLengthError(rec_list_len, output_list_len)
 
     # Default is to go through all users

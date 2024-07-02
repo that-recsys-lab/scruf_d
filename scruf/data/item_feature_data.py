@@ -1,4 +1,4 @@
-from scruf.util import is_valid_keys, get_path_from_keys, ConfigKeys, ensure_list, maybe_number
+from scruf.util import is_valid_keys, get_path_from_keys, ConfigKeys, ensure_list, maybe_number, FeatureFileFormatError
 import csv
 from collections import defaultdict
 from icecream import ic
@@ -48,6 +48,8 @@ class ItemFeatureData:
             reader = csv.DictReader(csvfile, fieldnames=['item', 'feature', 'value'],
                                     skipinitialspace=True)
             for row in reader:
+                if None in row and len(row[None]) > 0:
+                    raise FeatureFileFormatError(csvfile, row)
                 feature_value = maybe_number(row['value'])
                 self.item_feature_index[row['item']][row['feature']] = feature_value
 
@@ -109,3 +111,4 @@ class ItemFeatureData:
             dummified_features[feature] = epsilon
             dummified_features[not_feature] = 1
         return dummified_features
+

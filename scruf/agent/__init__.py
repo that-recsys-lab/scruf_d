@@ -8,3 +8,4 @@ from .user_agent_compatibility import ContextCompatibilityMetric
 from .preference_function import PreferenceFunction, PreferenceFunctionFactory
 from .binary_preference import BinaryPreferenceFunction, PerturbedBinaryPreferenceFunction
 from .cascade_preference import CascadePreferenceFunction
+from .item_ranking_fairness import DisparateExposureFM, MeanReciprocalRankFM
