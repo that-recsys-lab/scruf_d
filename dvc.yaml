@@ -2,4 +2,4 @@ stages:
   run:
     cmd: python __main__.py params.yaml
     outs:
-      - history.json
+      - data/history.json
