@@ -83,20 +83,20 @@ class GreedySublistTestCase(unittest.TestCase):
         bcoll.set_ballot('__rec', rl1, 1.0)
         bcoll.set_ballot('test2', rl2, 1.0)
 
-        output = choice.compute_choice(None, bcoll, rl1, 4)
-        self.assertEqual(output.get_length(), 4)
-        self.assertEqual('i5', output.results[0].item)
-        self.assertEqual('i4', output.results[2].item)
+        _, result_lst = choice.compute_choice(None, bcoll, rl1, 4)
+        self.assertEqual(result_lst.get_length(), 4)
+        self.assertEqual('i5', result_lst.results[0].item)
+        self.assertEqual('i4', result_lst.results[2].item)
 
         bcoll2 = BallotCollection()
         bcoll2.set_ballot('__rec', rl1, 1.0)
         bcoll2.set_ballot('test3', rl3, 1.0)
 
-        output2 = choice.compute_choice(None, bcoll2, rl1, 4)
-        self.assertEqual('i5', output2.results[0].item)
-        self.assertEqual('i1', output2.results[1].item)
-        self.assertEqual('i3', output2.results[2].item)
-        self.assertEqual('i2', output2.results[3].item)
+        _, result_lst2 = choice.compute_choice(None, bcoll2, rl1, 4)
+        self.assertEqual('i5', result_lst2.results[0].item)
+        self.assertEqual('i1', result_lst2.results[1].item)
+        self.assertEqual('i3', result_lst2.results[2].item)
+        self.assertEqual('i2', result_lst2.results[3].item)
 
     def test_mmr(self):
         config = toml.loads(SAMPLE_PROPERTIES2)
@@ -116,10 +116,10 @@ class GreedySublistTestCase(unittest.TestCase):
         bcoll.set_ballot('test2', rl2, 1.0) # allocations are ignored
         bcoll.set_ballot('test3', rl3, 1.0)
 
-        output = choice.compute_choice(None, bcoll, rl1, 4)
-        self.assertEqual(output.get_length(), 4)
-        self.assertEqual('i5', output.results[0].item)
-        self.assertEqual('i3', output.results[2].item)
+        ballots, result_lst = choice.compute_choice(None, bcoll, rl1, 4)
+        self.assertEqual(result_lst.get_length(), 4)
+        self.assertEqual('i5', result_lst.results[0].item)
+        self.assertEqual('i3', result_lst.results[2].item)
 
     def test_mmr_max(self):
         config = toml.loads(SAMPLE_PROPERTIES2)
@@ -139,10 +139,10 @@ class GreedySublistTestCase(unittest.TestCase):
         bcoll.set_ballot('test2', rl2, 1.0) # allocations are ignored
         bcoll.set_ballot('test3', rl3, 1.0)
 
-        output = choice.compute_choice(None, bcoll, rl1, 4)
-        self.assertEqual(output.get_length(), 4)
-        self.assertEqual('i5', output.results[0].item)
-        self.assertEqual('i3', output.results[2].item)
+        _, result_lst = choice.compute_choice(None, bcoll, rl1, 4)
+        self.assertEqual(result_lst.get_length(), 4)
+        self.assertEqual('i5', result_lst.results[0].item)
+        self.assertEqual('i3', result_lst.results[2].item)
 
 if __name__ == '__main__':
     unittest.main()

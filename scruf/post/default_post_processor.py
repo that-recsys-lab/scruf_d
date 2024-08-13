@@ -12,7 +12,7 @@ from scruf.agent import FairnessAgent, AgentCollection
 # time stamp | fairness score (per agent) | compatibility score (per agent) | recommender input | final output
 # A multi-index is used to organize the different parts of the dataframe
 class DefaultPostProcessor(PostProcessor):
-    _PROPERTY_NAMES = ['full_filename', 'summary_filename']
+    _PROPERTY_NAMES = ['filename', 'summary_filename']
 
     def __init__(self):
         super().__init__()

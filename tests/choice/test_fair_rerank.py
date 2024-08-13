@@ -124,7 +124,7 @@ class FARTestCase(unittest.TestCase):
         bcoll.set_ballot('__rec', rl1, 1.0)
         bcoll.set_ballot('test2', rl2, 1.0)
 
-        output = choice.compute_choice(None, bcoll, rl1, 4)
+        _, output = choice.compute_choice(None, bcoll, rl1, 4)
         self.assertEqual(output.get_length(), 4)
         self.assertEqual('i5', output.results[0].item)
         self.assertEqual('i4', output.results[1].item)
@@ -134,7 +134,7 @@ class FARTestCase(unittest.TestCase):
         bcoll2.set_ballot('test2', rl2, 1.0)
         bcoll2.set_ballot('test3', rl3, 1.0)
 
-        output2 = choice.compute_choice(None, bcoll2, rl1, 4)
+        _, output2 = choice.compute_choice(None, bcoll2, rl1, 4)
         self.assertEqual('i5', output2.results[0].item)
         self.assertEqual('i4', output2.results[1].item)
         self.assertEqual('i2', output2.results[2].item)
@@ -170,7 +170,7 @@ class FARTestCase(unittest.TestCase):
         test3agent.recent_compatibility = 1.0
         agents.agents = [test2agent, test3agent]
 
-        output2 = choice.compute_choice(None, bcoll2, rl1, 4)
+        _, output2 = choice.compute_choice(None, bcoll2, rl1, 4)
         self.assertEqual('i5', output2.results[0].item)
         self.assertEqual('i2', output2.results[1].item)
 
@@ -223,7 +223,7 @@ class FARTestCase(unittest.TestCase):
         bcoll.set_ballot('__rec', rl1, 0.8)
         bcoll.set_ballot('test2', rl2, 1.0)
 
-        output = choice.compute_choice(None, bcoll, rl1, 4)
+        _, output = choice.compute_choice(None, bcoll, rl1, 4)
 
         # ic(output)
         self.assertEqual(output.get_length(), 4)

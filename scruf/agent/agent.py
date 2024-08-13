@@ -33,7 +33,8 @@ class FairnessAgent:
         compatibility_metric_name = properties['compatibility_class']
         self.compatibility_metric = CompatibilityMetricFactory.create_compatibility_metric(compatibility_metric_name)
 
-        if 'compatibility' in properties:  # If the metric key is present in the properties dictionary, the setup() method of the fairness metric object is called with the value of the metric key as the parameter. Does the metric key have multiple values?
+        if 'compatibility' in properties:  # If the metric key is present in the properties dictionary, 
+            # the setup() method of the fairness metric object is called with the value of the metric key as the parameter. Does the metric key have multiple values?
             self.compatibility_metric.setup(properties['compatibility'])
         else:
             self.compatibility_metric.setup(dict())
@@ -84,7 +85,6 @@ class AgentCollection:
     def get_agent(self, name):
         agent = None
         for ag in self.agents:
-            # if ag.postprocessonly == True:
             if ag.name == name:
                 agent = ag
         return agent

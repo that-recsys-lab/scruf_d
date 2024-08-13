@@ -19,6 +19,7 @@ postprocess_class = "default"
 
 [post.properties]
 filename="test-output.csv"
+summary_filename="test-summary.csv"
 '''
 
 SAMPLE_PROPERTIES3 = '''
@@ -27,6 +28,7 @@ postprocess_class = "ndcg"
 
 [post.properties]
 filename="test-output.csv"
+summary_filename="test-summary.csv"
 threshold="none"
 binary="false"
 '''
@@ -47,11 +49,28 @@ name = "2"
 protected_feature = "2"
 protected_values = [1]
 
+[agent]
+
+[agent.country]
+name = "country"
+metric_class = "proportional_item"
+compatibility_class = "context_compatibility"
+preference_function_class = "binary_preference"
+
+[agent.country.metric]
+feature = "2"
+proportion = 0.2
+
+[agent.country.preference]
+delta = 0.3
+feature = "COUNTRY_low_pfr"
+
 [post]
 postprocess_class = "exposure"
 
 [post.properties]
 filename="test-output.csv"
+summary_filename="test-summary.csv"
 threshold="none"
 binary="false"
 '''
@@ -112,11 +131,13 @@ class PostProcessorTestCase(unittest.TestCase):
         self.assertEqual(1.0, ndcg_col[0])
 
     def test_exposure(self):
+        config = toml.loads(SAMPLE_PROPERTIES4)
+
         fake_state = scruf.Scruf.ScrufState(None)
         fake_state.output_list_size = 10
         scruf.Scruf.state = fake_state
-
-        config = toml.loads(SAMPLE_PROPERTIES4)
+        scruf.Scruf.state.agents = []
+        scruf.Scruf.state.config = config
 
         # Manual setup of the feature data
         ifd = ItemFeatureData()
@@ -134,9 +155,9 @@ class PostProcessorTestCase(unittest.TestCase):
         post.history = post.read_history(self.history_path)
         post.history_to_dataframe()
         post.compute_ndcg_column()
-        post.compute_fairness_columns()
+        post.compute_fairness_columns(post.history)
 
-        fairness_col = post.dataframe[('Exposure', '2')]
+        fairness_col = post.dataframe[('Fairness Metric', '2')]
 
         self.assertAlmostEqual(0.1, fairness_col[0], places=3)
 

@@ -11,6 +11,8 @@ class Context(PropertyMixin,ABC):
     def setup(self, input_props, names=None):
         super().setup(input_props, names=names)
 
+    # TODO: This is a little confusing since the context object is a container for other
+    # things also called contexts. The name of one of these things needs to change.
     @abstractmethod
     def get_context(self, user_id):
         pass

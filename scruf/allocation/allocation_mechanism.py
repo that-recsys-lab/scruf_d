@@ -80,7 +80,7 @@ class ScoredAllocationMechanism(AllocationMechanism):
 
 
 class ProductAllocationMechanism(ScoredAllocationMechanism):
-
+    """Computes the allocation as the product of (1-fairness) and compatibility."""
     def __init__(self):
         super().__init__()
 
@@ -89,7 +89,9 @@ class ProductAllocationMechanism(ScoredAllocationMechanism):
 
 
 class WeightedProductAllocationMechanism(ScoredAllocationMechanism):
-
+    """Computes the allocation as the product of (1-fairness)^e1 and compatibility^e2
+    where e1 and e2 are exponents that control how much each contributes to the allocation
+    probability."""
     _PROPERTY_NAMES = ['fairness_exponent', 'compatibility_exponent']
 
     def __init__(self):
@@ -98,7 +100,6 @@ class WeightedProductAllocationMechanism(ScoredAllocationMechanism):
     def setup(self, input_props, names=None):
         super().setup(input_props,
                       names=self.configure_names(WeightedProductAllocationMechanism._PROPERTY_NAMES, names))
-
 
     def __str__(self):
         return f"WeightedProductAllocation: fairness = {self.get_propery('fairness_exponent')}, compatibility = {self.get_propery('compatibility_exponent')}"
@@ -121,12 +122,11 @@ class LeastFairAllocationMechanism(AllocationMechanism):
     def compute_allocation_probabilities(self, agents, history, context):
         # Compute the fairness scores for each agent
         scores = agents.compute_fairnesses(history)
-        # Find lowest fairness
+        # Find lowest fairness. If there are multiple agents with the same score, choose
+        # one randomly.
         lowest_agent = collapse_score_dict(scores, type='min', handle_multiple='random',
                                            rand=scruf.Scruf.state.rand)
-        # To get prior behavior, change to
-        #lowest_agent = collapse_score_dict(scores, type='min', handle_multiple='first',
-        #                                   rand=scruf.Scruf.state.rand)
+
         # Create empty probability vector
         probs = agents.agent_value_pairs(default=0.0)
 

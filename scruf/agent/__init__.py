@@ -4,7 +4,6 @@ from .agent import FairnessAgent, AgentCollection
 from .compatibility_metric import CompatibilityMetric, CompatibilityMetricFactory, AlwaysOneCompatibilityMetric, \
     AlwaysZeroCompatibilityMetric, InvalidCompatibilityMetricError
 from .user_agent_compatibility import ContextCompatibilityMetric
-#from .value_scorer import FixedValueChoiceScorer
 from .preference_function import PreferenceFunction, PreferenceFunctionFactory
 from .binary_preference import BinaryPreferenceFunction, PerturbedBinaryPreferenceFunction
 from .cascade_preference import CascadePreferenceFunction

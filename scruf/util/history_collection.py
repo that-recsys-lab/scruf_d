@@ -37,7 +37,6 @@ class HistoryCollection:
             entries = self.collection
         else:
             entries = itertools.islice(self.collection, 0, k)
-        # entries = self.collection[range(0, k)]
         return [entry.item for entry in entries]
 
     def get_from_time(self, t):

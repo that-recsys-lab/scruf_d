@@ -40,6 +40,7 @@ class GreedySublistChoiceMechanism(ChoiceMechanism):
             if output.get_length() > 0:
                 # score recommendation list
                 candidates = self.sublist_scorer(output, candidates, ballots)
+                ic(candidates)
             # remove top item and add to output
             top_item = candidates.get_results()[0]
             candidates.remove_top()

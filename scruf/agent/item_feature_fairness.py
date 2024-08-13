@@ -84,7 +84,6 @@ class ProportionalItemFM(ItemFeatureFairnessMetric):
         protected_count = 0
         total_count = 0
         for result in history_entries:
-            #result = history_entry['output']
             protected_vector = [1 if item_data.is_protected(feature, result_entry.item) else 0 \
                                     for result_entry in result.get_results()]
             protected_count += sum(protected_vector)
@@ -98,7 +97,6 @@ class ProportionalItemFM(ItemFeatureFairnessMetric):
         protected_count = 0
         results = [item for sublist in history_entries for item in sublist]
         for result in results:
-            #result = history_entry['output']
             protected_vector = [1 if item_data.is_protected(feature, result) else 0]
             protected_count += sum(protected_vector)
         total_count = len(results)
