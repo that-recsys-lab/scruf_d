@@ -94,17 +94,25 @@ class FARChoiceMechanism(GreedySublistChoiceMechanism):
         self.build_feature_map(ballots)
 
         # For each fairness agent
+        temp_ballots = []
         for ballot in ballots.get_ballots():
+            temp_ballot = copy(ballot)
             # calculate prod_{i∈S(u)}I_{i not in Vc}
-            if ballot.name != BallotCollection.REC_NAME:
-                rep_score = self.representation_score(list_so_far, ballot.name)
-                # drop votes for items already in the output list
-                self.filter_ballot(ballot, candidates)
+            if temp_ballot.name != BallotCollection.REC_NAME:
+                rep_score = self.representation_score(list_so_far, temp_ballot.name)
                 # No sort because we're going to merge later
-                ballot.prefs.rescore_no_sort(
+                temp_ballot.prefs.rescore_no_sort(
                     lambda entry: rep_score * ballot.weight if entry.score > 0 else 0)
 
-        scored = ballots.merge(candidates.get_user())
+            # drop votes for items already in the output list
+            self.filter_ballot(temp_ballot, candidates)
+
+            temp_ballots.append(temp_ballot)
+
+        temp_ballot_coll = BallotCollection()
+        temp_ballot_coll.set_from_ballot_list(temp_ballots)
+
+        scored = temp_ballot_coll.merge(candidates.get_user(), ignore_weight=True) # Ballot weight already included
         return scored
 
 # we personalize the previous re-ranking criterion Eq.(1) by

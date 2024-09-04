@@ -11,7 +11,8 @@ class ResultEntry:
         self.rank = rank
 
     def __repr__(self):
-        return f'ResultEntry: U:{self.user}, I:{self.item}, S:{self.score}, R{self.rank}'
+        return f'ResultEntry: I:{self.item}, S:{self.score:.4f}, R{self.rank}'
+        #return f'ResultEntry: U:{self.user}, I:{self.item}, S:{self.score}, R{self.rank}'
 
 # TODO: Probably should have some kind of 'dirty' flag, so that when the list is changed but not
 # sorted, some functions can either fail or force sort.
