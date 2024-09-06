@@ -17,7 +17,7 @@ class MeanReciprocalRankFM(ItemFeatureFairnessMetric):
         super().__init__()
 
     def setup(self, input_props, names=None):
-        super().setup(input_props, \
+        super().setup(input_props,
                       names=self.configure_names(MeanReciprocalRankFM._PROPERTY_NAMES, names))
 
     def __str__(self):
@@ -39,17 +39,18 @@ class MeanReciprocalRankFM(ItemFeatureFairnessMetric):
         mrr = []
 
         for result in history.choice_output_history.get_recent(-1):
-            mrr_for_query = 0  # MRR for the current query
-            for idx, recommendation in enumerate(result.get_results(), start=1):
+            mrr_for_query = 0.0  # MRR for the current query
+            results = result.get_results()
+            for idx, recommendation in enumerate(results, start=1):
                 if item_data.is_protected(protected_feature, recommendation.item):
-                    mrr_for_query = max(mrr_for_query, 1 / idx)
+                    mrr_for_query = max(mrr_for_query, 1.0 / idx)
                     mrr.append(mrr_for_query)
                     break
-                if idx == 10:
+                if idx == len(results):
                     mrr.append(0)
         avg_mrr = mean(mrr)
         fair_mrr = avg_mrr/target_mrr
-        fairness_score = min(1, fair_mrr)
+        fairness_score = min(1.0, fair_mrr)
 
         return fairness_score
 
@@ -61,17 +62,17 @@ class MeanReciprocalRankFM(ItemFeatureFairnessMetric):
         mrr = []
 
         for result in history:
-            mrr_for_query = 0
+            mrr_for_query = 0.0
             for idx, recommendation in enumerate(result, start=1):
                 if item_data.is_protected(protected_feature, recommendation):
-                    mrr_for_query = max(mrr_for_query, 1 / idx)
+                    mrr_for_query = max(mrr_for_query, 1.0 / idx)
                     mrr.append(mrr_for_query)
                     break
                 if idx == 10:
                     mrr.append(0)
         avg_mrr = mean(mrr)
         fair_mrr = avg_mrr/target_mrr
-        fairness_score = min(1, fair_mrr)
+        fairness_score = min(1.0, fair_mrr)
 
         return fairness_score
     

@@ -87,7 +87,8 @@ class FARChoiceMechanism(GreedySublistChoiceMechanism):
         ballot.prefs = ballot.prefs.filter_results(
             lambda entry: candidates.contains_item(entry.item))
 
-    # Destructive to ballots. Shouldn't matter because they are copied in parent class compute_choice
+    # (No longer) Destructive to ballots. Shouldn't matter because they are copied in parent class compute_choice
+    # So, actually it does matter.
     def sublist_scorer(self, list_so_far: ResultList, candidates: ResultList, ballots: BallotCollection):
 
         rec_weight = ballots.get_ballot(BallotCollection.REC_NAME).weight
