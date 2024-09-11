@@ -40,11 +40,90 @@ feature = "bar"
 delta = 0.5
 '''
 
+SAMPLE_AGENTS2 = '''
+[agent]
+
+[agent.a_compat]
+name = "A Compatibility"
+metric_class = "always_zero"
+compatibility_class = "always_one"
+preference_function_class = "binary_preference"
+
+[agent.a_compat.preference]
+feature = "foo"
+delta = 0.5
+
+[agent.b_compat]
+name = "B Compatibility"
+metric_class = "always_zero"
+compatibility_class = "always_one"
+preference_function_class = "binary_preference"
+
+[agent.b_compat.preference]
+feature = "bar"
+delta = 0.5
+'''
+
+SAMPLE_AGENTS3 = '''
+[agent]
+
+[agent.a_compat]
+name = "A Compatibility"
+metric_class = "always_zero"
+compatibility_class = "always_zero"
+preference_function_class = "binary_preference"
+
+[agent.a_compat.preference]
+feature = "foo"
+delta = 0.5
+
+[agent.b_compat]
+name = "B Compatibility"
+metric_class = "always_zero"
+compatibility_class = "always_zero"
+preference_function_class = "binary_preference"
+
+[agent.b_compat.preference]
+feature = "bar"
+delta = 0.5
+'''
+
 SAMPLE_LOTTERY_PROPERTIES = '''
 [allocation]
 algorithm = "static_lottery"
 [allocation.properties]
 weights = [["Agent 1", "0.5"], ["Agent 2", "0.2"]]
+'''
+
+SAMPLE_LOTTERY_PROPERTIES2 = '''
+[allocation]
+algorithm = "product_lottery"
+'''
+
+SAMPLE_LOTTERY_PROPERTIES3 = '''
+[allocation]
+algorithm = "weighted_product_lottery"
+[allocation.properties]
+fairness_exponent = 0.0
+compatibility_exponent = 0.0
+'''
+
+SAMPLE_LOTTERY_PROPERTIES4 = '''
+[allocation]
+algorithm = "fairness_lottery"
+'''
+
+SAMPLE_LOTTERY_PROPERTIES5 = '''
+[allocation]
+algorithm = "product_allocation"
+'''
+
+SAMPLE_LOTTERY_PROPERTIES6 = '''
+[allocation]
+algorithm = "weighted_product_allocation"
+[allocation.properties]
+fairness_exponent = 0.0
+compatibility_exponent = 0.0
 '''
 
 class AllocationMechanismTestCase(unittest.TestCase):
@@ -93,4 +172,127 @@ class AllocationMechanismTestCase(unittest.TestCase):
         self.assertEqual(lottery['Agent 1'], 0.5)
         self.assertEqual(lottery['Agent 2'], 0.2)
         self.assertAlmostEqual(lottery['__dummy__'], 0.3)
+
+    def test_product_lottery(self):
+        config = toml.loads(SAMPLE_LOTTERY_PROPERTIES2)
+        alg_name = config['allocation']['algorithm']
+        alloc = AllocationMechanismFactory.create_allocation_mechanism(alg_name)
+        alloc.setup({})
+
+        agent_config = toml.loads(SAMPLE_AGENTS2)
+        agents = AgentCollection()
+        agents.setup(agent_config)
+
+        scruf.Scruf.state = scruf.Scruf.ScrufState(None)
+        scruf.Scruf.state.rand = random.Random(20220223)
+        scruf.Scruf.state.agents = agents
+
+        alloc_result = alloc.compute_allocation_probabilities(agents, None, None)
+        probs1 = alloc_result['output']
+
+        # With this random seed, the scores should be 0, 1
+        probA = probs1['A Compatibility']
+        probB = probs1['B Compatibility']
+
+        self.assertAlmostEqual(probA, 0.0, 4)
+        self.assertAlmostEqual(probB, 1.0, 4)
+
+
+    def test_weighted_product_lottery(self):
+        config = toml.loads(SAMPLE_LOTTERY_PROPERTIES3)
+        alg_name = config['allocation']['algorithm']
+        alloc = AllocationMechanismFactory.create_allocation_mechanism(alg_name)
+        alloc.setup(config['allocation']['properties'])
+
+        agent_config = toml.loads(SAMPLE_AGENTS3)
+        agents = AgentCollection()
+        agents.setup(agent_config)
+
+        scruf.Scruf.state = scruf.Scruf.ScrufState(None)
+        scruf.Scruf.state.rand = random.Random(20220223)
+        scruf.Scruf.state.agents = agents
+
+        alloc_result = alloc.compute_allocation_probabilities(agents, None, None)
+        probs1 = alloc_result['output']
+
+        compatibilityB = alloc_result['compatibility scores']['B Compatibility']
+
+        probA = probs1['A Compatibility']
+        probB = probs1['B Compatibility']
+
+        self.assertAlmostEqual(compatibilityB, 0.0, 4)
+        self.assertAlmostEqual(probA, 0.0, 4)
+        self.assertAlmostEqual(probB, 1.0, 4) # Only possible if the exponent is applied
+
+    def test_fairness_lottery(self):
+        config = toml.loads(SAMPLE_LOTTERY_PROPERTIES4)
+        alg_name = config['allocation']['algorithm']
+        alloc = AllocationMechanismFactory.create_allocation_mechanism(alg_name)
+        alloc.setup({})
+
+        agent_config = toml.loads(SAMPLE_AGENTS3)
+        agents = AgentCollection()
+        agents.setup(agent_config)
+
+        scruf.Scruf.state = scruf.Scruf.ScrufState(None)
+        scruf.Scruf.state.rand = random.Random(20220223)
+        scruf.Scruf.state.agents = agents
+
+        alloc_result = alloc.compute_allocation_probabilities(agents, None, None)
+        probs1 = alloc_result['output']
+
+        # With this random seed, the scores should be 0, 1
+        probA = probs1['A Compatibility']
+        probB = probs1['B Compatibility']
+
+        self.assertAlmostEqual(probA, 0.0, 4)
+        self.assertAlmostEqual(probB, 1.0, 4)
+
+    def test_product_allocation(self):
+        config = toml.loads(SAMPLE_LOTTERY_PROPERTIES5)
+        alg_name = config['allocation']['algorithm']
+        alloc = AllocationMechanismFactory.create_allocation_mechanism(alg_name)
+        alloc.setup({})
+
+        agent_config = toml.loads(SAMPLE_AGENTS2)
+        agents = AgentCollection()
+        agents.setup(agent_config)
+
+        scruf.Scruf.state = scruf.Scruf.ScrufState(None)
+        scruf.Scruf.state.agents = agents
+
+        alloc_result = alloc.compute_allocation_probabilities(agents, None, None)
+        probs1 = alloc_result['output']
+
+        probA = probs1['A Compatibility']
+        probB = probs1['B Compatibility']
+
+        # equally allocated
+        self.assertAlmostEqual(probA, 0.5, 4)
+        self.assertAlmostEqual(probB, 0.5, 4)
+
+    def test_weighted_product_allocation(self):
+        config = toml.loads(SAMPLE_LOTTERY_PROPERTIES6)
+        alg_name = config['allocation']['algorithm']
+        alloc = AllocationMechanismFactory.create_allocation_mechanism(alg_name)
+        alloc.setup(config['allocation']['properties'])
+
+        agent_config = toml.loads(SAMPLE_AGENTS3)
+        agents = AgentCollection()
+        agents.setup(agent_config)
+
+        scruf.Scruf.state = scruf.Scruf.ScrufState(None)
+        scruf.Scruf.state.agents = agents
+
+        alloc_result = alloc.compute_allocation_probabilities(agents, None, None)
+        probs1 = alloc_result['output']
+
+        compatibilityB = alloc_result['compatibility scores']['B Compatibility']
+
+        probA = probs1['A Compatibility']
+        probB = probs1['B Compatibility']
+
+        self.assertAlmostEqual(compatibilityB, 0.0, 4)
+        self.assertAlmostEqual(probA, 0.5, 4)
+        self.assertAlmostEqual(probB, 0.5, 4) # Only possible if the exponent is applied
 
