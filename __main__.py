@@ -23,6 +23,12 @@ def read_args():
     parser.add_argument(
         "-g", "--progress", action="store_true", help="Shows progress bar if set."
     )
+    parser.add_argument(
+        "-dnc",
+        "--do_not_compress",
+        action="store_true",
+        help="Disables automatic parquet compression of history files.",
+    )
 
     input_args = parser.parse_args()
     arg_check(vars(input_args))
@@ -64,6 +70,6 @@ if __name__ == "__main__":
     if post_only:
         scruf.post_process()
 
-    scruf.run_experiment(progress=progress)
+    scruf.run_experiment(progress=progress, compress=args["do_not_compress"])
 
     exit(0)

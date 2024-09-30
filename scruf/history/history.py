@@ -1,6 +1,8 @@
 import jsons
 import pathlib
 import scruf
+import os
+from pyarrow import csv, parquet
 
 from scruf.util import (
     HistoryCollection,
@@ -134,6 +136,17 @@ class ScrufHistory:
 
         self._history_file.flush()
 
-    def cleanup(self):
+    def cleanup(self, compress=False):
         if not self._history_file.closed:
             self._history_file.close()
+        if compress:
+            return
+        table = csv.read_csv(str(self.working_dir) + "/" + self.history_file_name)
+        parquet.write_table(
+            table,
+            str(self.working_dir)
+            + "/"
+            + os.path.splitext(self.history_file_name)[0]
+            + ".parquet",
+        )
+        os.remove(str(self.working_dir) + "/" + self.history_file_name)
