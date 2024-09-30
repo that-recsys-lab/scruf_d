@@ -1,6 +1,7 @@
 import unittest
 import toml
 from scruf.agent import FairnessAgent, ProportionalItemFM, AgentCollection, BinaryPreferenceFunction
+from icecream import ic
 
 # This is just the agent part
 CONFIG_DOCUMENT = """
@@ -51,6 +52,17 @@ class AgentTestCase(unittest.TestCase):
         config = toml.loads(CONFIG_DOCUMENT)
         agent_coll = AgentCollection()
         agent_coll.setup(config)
+
+        self.assertEqual(len(agent_coll.agent_names()), 2)
+    
+    def test_agent_value_pairs(self):
+        config = toml.loads(CONFIG_DOCUMENT)
+        agent_coll = AgentCollection()
+        agent_coll.setup(config)
+        prs = agent_coll.agent_value_pairs()
+
+        self.assertTrue(all(map(lambda x: x == 0, prs.values())))
+        self.assertIn("Country", prs.keys())
 
 
 if __name__ == '__main__':

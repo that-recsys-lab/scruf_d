@@ -69,13 +69,13 @@ class WeightedProductAllocationLottery(LotteryAllocationMechanism):
 
 
     def __str__(self):
-        return f"WeightedProductAllocation: fairness = {self.get_propery('fairness_exponent')}, compatibility = {self.get_propery('compatibility_exponent')}"
+        return f"WeightedProductAllocation: fairness = {self.get_property('fairness_exponent')}, compatibility = {self.get_property('compatibility_exponent')}"
 
     def score(self, agent_name, fairness_values, compatibility_values):
         fairness_exp = self.get_property('fairness_exponent')
         compat_exp = self.get_property('compatibility_exponent')
         fairness_term = (1.0 - fairness_values[agent_name]) ** fairness_exp
-        compat_term =  compatibility_values[agent_name] ** compat_exp
+        compat_term = compatibility_values[agent_name] ** compat_exp
         return fairness_term * compat_term
 
 class FairnessAllocationLottery(LotteryAllocationMechanism):

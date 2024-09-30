@@ -51,8 +51,10 @@ class ScrufHistory:
         self.allocation_history = HistoryCollection(window_size)
         self.choice_input_history = HistoryCollection(window_size)
         self.choice_output_history = HistoryCollection(window_size)
+
         # self.recommendation_input_history = ResultsHistory(window_size)
         # self.recommendation_output_history = ResultsHistory(window_size)
+
 
         history_path = self.working_dir / self.history_file_name
         if get_value_from_keys(["location", "overwrite"], config) == "true":

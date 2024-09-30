@@ -60,7 +60,6 @@ class WhalrusWrapperMechanism(ChoiceMechanism):
         if self.check_tiebreak_type(tiebreak_property):
             module = importlib.import_module("whalrus")
             return getattr(module, tiebreak_name)()
-
         else:
             raise UnknownWhalrusTiebreakError(tiebreak_name)
 
@@ -85,6 +84,8 @@ class WhalrusWrapperMechanism(ChoiceMechanism):
         recommended_items: ResultList,
         list_size,
     ):
+        if self.ignore_weights == "false":
+            self.ignore_weights = False
         if self.ignore_weights:
             bcoll.set_ballot("__rec", recommended_items, 1.0)  # weight doesn't matter
             wballots, weights = self.wrap_ballots(bcoll)
@@ -119,6 +120,7 @@ class WhalrusWrapperMechanism(ChoiceMechanism):
 # For score-based mechanisms
 class WhalrusWrapperScoring(WhalrusWrapperMechanism):
     # These are the ones that inherit from RuleScoreNum
+
     _LEGAL_MECHANISMS = [
         "RuleApproval",
         "RuleBorda",
@@ -182,6 +184,7 @@ class WhalrusWrapperOrdinal(WhalrusWrapperMechanism):
 
     def invoke_whalrus_rule(self, ballots, weights=None):
         if weights is None:
+
             if self.tiebreak_class is None:
                 self.whalrus_rule = self.whalrus_class(ballots)
             else:

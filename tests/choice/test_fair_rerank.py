@@ -15,8 +15,10 @@ algorithm = "FAR"
 [choice.properties]
 binary = "True"
 use_allocation_weight = "True"
-recommender_weight = 0.8
+recommender_weight = 1.0
 '''
+
+# Why doesn't ballot weight override recommender weight?
 
 SAMPLE_PROPERTIES2 = '''
 [choice]
@@ -76,23 +78,23 @@ SAMPLE_FEATURES = [('i1', 'f1', 1),
 
 RESULT_TRIPLES1 = [('u1', 'i5', '5.0'),
                    ('u1', 'i1', '2.5'),
-                  ('u1', 'i3', '1.5'),
-                  ('u1', 'i4', '2.0'),
+                   ('u1', 'i3', '1.5'),
+                   ('u1', 'i4', '2.0'),
                    ('u1', 'i2', '1.7')
                   ]
 
 RESULT_TRIPLES2 = [('u1', 'i4', '1.0'),
-                  ('u1', 'i2', '1.0'),
-                  ('u1', 'i3', '0.0'),
-                  ('u1', 'i1', '0.0'),
-                  ('u1', 'i5', '0.0'),
+                   ('u1', 'i2', '1.0'),
+                   ('u1', 'i3', '0.0'),
+                   ('u1', 'i1', '0.0'),
+                   ('u1', 'i5', '0.0'),
                   ]
 
 RESULT_TRIPLES3 = [('u1', 'i4', '0.0'),
-                  ('u1', 'i2', '0.4'),
-                  ('u1', 'i3', '0.4'),
-                  ('u1', 'i1', '0.0'),
-                  ('u1', 'i5', '0.0'),
+                   ('u1', 'i2', '0.4'),
+                   ('u1', 'i3', '0.4'),
+                   ('u1', 'i1', '0.0'),
+                   ('u1', 'i5', '0.0'),
                   ]
 
 # TODO: Note no test cases for the non-binary version of FAR
@@ -104,7 +106,7 @@ class FARTestCase(unittest.TestCase):
         choice.setup(config['choice']['properties'])
 
         self.assertEqual(choice.__class__, FARChoiceMechanism)
-        self.assertAlmostEqual(choice.get_property('recommender_weight'), 0.8)
+        self.assertAlmostEqual(choice.get_property('recommender_weight'), 1.0)
 
     def test_FAR(self):
         config = toml.loads(SAMPLE_PROPERTIES1)
@@ -124,7 +126,7 @@ class FARTestCase(unittest.TestCase):
         bcoll.set_ballot('__rec', rl1, 1.0)
         bcoll.set_ballot('test2', rl2, 1.0)
 
-        output = choice.compute_choice(None, bcoll, rl1, 4)
+        _, output = choice.compute_choice(None, bcoll, rl1, 4)
         self.assertEqual(output.get_length(), 4)
         self.assertEqual('i5', output.results[0].item)
         self.assertEqual('i4', output.results[1].item)
@@ -134,11 +136,24 @@ class FARTestCase(unittest.TestCase):
         bcoll2.set_ballot('test2', rl2, 1.0)
         bcoll2.set_ballot('test3', rl3, 1.0)
 
-        output2 = choice.compute_choice(None, bcoll2, rl1, 4)
+        '''
+        __rec has i5 first so FAR will put that in position 1
+        i5 has feature f1
+        test2 has i4 and i2 as 1.0
+        test3 has i2 and i3 as 0.4
+        given the formula, there are no agent items for test2 or test3 but item 2 is non-zero
+        for both test2 and test3
+        so, the item should be i2
+        now, all three features are accounted for i4, i1 and i3 are left.
+        i1 is preferred by the recommender so the order is i1, i4, i3   
+        '''
+
+        _, output2 = choice.compute_choice(None, bcoll2, rl1, 4)
         self.assertEqual('i5', output2.results[0].item)
-        self.assertEqual('i4', output2.results[1].item)
-        self.assertEqual('i2', output2.results[2].item)
-        self.assertEqual('i1', output2.results[3].item)
+        self.assertEqual('i2', output2.results[1].item)
+        self.assertEqual('i1', output2.results[2].item)
+        self.assertEqual('i4', output2.results[3].item)
+
 
     def test_PFAR(self):
         config = toml.loads(SAMPLE_PROPERTIES2)
@@ -170,9 +185,10 @@ class FARTestCase(unittest.TestCase):
         test3agent.recent_compatibility = 1.0
         agents.agents = [test2agent, test3agent]
 
-        output2 = choice.compute_choice(None, bcoll2, rl1, 4)
+        _, output2 = choice.compute_choice(None, bcoll2, rl1, 4)
         self.assertEqual('i5', output2.results[0].item)
         self.assertEqual('i2', output2.results[1].item)
+
 
     def testOFAIR(self):
         config = toml.loads(SAMPLE_PROPERTIES3)
@@ -223,7 +239,7 @@ class FARTestCase(unittest.TestCase):
         bcoll.set_ballot('__rec', rl1, 0.8)
         bcoll.set_ballot('test2', rl2, 1.0)
 
-        output = choice.compute_choice(None, bcoll, rl1, 4)
+        _, output = choice.compute_choice(None, bcoll, rl1, 4)
 
         # ic(output)
         self.assertEqual(output.get_length(), 4)

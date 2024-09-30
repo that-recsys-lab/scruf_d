@@ -40,6 +40,10 @@ class BallotCollection:
         bal = Ballot(name, prefs, weight)
         self.ballots[name] = bal
 
+    def set_from_ballot_list(self, ballots):
+        for ballot in ballots:
+            self.ballots[ballot.name] = ballot
+
     def subset(self, names, copy=False, inverse=False):
         new_bcoll = BallotCollection()
         if inverse:

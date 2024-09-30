@@ -66,12 +66,15 @@ class BulkLoadedUserData(UserArrivalData):
 
         self.current_user_index = None
 
+    # TODO: This check is not very comprehensive. It seems to only check the first user
+    # so can't detect consistency across the whole data. Also, it is only an error if the
+    # list is shorter than the output list size. 
     def data_check(self, config):
         user = self.arrival_sequence[0]
         user_data: ResultList = self.user_table[user]
         rec_list_len = len(user_data.get_results())
         output_list_len = get_value_from_keys(['parameters', 'list_size'], config)
-        if rec_list_len <= output_list_len:
+        if rec_list_len < output_list_len:
             raise InputListLengthError(rec_list_len, output_list_len)
 
     # Default is to go through all users

@@ -79,7 +79,6 @@ class Scruf:
     # post_only flag is currently ignored but could be used to avoid some setup tasks.
     def __init__(self, config, post_only=False):
         Scruf.state = Scruf.ScrufState(config)
-        # ic(toml.dumps(config))
 
     @staticmethod
     def setup_experiment():
@@ -141,7 +140,7 @@ class Scruf:
 
     @staticmethod
     def post_process():
-        # Post processing jneeds setup
+        # Post processing needs setup
         post_props = Scruf.get_value_from_keys(["post", "properties"], default={})
         Scruf.state.post_processor.setup(post_props)
         # Also need item features

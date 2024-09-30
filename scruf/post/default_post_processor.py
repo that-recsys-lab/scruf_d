@@ -4,17 +4,21 @@ from .post_processor import PostProcessor, PostProcessorFactory
 import scruf
 from numpy import log2, NINF
 from icecream import ic
+from scruf.agent import FairnessAgent, AgentCollection
+
 
 
 # Basic post-processing creates a dataframe with the following structure
 # time stamp | fairness score (per agent) | compatibility score (per agent) | recommender input | final output
 # A multi-index is used to organize the different parts of the dataframe
 class DefaultPostProcessor(PostProcessor):
-    _PROPERTY_NAMES = ['filename']
+    _PROPERTY_NAMES = ['filename', 'summary_filename']
 
     def __init__(self):
         super().__init__()
         self.dataframe = None
+        self.full_history = None
+        self.summary = None
 
     def setup(self, input_props, names=None):
         super().setup(input_props, names=self.configure_names(DefaultPostProcessor._PROPERTY_NAMES, names))
@@ -41,13 +45,19 @@ class DefaultPostProcessor(PostProcessor):
                        for results in self.entry_iterate(['choice_out','results'])]
         results_df = pd.DataFrame({'In': ballot_in, 'Out': results_out})
 
+        self.full_history = [[sublist[0] for sublist in row] for row in results_out]
+
         self.dataframe = pd.concat([fair_df, compat_df, alloc_df, results_df], axis=1,
                                keys=['Fairness Metric', 'Compatibility', 'Allocation', 'Results'])
 
-    def save_dataframe(self):
-        dataframe_path = get_path_from_keys(['post', 'properties', 'filename'], scruf.get_config())
-        ic(dataframe_path)
+    def save_full_dataframe(self):
+        dataframe_path = get_path_from_keys(['post', 'properties', 'full_filename'], scruf.get_config())
         self.dataframe.to_csv(dataframe_path)
+
+    def save_summary_dataframe(self):
+        dataframe_path = get_path_from_keys(['post', 'properties', 'summary_filename'], scruf.get_config())
+        self.summary = pd.DataFrame(self.summary,  index=[0])
+        self.summary.to_csv(dataframe_path)
 
     def process(self):
         self.load_history()
@@ -149,48 +159,39 @@ class NDCGPostProcessor(DefaultPostProcessor):
 # would be to create a column-adding superclass and then have a list of decorators that can be extended
 # for whatever you need.
 # Or we could implement the original default in the same way ? Apply the decorators line-by-line. Whoa!
+
 class ExposurePostProcessor(NDCGPostProcessor):
     def __init__(self):
         super().__init__()
         self.feature_proportions = None
         self.item_features = None
+        self.agent_collection = None
+        self.agents = None
 
-    def setup(self, input_props, names=None):
+    def setup(self, input_props, names=None, agent_collection=None):
         super().setup(input_props, names=names)
         self.item_features = scruf.Scruf.state.item_features
+        self.agent_collection = AgentCollection()
+        self.agents = scruf.Scruf.state.agents
+        self.config = config = scruf.Scruf.state.config
 
-    def count_protected_items(self, feature, results):
-        protect = list(filter(lambda entry: self.item_features.is_protected(feature, entry[0]),
-                         results))
-        return len(protect)
+    def compute_test_fairness(self, history):
+        # Use compute_fairnesses method from AgentCollection
+        return self.agent_collection.compute_fairnesses(history)
 
-    def results_to_fairness(self, results, feature):
-#        ic(results, feature)
-        count = self.count_protected_items(feature, results)
-        return (1.0 * count) / len(results)
-
-    def compute_fairness(self, feature):
-        result_lists = self.dataframe[('Results', 'Out')]
-        feature_fairness = result_lists.apply(lambda results: self.results_to_fairness(results, feature))
-
-        return feature_fairness
-
-    def compute_fairness_columns(self):
-        fairness_df = pd.DataFrame()
-        for feature, tuple in scruf.Scruf.state.item_features.known_features.items():
-            # if the feature representation has no protected values, then it isn't a sensitive feature
-            if tuple[1] is not None:
-                # build list-level fairness series
-                fairness_df[('Exposure', feature)] = self.compute_fairness(feature)
-
-        self.dataframe = pd.concat([self.dataframe, fairness_df], axis=1)
+    def compute_fairness_columns(self, history):
+        self.agent_collection.setup(self.config)
+        fairnesses = self.agent_collection.compute_test_fairnesses(history)
+        self.summary = fairnesses
+        return fairnesses
 
     def process(self):
         self.load_history()
         self.history_to_dataframe()
         self.compute_ndcg_column()
-        self.compute_fairness_columns()
-        self.save_dataframe()
+        self.compute_fairness_columns(self.full_history)
+        self.save_summary_dataframe()
+
 
 
 # TODO:
