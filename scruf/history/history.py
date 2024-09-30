@@ -1,15 +1,27 @@
 import jsons
 import pathlib
 import scruf
+import os
+from pyarrow import csv, parquet
 
-from scruf.util import HistoryCollection, get_value_from_keys, check_key_lists, ConfigKeys, \
-    get_working_dir_path, ConfigKeyMissingError
+from scruf.util import (
+    HistoryCollection,
+    get_value_from_keys,
+    check_key_lists,
+    ConfigKeys,
+    get_working_dir_path,
+    ConfigKeyMissingError,
+)
 from .results_history import ResultsHistory
 
 
 class ScrufHistory:
 
-    CONFIG_ELEMENTS = [ConfigKeys.WORKING_PATH_KEYS, ConfigKeys.OUTPUT_PATH_KEYS, ConfigKeys.WINDOW_SIZE_KEYS]
+    CONFIG_ELEMENTS = [
+        ConfigKeys.WORKING_PATH_KEYS,
+        ConfigKeys.OUTPUT_PATH_KEYS,
+        ConfigKeys.WINDOW_SIZE_KEYS,
+    ]
 
     @classmethod
     def check_config(cls, config):
@@ -31,21 +43,23 @@ class ScrufHistory:
         ScrufHistory.check_config(config)
 
         self.working_dir = get_working_dir_path(config)
-        self.history_file_name = get_value_from_keys(ConfigKeys.OUTPUT_PATH_KEYS, config)
+        self.history_file_name = get_value_from_keys(
+            ConfigKeys.OUTPUT_PATH_KEYS, config
+        )
         window_size = get_value_from_keys(ConfigKeys.WINDOW_SIZE_KEYS, config)
 
         self.allocation_history = HistoryCollection(window_size)
         self.choice_input_history = HistoryCollection(window_size)
         self.choice_output_history = HistoryCollection(window_size)
-        #self.recommendation_input_history = ResultsHistory(window_size)
-        #self.recommendation_output_history = ResultsHistory(window_size)
+        # self.recommendation_input_history = ResultsHistory(window_size)
+        # self.recommendation_output_history = ResultsHistory(window_size)
 
         history_path = self.working_dir / self.history_file_name
-        if get_value_from_keys(['location', 'overwrite'], config) == 'true':
+        if get_value_from_keys(["location", "overwrite"], config) == "true":
             if history_path.exists():
                 history_path.unlink()
 
-        self._history_file = open(history_path, 'xt')
+        self._history_file = open(history_path, "xt")
 
     def write_current_state(self):
         current_time = scruf.Scruf.state.user_data.current_user_index
@@ -54,20 +68,85 @@ class ScrufHistory:
         choice_input = self.choice_input_history.get_most_recent()
         choice_output = self.choice_output_history.get_most_recent()
 
-        output_json = {
-            'time': current_time,
-            'user': current_user,
-            'allocation': alloc,
-            'choice_in': choice_input,
-            'choice_out': choice_output
-        }
+        # agent-level outputs
+        for agent in alloc["fairness scores"].keys():
+            fair_output = [
+                current_time,
+                current_user,
+                "agent",
+                agent,
+                alloc["fairness scores"][agent],
+                "NaN",
+                "fairness",
+            ]
 
-        json_str = jsons.dumps(output_json)
-        self._history_file.write(json_str)
-        self._history_file.write('\n')
+            if (
+                alloc["compatibility scores"][agent]
+                != alloc["compatibility scores"][agent]
+            ):
+                compat_score = "NaN"
+            else:
+                compat_score = alloc["compatibility scores"][agent]
+            compat_output = [
+                current_time,
+                current_user,
+                "agent",
+                agent,
+                compat_score,
+                "NaN",
+                "compatibility",
+            ]
+            alloc_output = [
+                current_time,
+                current_user,
+                "agent",
+                agent,
+                alloc["output"][agent],
+                "NaN",
+                "allocation",
+            ]
+
+            fair_output = [str(item) for item in fair_output]
+            compat_output = [str(item) for item in compat_output]
+            alloc_output = [str(item) for item in alloc_output]
+
+            self._history_file.write(", ".join(fair_output) + "\n")
+            self._history_file.write(", ".join(compat_output) + "\n")
+            self._history_file.write(", ".join(alloc_output) + "\n")
+
+        # item-level outputs
+        for entry in choice_input.ballots["__rec"].prefs.results:
+            item = entry.item
+            rank = entry.rank
+            score = entry.score
+
+            output = [current_time, current_user, "item", item, score, rank, "__rec"]
+
+            output = [str(item) for item in output]
+            self._history_file.write(", ".join(output) + "\n")
+
+        for entry in choice_output.results:
+            item = entry.item
+            rank = entry.rank
+            score = entry.score
+
+            output = [current_time, current_user, "item", item, score, rank, "output"]
+            output = [str(item) for item in output]
+            self._history_file.write(", ".join(output) + "\n")
+
         self._history_file.flush()
 
-        # TODO: Close the history file
-    def cleanup(self):
+    def cleanup(self, compress=False):
         if not self._history_file.closed:
             self._history_file.close()
+        if compress:
+            return
+        table = csv.read_csv(str(self.working_dir) + "/" + self.history_file_name)
+        parquet.write_table(
+            table,
+            str(self.working_dir)
+            + "/"
+            + os.path.splitext(self.history_file_name)[0]
+            + ".parquet",
+        )
+        os.remove(str(self.working_dir) + "/" + self.history_file_name)
