@@ -2,8 +2,10 @@ import unittest
 
 import scruf, pathlib, tempfile, toml
 
+from icecream import ic
+
 from scruf.agent import ItemFeatureFairnessMetric, FairnessMetricFactory, ProportionalItemFM, \
-    MeanReciprocalRankFM, DisparateExposureFM
+    MeanReciprocalRankFM, DisparateExposureFM, GiniIndexFM
 from scruf.util import PropertyMismatchError, UnregisteredFairnessMetricError, InvalidFairnessMetricError, \
     ResultList
 from scruf.history import ResultsHistory, ScrufHistory
@@ -57,7 +59,7 @@ RESULT_TRIPLES_2 = [('u2', 'i11', '2.0'),
                   ('u2', 'i5', '1.0'),
                   ]
 
-# 3 protectec
+# 3 protected
 RESULT_TRIPLES_3 = [('u3', 'i21', '3.5'),
                   ('u3', 'i12', '3.0'),
                   ('u3', 'i3', '2.5'),
@@ -87,9 +89,24 @@ i2,f1,0
 i3,f1,1
 i4,f1,0
 i5,f1,1
+i6,f1,0
+i7,f1,1
+i8,f1,0
+i9,f1,1
+i10,f1,0
 i11,f1,1
 i12,f1,0
+i13,f1,1
+i14,f1,0
+i15,f1,1
+i16,f1,0
+i17,f1,1
+i18,f1,0
+i19,f1,1
+i20,f1,0
 i21,f1,1
+i22,f1,0
+i23,f1,1
 i24,f1,0
 i25,f1,1
 '''
@@ -238,6 +255,44 @@ class FairnessMetricTestCase(unittest.TestCase):
         utility_unprot = sum(unprot_rr_values)
         utility_ratio = (utility_prot / 0.6) / (utility_unprot / 0.4)
         correct_score = utility_ratio / 0.75
+
+        self.assertAlmostEqual(correct_score, fairness, 4)
+
+    def test_gini_index_fm(self):
+        metric = GiniIndexFM()
+        metric.setup(ITEM_FEATURE_PROPERTIES_MISSING)
+
+        self.rlist1 = ResultList()
+        self.rlist2 = ResultList()
+        self.rlist3 = ResultList()
+
+        self.rlist1.setup(RESULT_TRIPLES_1)
+        self.rlist2.setup(RESULT_TRIPLES_2)
+        self.rlist3.setup(RESULT_TRIPLES_3)
+
+        rhist = ResultsHistory(5)
+        rhist.add_items([self.rlist3, self.rlist2, self.rlist1])
+        hist = ScrufHistory()
+        hist.choice_output_history = rhist
+
+        scruf.Scruf.state = scruf.Scruf.ScrufState(None)
+        if_data = ItemFeatureData()
+        self.config['location']['path'] = self.temp_dir_path
+        if_data.setup(self.config)
+        scruf.Scruf.state.item_features = if_data
+
+        fairness = metric.compute_fairness(hist)
+
+        #correct values
+        item_recs = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 3]
+        n = len(item_recs)
+        position_sum = 0
+        for i, value in enumerate(item_recs, 1):
+            position_sum += i*value
+        value_sum = sum(item_recs)
+        half_relative_mean = (2*position_sum)/(n*value_sum)
+        correct_score = half_relative_mean - ((n+1)/n)
 
         self.assertAlmostEqual(correct_score, fairness, 4)
 
