@@ -138,10 +138,10 @@ class ScrufHistory:
 
         self._history_file.flush()
 
-    def cleanup(self, compress=False):
+    def cleanup(self, no_compress=False):
         if not self._history_file.closed:
             self._history_file.close()
-        if compress:
+        if no_compress:
             return
         table = csv.read_csv(str(self.working_dir) + "/" + self.history_file_name)
         parquet.write_table(

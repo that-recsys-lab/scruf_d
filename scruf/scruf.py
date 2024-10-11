@@ -101,10 +101,10 @@ class Scruf:
         # Bookkeeping
         Scruf.state.history.setup(Scruf.state.config)
 
-    def run_experiment(self, progress=False, compress=False):
+    def run_experiment(self, progress=False, no_compress=False):
         Scruf.setup_experiment()
         self.run_loop(iterations=Scruf.state.iterations, progress=progress)
-        Scruf.cleanup_experiment(compress=compress)
+        Scruf.cleanup_experiment(no_compress=no_compress)
         Scruf.post_process()
 
     # Get next user
@@ -135,8 +135,8 @@ class Scruf:
             history.write_current_state()
 
     @staticmethod
-    def cleanup_experiment(compress=False):
-        Scruf.state.history.cleanup(compress=compress)
+    def cleanup_experiment(no_compress=False):
+        Scruf.state.history.cleanup(no_compress=no_compress)
 
     @staticmethod
     def post_process():

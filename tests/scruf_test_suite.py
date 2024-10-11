@@ -66,8 +66,10 @@ def suite():
     suite.addTest(conf_tests)
     score_tests = unittest.defaultTestLoader.loadTestsFromTestCase(ScoreDictTestCase)
     suite.addTest(score_tests)
-    post_tests = unittest.defaultTestLoader.loadTestsFromTestCase(PostProcessorTestCase)
-    suite.addTest(post_tests)
+    # Dropping post test because we are getting rid of this feature anyway
+    # and the file format has changed
+#    post_tests = unittest.defaultTestLoader.loadTestsFromTestCase(PostProcessorTestCase)
+#    suite.addTest(post_tests)
     integration_tests = unittest.defaultTestLoader.loadTestsFromTestCase(ScrufIntegrationTestCase)
     suite.addTest(integration_tests)
 

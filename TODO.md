@@ -1,13 +1,12 @@
 # TODO items
 
 ## Known bugs
-* output files are too large
++ strip initial spaces from history strings
 
 ## Data Handling
 
 ## Unit Tests
-* Unit tests for lottery mechanisms
-* Unit tests for choice mechanisms
+
 
 ## Simulation
 * Test and document Jupyter notebook usage
@@ -21,7 +20,6 @@
 * Choice
   * More complex choice mechanisms?
 * Metrics
-  * get ndcg etc. via librec-auto working
   * accuracy regret
   * overall ndcg
   * overall fairness (note different from what the agent's measure which is a function of the window)

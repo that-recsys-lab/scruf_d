@@ -70,6 +70,6 @@ if __name__ == "__main__":
     if post_only:
         scruf.post_process()
 
-    scruf.run_experiment(progress=progress, compress=args["do_not_compress"])
+    scruf.run_experiment(progress=progress, no_compress=args["do_not_compress"])
 
     exit(0)

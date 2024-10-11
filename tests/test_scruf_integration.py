@@ -3,7 +3,7 @@ import tempfile
 import pathlib
 import toml
 from scruf import Scruf
-import json
+from pyarrow import csv
 from icecream import ic
 
 # What to test:
@@ -24,7 +24,7 @@ rec_filename = "recommendations.csv"
 feature_filename = "item_features.csv"
 
 [output]
-filename = "history_file.json"
+filename = "history_file.csv"
 
 [parameters]
 list_size = 2
@@ -117,7 +117,7 @@ user8,Feature 2 Agent,0.95
 '''
 
 TEST_FEATURE_FILE = 'item_features.csv'
-TEST_HISTORY_FILE = 'history_file.json'
+TEST_HISTORY_FILE = 'history_file.csv'
 TEST_CONTEXT_FILE = 'compat_data.csv'
 
 TEST_RECOMMENDATIONS = '''user1, item1, 5.0
@@ -198,27 +198,30 @@ class ScrufIntegrationTestCase(unittest.TestCase):
         scruf = Scruf(self.config)
         scruf.setup_experiment()
         scruf.run_loop(iterations=1)
-        scruf.cleanup_experiment()
+        scruf.cleanup_experiment(no_compress=True)
 
         self.assertEqual(0, scruf.state.user_data.current_user_index)
 
-        with open(self.temp_dir_path / TEST_HISTORY_FILE, 'r') as history_file:
-            line = history_file.readline()
+        table = csv.read_csv(self.temp_dir_path / TEST_HISTORY_FILE,
+                             csv.ReadOptions(column_names=['time', 'user', 'type', 'item',
+                                                           'score', 'rank', 'var']))
 
-        history = json.loads(line)
-        ic(history)
+        hist_dicts = table.to_pylist()
 
         # It should have processed user 1
-        self.assertEqual(0, history['time'])
-        self.assertEqual('user1', history['user'])
-        self.assertIsInstance(history['allocation'], dict)
-        alloc = history['allocation']
+        self.assertEqual(0, hist_dicts[0]['time'])
+        self.assertEqual(' user1', hist_dicts[0]['user'])
+
+        allocs = [line for line in hist_dicts if line['var'] == 'allocation']
+
         # should be all zeros
-        self.assertTrue(all([score == 0.0 for score in alloc['output'].values()]))
-        choice_output = history['choice_out']['results']
-        self.assertEqual(len(choice_output), 2)
-        self.assertTrue(choice_output[0]['item'], 'item1')
-        self.assertTrue(choice_output[1]['item'], 'item2')
+        self.assertTrue(all([alloc[' 1.0'] == 0.0 for alloc in allocs]))
+
+        # output
+        outputs = [line for line in hist_dicts if line['var'] == ' output']
+        self.assertEqual(len(outputs), 2)
+        self.assertTrue(outputs[0]['item'], ' item1')
+        self.assertTrue(outputs[1]['item'], ' item2')
 
     # Need to get proportional fairness working to test this.
     def test_run_two(self):
@@ -226,24 +229,25 @@ class ScrufIntegrationTestCase(unittest.TestCase):
         scruf = Scruf(self.config)
         scruf.setup_experiment()
         scruf.run_loop(iterations=2)
-        scruf.cleanup_experiment()
+        scruf.cleanup_experiment(no_compress=True)
 
         self.assertEqual(1, scruf.state.user_data.current_user_index)
 
-        with open(self.temp_dir_path / TEST_HISTORY_FILE, 'r') as history_file:
-            line1 = history_file.readline()
-            line2 = history_file.readline()
+        table = csv.read_csv(self.temp_dir_path / TEST_HISTORY_FILE,
+                             csv.ReadOptions(column_names=['time', 'user', 'type', 'item',
+                                                           'score', 'rank', 'var']))
+        hist_dicts = table.to_pylist()
 
-        history = json.loads(line2)
-        ic(history)
+
+        self.assertEqual(24, len(hist_dicts))
 
         # It should have processed user 2
-        self.assertEqual(1, history['time'])
-        self.assertEqual('user2', history['user'])
-        self.assertIsInstance(history['allocation'], dict)
-        alloc = history['allocation']
-        fairness = alloc['fairness scores']
-        output = alloc['output']
+        self.assertEqual(1, hist_dicts[12]['time'])
+        self.assertEqual(' user2',hist_dicts[12]['user'])
+#        self.assertIsInstance(history['allocation'], dict)
+#        alloc = history['allocation']
+#        fairness = alloc['fairness scores']
+#        output = alloc['output']
 
 if __name__ == '__main__':
     unittest.main()

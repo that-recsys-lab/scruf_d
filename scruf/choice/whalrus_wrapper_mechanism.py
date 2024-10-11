@@ -196,7 +196,7 @@ class WhalrusWrapperOrdinal(WhalrusWrapperMechanism):
                 self.whalrus_rule = self.whalrus_class(ballots, weights=weights)
             else:
                 self.whalrus_rule = self.whalrus_class(
-                    ballots, weights=weights, tie_break=self.tiebreak_class()
+                    ballots, weights=weights, tie_break=self.tiebreak_class
                 )
 
     # Score range is 0..length of list. This is also something we might want to make configurable
