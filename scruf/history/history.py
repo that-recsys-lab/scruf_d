@@ -70,6 +70,9 @@ class ScrufHistory:
         choice_input = self.choice_input_history.get_most_recent()
         choice_output = self.choice_output_history.get_most_recent()
 
+        # header
+        self._history_file.write("time,"+"user,"+"agent_or_item,"+"id,"+"score,"+"rank,"+"out_type","\n")
+
         # agent-level outputs
         for agent in alloc["fairness scores"].keys():
             fair_output = [
@@ -112,9 +115,9 @@ class ScrufHistory:
             compat_output = [str(item) for item in compat_output]
             alloc_output = [str(item) for item in alloc_output]
 
-            self._history_file.write(", ".join(fair_output) + "\n")
-            self._history_file.write(", ".join(compat_output) + "\n")
-            self._history_file.write(", ".join(alloc_output) + "\n")
+            self._history_file.write(",".join(fair_output) + "\n")
+            self._history_file.write(",".join(compat_output) + "\n")
+            self._history_file.write(",".join(alloc_output) + "\n")
 
         # item-level outputs
         for entry in choice_input.ballots["__rec"].prefs.results:
@@ -125,7 +128,7 @@ class ScrufHistory:
             output = [current_time, current_user, "item", item, score, rank, "__rec"]
 
             output = [str(item) for item in output]
-            self._history_file.write(", ".join(output) + "\n")
+            self._history_file.write(",".join(output) + "\n")
 
         for entry in choice_output.results:
             item = entry.item
@@ -134,7 +137,7 @@ class ScrufHistory:
 
             output = [current_time, current_user, "item", item, score, rank, "output"]
             output = [str(item) for item in output]
-            self._history_file.write(", ".join(output) + "\n")
+            self._history_file.write(",".join(output) + "\n")
 
         self._history_file.flush()
 
