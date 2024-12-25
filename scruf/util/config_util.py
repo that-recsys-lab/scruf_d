@@ -21,10 +21,10 @@ def is_valid_keys(key_list, config):
         else:
             return False
 
-
+# Booleans trip us up too much. Be very liberal about it
 def get_value_from_keys(key_list, config, default=None):
     if len(key_list) == 0:
-        return config
+        return ensure_boolean(config)
     else:
         head_key = key_list[0]
         if head_key in config:
@@ -34,6 +34,16 @@ def get_value_from_keys(key_list, config, default=None):
         else:
             return default
 
+def ensure_boolean(entry):
+    if isinstance(entry, str):
+        if entry.lower() == 'true':
+            return True
+        elif entry.lower() =='false':
+            return False
+        else:
+            return entry
+    else:
+        return entry
 
 def check_key_lists(path_specs, config):
     return all(map(lambda path: is_valid_keys(path, config), path_specs))

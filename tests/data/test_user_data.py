@@ -91,7 +91,7 @@ class UserDataTestCase(unittest.TestCase):
     def test_list_length_error(self):
         user_data = BulkLoadedUserData()
         self.config['location']['path'] = self.temp_dir_path
-        self.config['parameters']['list_size'] = 3
+        self.config['parameters']['list_size'] = 4
         with self.assertRaises(InputListLengthError):
             user_data.setup(self.config)
 

@@ -3,10 +3,13 @@ import unittest
 from agent.test_fairness_agents import AgentTestCase
 from agent.test_fairness_metric import FairnessMetricTestCase
 from agent.test_compatibility_metric import CompatibilityMetricTestCase
+from agent.test_context_compatibility import ContextCompatibilityTestCase
 from agent.test_preference_function import PreferenceFunctionTestCase
 from allocation.test_allocation_mechanism import AllocationMechanismTestCase
 from choice.test_choice_mechanism import ChoiceMechanismTestCase
 from choice.test_whalrus_wrapper import WhalrusWrapperTestCase
+from choice.test_greedy_sublist import GreedySublistTestCase
+from choice.test_fair_rerank import FARTestCase
 from data.test_context_class import ContextClassTestCase
 from data.test_item_feature import ItemFeatureTestCase
 from data.test_user_data import UserDataTestCase
@@ -29,7 +32,9 @@ def suite():
     suite.addTest(metric_tests)
     compat_test = unittest.defaultTestLoader.loadTestsFromTestCase(CompatibilityMetricTestCase)
     suite.addTest(compat_test)
-    pref_test = unittest.defaultTestLoader.loadTestsFromTestCase(CompatibilityMetricTestCase)
+    cx_compat_test = unittest.defaultTestLoader.loadTestsFromTestCase(ContextCompatibilityTestCase)
+    suite.addTest(cx_compat_test)
+    pref_test = unittest.defaultTestLoader.loadTestsFromTestCase(PreferenceFunctionTestCase)
     suite.addTest(pref_test)
     alloc_test = unittest.defaultTestLoader.loadTestsFromTestCase(AllocationMechanismTestCase)
     suite.addTest(alloc_test)
@@ -37,6 +42,10 @@ def suite():
     suite.addTest(choice_test)
     whalrus_test = unittest.defaultTestLoader.loadTestsFromTestCase(WhalrusWrapperTestCase)
     suite.addTest(whalrus_test)
+    greedy_test = unittest.defaultTestLoader.loadTestsFromTestCase(GreedySublistTestCase)
+    suite.addTest(greedy_test)
+    far_test = unittest.defaultTestLoader.loadTestsFromTestCase(FARTestCase)
+    suite.addTest(far_test)
     ctx_test = unittest.defaultTestLoader.loadTestsFromTestCase(ContextClassTestCase)
     suite.addTest(ctx_test)
     if_test = unittest.defaultTestLoader.loadTestsFromTestCase(ItemFeatureTestCase)
@@ -57,8 +66,10 @@ def suite():
     suite.addTest(conf_tests)
     score_tests = unittest.defaultTestLoader.loadTestsFromTestCase(ScoreDictTestCase)
     suite.addTest(score_tests)
-    post_tests = unittest.defaultTestLoader.loadTestsFromTestCase(PostProcessorTestCase)
-    suite.addTest(post_tests)
+    # Dropping post test because we are getting rid of this feature anyway
+    # and the file format has changed
+#    post_tests = unittest.defaultTestLoader.loadTestsFromTestCase(PostProcessorTestCase)
+#    suite.addTest(post_tests)
     integration_tests = unittest.defaultTestLoader.loadTestsFromTestCase(ScrufIntegrationTestCase)
     suite.addTest(integration_tests)
 

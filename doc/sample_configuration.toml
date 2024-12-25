@@ -36,6 +36,12 @@ name = "Feature 2"
 protected_feature = "feature2"
 protected_values = 1
 
+# Despite the label protected_feature, the absence of a protected values entry
+# means that this feature is not sensitive.
+[feature.f3]
+name = "Feature 3"
+protected_feature = "feature_not_sensitive"
+
 [agent]
 
 [agent.f1]

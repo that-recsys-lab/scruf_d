@@ -28,6 +28,14 @@ name="test"
 [e]
 list=[1,2,3]
 
+[f]
+b1 = "True"
+b2 = "true"
+b4 = true
+b5 = "False"
+b6 = "false"
+b8 = false
+
 '''
 
 class ConfigUtilTestCase(unittest.TestCase):
@@ -51,6 +59,14 @@ class ConfigUtilTestCase(unittest.TestCase):
         self.assertTrue(check_key_lists(path_specs, config=self.config))
         path_specs.append(['e', 'lalalala'])
         self.assertFalse(check_key_lists(path_specs, config=self.config))
+
+    def test_boolean(self):
+        self.assertTrue(get_value_from_keys(['f', 'b1'], config=self.config))
+        self.assertFalse(get_value_from_keys(['f', 'b5'], config=self.config))
+        self.assertTrue(get_value_from_keys(['f', 'b2'], config=self.config))
+        self.assertFalse(get_value_from_keys(['f', 'b6'], config=self.config))
+        self.assertTrue(get_value_from_keys(['f', 'b4'], config=self.config))
+        self.assertFalse(get_value_from_keys(['f', 'b8'], config=self.config))
 
 
 if __name__ == '__main__':

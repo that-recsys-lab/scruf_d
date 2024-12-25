@@ -1,23 +1,20 @@
-# Context provides the basis of computing the compatibility between an agent and a recommendation
-# opportunity (i.e. a user).
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from scruf.util import PropertyMixin, InvalidContextClassError, UnregisteredContextClassError, get_path_from_keys
 import csv
 
 
-class Context(PropertyMixin,ABC):
+class Test(PropertyMixin, ABC):
 
     def setup(self, input_props, names=None):
         super().setup(input_props, names=names)
 
-    # TODO: This is a little confusing since the context object is a container for other
-    # things also called contexts. The name of one of these things needs to change.
     @abstractmethod
-    def get_context(self, user_id):
+    def get_test(self, user_id):
         pass
 
-class NullContext(Context):
+
+class NullTest(Test):
 
     def __init__(self):
         super().__init__()
@@ -25,32 +22,33 @@ class NullContext(Context):
     def setup(self, config):
         pass
 
-    def get_context(self, user_id):
+    def get_test(self, user_id):
         return None
-    
-class CSVContext(Context):
-    _PROPERTY_NAMES = ["compatibility_file"]
+
+
+class CSVTest(Test):
+    _PROPERTY_NAMES = ["test_data"]
 
     def __init__(self):
         super().__init__()
-        self.compatibility_dict = defaultdict(dict)
+        self.test_dict = defaultdict(dict)
 
     def setup(self, config, names=None):
         super().setup(config['context']['properties'],
-                      names=self.configure_names(CSVContext._PROPERTY_NAMES, names))
-        comp_file = get_path_from_keys(['context', 'properties', 'compatibility_file'], config,
+                      names=self.configure_names(CSVTest._PROPERTY_NAMES, names))
+        test_data = get_path_from_keys(['context', 'properties', 'test_data'], config,
                                        check_exists=True)
 
-        with open(comp_file, "r") as f:
-            reader = csv.DictReader(f, fieldnames=['user_id', 'agent', 'compatibility'])
+        with open(test_data, "r") as f:
+            reader = csv.DictReader(f, fieldnames=['user_id', 'item_id', 'rating'])
             for row in reader:
                 user_id = row['user_id']
-                agent = row['agent']
-                compatibility = float(row['compatibility'])
-                self.compatibility_dict[user_id][agent] = compatibility
-    
-    def get_context(self, user_id):
-        return self.compatibility_dict[user_id]
+                item_id = row['item_id']
+                rating = float(row['rating'])
+                self.test_dict[user_id][item_id] = rating
+
+    def get_test(self, user_id):
+        return self.test_dict[user_id]
 
 
 class ContextFactory:

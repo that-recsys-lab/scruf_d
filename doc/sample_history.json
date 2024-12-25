@@ -8,3 +8,26 @@
     "agent 2": [["item 1", 0.0], ["item 2", 0.0], ["item 3", 1.5], ["item 4", 0.0]],
     "output": [["item 1", 5.0], ["item 3", 4.5]]}
 }
+
+In CSV format:
+
+time, user, item, score, rank, type
+1, "user 1", "agent 1", 0.3, NA, "fairness"
+1, "user 1", "agent 2", 0.5, NA, "fairness"
+1, "user 1", "agent 3", 0.2, NA, "fairness"
+1, "user 1", "agent 1", 0.0, NA, "compatibility"
+1, "user 1", "agent 2", 0.1, NA, "compatibility"
+1, "user 1", "agent 3", 0.9, NA, "compatibility"
+1, "user 1", "agent 1", 0.0, NA, "allocation"
+1, "user 1", "agent 2", 1.0, NA, "allocation"
+1, "user 1", "agent 3", 0.0, NA, "allocation"
+1, "user 1", "item 1", 5.0, 1, "_rec"
+1, "user 1", "item 2", 4.0, 2, "_rec"
+1, "user 1", "item 3", 3.0, 3, "_rec"
+1, "user 1", "item 4", 2.0, 4, "_rec"
+1, "user 1", "item 1", 0.0, 2, "agent 2"
+1, "user 1", "item 2", 0.0, 2, "agent 2"
+1, "user 1", "item 3", 1.4, 1, "agent 2"
+1, "user 1", "item 4", 0.0, 2, "agent 2"
+1, "user 1", "item 1", 5.0, 1, "output"
+1, "user 1", "item 2", 4.5, 2, "output"

@@ -24,26 +24,19 @@ class WScoringChoiceMechanism(ChoiceMechanism):
     # for an item for one agent, then a default score is applied. If there is no score table, then all
     # ballots must contain the same set of items. default score not implemented yet.
     def weighted_combine(self, user, bcoll, default_score_table: None):
-        output = ResultList()
         if len(bcoll.get_ballots()) == 0:
-            return output
+            return ResultList()
 
         if default_score_table is not None:
             raise ScrufError('Default scoring not implemented yet.')
 
-        score_table = defaultdict(float)
         item_set = {entry.item for entry in bcoll.get_ballot('__rec').prefs.get_results()}
         for ballot in bcoll.get_ballots():
             ballot_items = {entry.item for entry in ballot.prefs.get_results()}
             if len(item_set.symmetric_difference(ballot_items)) != 0:
                 raise ScrufError('Ballots must contain identical items if no default score table provided.')
 
-            for entry in ballot.prefs.get_results():
-                score_table[entry.item] += entry.score * ballot.weight
-
-        triples_list = [(user, item, score_table[item]) for item in item_set]
-        output.setup(triples_list, presorted=False)
-        return output
+        return bcoll.merge(user)
 
     def compute_choice(self, agents: AgentCollection, bcoll: BallotCollection, recommended_items: ResultList, list_size):
         rec_weight = float(self.get_property('recommender_weight'))

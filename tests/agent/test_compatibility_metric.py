@@ -9,6 +9,7 @@ COMPATIBILITY_PROPERTIES_EXTRA = \
     'extra_prop': 42
 }
 
+
 # Note: we are not testing the setting of properties because we don't have any metrics with properties defined yet.
 class CompatibilityMetricTestCase(unittest.TestCase):
     def test_metric_creation(self):
@@ -33,6 +34,8 @@ class CompatibilityMetricTestCase(unittest.TestCase):
 
         with self.assertRaises(InvalidCompatibilityMetricError):
             CompatibilityMetricFactory.register_compatibility_metric('wrong', PropertyMismatchError)
+
+
 
 if __name__ == '__main__':
     unittest.main()

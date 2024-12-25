@@ -14,6 +14,8 @@ class ChoiceMechanism(PropertyMixin,ABC):
     def setup(self, input_props, names=None):
         super().setup(input_props, names=names)
 
+    # TODO: It would be better to copy the recommender ballot into bcoll here and save to the history,
+    # rather than rely on compute_choice not to alter it.
     def do_choice(self, allocation_probabilities, recommendations: ResultList):
         agents = scruf.Scruf.state.agents
         list_size = scruf.Scruf.state.output_list_size
@@ -46,13 +48,14 @@ class NullChoiceMechanism(ChoiceMechanism):
     def __init__(self):
         super().__init__()
         
-    def compute_choice(self, agents, allocation_probabilities, recommended_items: ResultList, list_size):
+    def compute_choice(self, agents, ignore_bcoll: BallotCollection, recommended_items: ResultList, list_size):
         """
         Returns the recommendation list without any re-ranking.
         :return: selected agent for each user
         """
         bcoll = BallotCollection()
-        bcoll.set_ballot('__rec', recommended_items, 1.0)
+        recommended_items.sort()
+        bcoll.set_ballot(BallotCollection.REC_NAME, recommended_items, 1.0)
         output = copy.deepcopy(recommended_items)
         output.trim(list_size)
         return bcoll, output

@@ -87,6 +87,10 @@ class UnregisteredChoiceMechanismError(ScrufError):
         self.message = f'Cannot create choice mechanism: Class {name} is not registered and may not exist.'
         super().__init__(self.message)
 
+class MultipleBallotsGreedyError(ScrufError):
+    def __init__(self, name):
+        self.message = f'Cannot score lists: Multiple ballots for this reranker are not supported.'
+        super().__init__(self.message)
 
 class MismatchedWhalrusRuleError(ScrufError):
     def __init__(self, name, wrapper_name):
@@ -155,4 +159,10 @@ class InvalidPostProcessorError(ScrufError):
 class UnregisteredPostProcessorError(ScrufError):
     def __init__(self, name):
         self.message = f'Cannot create post processor: Class {name} is not registered and may not exist.'
+        super().__init__(self.message)
+
+class FeatureFileFormatError(ScrufError):
+    def __init__(self, file, row):
+
+        self.message = f'Error in item feature file {file} Row representation: {row}.'
         super().__init__(self.message)
