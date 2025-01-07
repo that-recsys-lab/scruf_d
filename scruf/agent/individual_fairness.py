@@ -6,9 +6,7 @@ import scruf
 
 
 class IndividualFairnessMetric(FairnessMetric):
-    """
-    An IndividualFairnessMetric is one where recommended items are ...
-    """
+
     _PROPERTY_NAMES = []
 
     def __init__(self):
@@ -24,7 +22,6 @@ class IndividualFairnessMetric(FairnessMetric):
     @abstractmethod
     def compute_test_fairness(self, history):
         pass
-
 
 class GiniIndexFM(IndividualFairnessMetric):
     """
@@ -58,12 +55,16 @@ class GiniIndexFM(IndividualFairnessMetric):
         for i in range(zeros_to_add):
             item_recs.append(0)
         item_recs.sort()
-        position_sum = 0
-        for i, value in enumerate(item_recs, 1):
-            position_sum += i * value
-        value_sum = sum(item_recs)
-        half_relative_mean = (2*position_sum) / (n*value_sum)
-        fairness_score = half_relative_mean - ((n + 1) / n)
+        #position_sum = 0
+        diff_sum = 0
+        for i, xi in enumerate(item_recs[:-1], 1):
+            diff_sum += np.sum(np.abs(xi - np.array(item_recs[i:])))
+        fairness_score = diff_sum / (len(item_recs) ** 2 * np.mean(item_recs))
+        # for i, value in enumerate(item_recs, 1):
+        #     position_sum += i * value
+        # value_sum = sum(item_recs)
+        # half_relative_mean = (2*position_sum) / (n*value_sum)
+        # fairness_score = half_relative_mean - ((n + 1) / n)
 
         return fairness_score
 
