@@ -23,10 +23,11 @@ class IndividualPreferenceFunction(PreferenceFunction):
     # For every item in the list
     #   check how often item is recommended
     #   order list with the least recommended items recommended highest.
-    def compute_preferences(self, history, recommendations: ResultList) -> ResultList:
+    def compute_preferences(self, recommendations: ResultList) -> ResultList:
         rec_list = copy.deepcopy(recommendations)
         delta = self.get_property('delta')
         counts_dict = {}
+        history = scruf.Scruf.state.history
         for result in history.choice_output_history.get_recent(-1):
             for recommendation in result.get_results():
                 if recommendation.item in counts_dict:
@@ -49,3 +50,7 @@ class IndividualPreferenceFunction(PreferenceFunction):
         rec_list.rescore(individual_score)
         return rec_list
 
+# Register the mechanisms created above
+pfunc_specs = [("individual_preference", IndividualPreferenceFunction)]
+
+PreferenceFunctionFactory.register_preference_functions(pfunc_specs)
