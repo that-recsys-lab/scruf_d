@@ -3,6 +3,7 @@ from abc import abstractmethod, ABC
 import numpy as np
 from statistics import mean
 import scruf
+from joblib import Parallel, delayed
 
 
 class IndividualFairnessMetric(FairnessMetric):
@@ -27,7 +28,7 @@ class GiniIndexFM(IndividualFairnessMetric):
     """
     The gini index computes the fairness in terms of .
     """
-    _PROPERTY_NAMES = []
+    _PROPERTY_NAMES = ['num_items', 'target']
 
     def __init__(self):
         super().__init__()
@@ -40,9 +41,13 @@ class GiniIndexFM(IndividualFairnessMetric):
         """
         Computes the
         """
+
+        n = self.get_property('num_items')
+        target = float(self.get_property('target'))
+
         if history.choice_output_history.is_empty():
             return 1.0
-        n = scruf.Scruf.state.item_features.item_feature_index.__len__()
+
         counts_dict = {}
         for result in history.choice_output_history.get_recent(-1):
             for recommendation in result.get_results():
@@ -50,16 +55,24 @@ class GiniIndexFM(IndividualFairnessMetric):
                     counts_dict[recommendation.item] += 1
                 else:
                     counts_dict[recommendation.item] = 1
-        item_recs = list(counts_dict.values())
-        zeros_to_add = n - len(item_recs)
-        for i in range(zeros_to_add):
-            item_recs.append(0)
-        item_recs.sort()
-        #position_sum = 0
-        diff_sum = 0
-        for i, xi in enumerate(item_recs[:-1], 1):
-            diff_sum += np.sum(np.abs(xi - np.array(item_recs[i:])))
-        fairness_score = diff_sum / (len(item_recs) ** 2 * np.mean(item_recs))
+        non_zero_counts = np.array(list(counts_dict.values()))
+        coverage = len(non_zero_counts)/2000
+        # zero_count = n - len(non_zero_counts)
+        #
+        # total_sum = non_zero_counts.sum()
+        # mean_n = total_sum / n
+        #
+        # diff_sum = 0
+        #
+        # for i, xi in enumerate(non_zero_counts[:-1]):
+        #     diff_sum += np.sum(np.abs(xi - non_zero_counts[i + 1:]))
+        #
+        # diff_sum += zero_count * np.sum(non_zero_counts)
+        # diff_sum += zero_count * (zero_count - 1) // 2 * 0
+
+        #gini = diff_sum / (n ** 2 * mean_n)
+        fairness_score = coverage/target
+        #fairness_score = (1 - gini) / target
         # for i, value in enumerate(item_recs, 1):
         #     position_sum += i * value
         # value_sum = sum(item_recs)

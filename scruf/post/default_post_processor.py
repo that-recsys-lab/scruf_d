@@ -71,6 +71,7 @@ class NDCGPostProcessor(DefaultPostProcessor):
 
     def __init__(self):
         super().__init__()
+        self.test_ndcg = None
 
     def setup(self, input_props, names=None):
         super().setup(input_props, names=self.configure_names(NDCGPostProcessor._PROPERTY_NAMES, names))
@@ -138,6 +139,9 @@ class NDCGPostProcessor(DefaultPostProcessor):
                                                               threshold=threshold,
                                                               binary=binary,
                                                               decay=decay_array), axis=1)
+        def compute_test_ndcg_synthetic(self):
+            self.test_ndcg = self.dataframe['nDCG']['Results'].mean()
+
 
     def process(self):
         self.load_history()
@@ -168,6 +172,7 @@ class ExposurePostProcessor(NDCGPostProcessor):
         self.agent_collection = None
         self.agents = None
 
+
     def setup(self, input_props, names=None, agent_collection=None):
         super().setup(input_props, names=names)
         self.item_features = scruf.Scruf.state.item_features
@@ -190,6 +195,7 @@ class ExposurePostProcessor(NDCGPostProcessor):
         self.history_to_dataframe()
         self.compute_ndcg_column()
         self.compute_fairness_columns(self.full_history)
+        self.save_full_dataframe()
         self.save_summary_dataframe()
 
 

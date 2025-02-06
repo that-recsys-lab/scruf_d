@@ -5,7 +5,7 @@ import pathlib
 from ruamel.yaml import YAML
 
 yaml = YAML(typ="safe")
-params = yaml.load(open("../scruf-dvc-experiments/params.yaml", encoding="utf-8")) #change here for new params files
+params = yaml.load(open("params.yaml", encoding="utf-8")) #change here for new params files
 
 folder_path = params["config"]["folder_path"]
 
@@ -18,9 +18,9 @@ def remove_suffix(input_string, suffix):
 def generate_config(base, config_number, rec_weight, choice, allocation, filename_suffix):
     base_toml = toml.load(base)
     new_filename = remove_suffix(base_toml["output"]["filename"], ".json") + f"_{filename_suffix}.json"
-    csv_filename = remove_suffix(base_toml["post"]["properties"]["summary_filename"], ".csv") + f"_{filename_suffix}.csv"
+    #csv_filename = remove_suffix(base_toml["post"]["properties"]["summary_filename"], ".csv") + f"_{filename_suffix}.csv"
     base_toml["output"]["filename"] = new_filename
-    base_toml["post"]["properties"]["summary_filename"] = csv_filename
+    #base_toml["post"]["properties"]["summary_filename"] = csv_filename
     # Check if the choice is "weighted_scoring"
     if choice == "weighted_scoring":
         base_toml["choice"]["choice_class"] = choice

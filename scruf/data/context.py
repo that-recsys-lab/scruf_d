@@ -29,7 +29,7 @@ class NullContext(Context):
         return None
     
 class CSVContext(Context):
-    _PROPERTY_NAMES = ["compatibility_file"]
+    _PROPERTY_NAMES = ["compatibility_file", "popularity_data"]
 
     def __init__(self):
         super().__init__()
@@ -52,6 +52,31 @@ class CSVContext(Context):
     def get_context(self, user_id):
         return self.compatibility_dict[user_id]
 
+class LoadPopularityData(Context):
+    _PROPERTY_NAMES = ["compatibility_file", "popularity_data"]
+    def __init__(self):
+        super().__init__()
+        self.data_file = None
+        self.popularity_dict = {}
+
+    def setup(self, config, names=None):
+        self.data_file = get_path_from_keys(['context', 'properties', 'popularity_data'], config, check_exists=True)
+        self._load_data()
+
+    def _load_data(self):
+        with open(self.data_file, "r") as f:
+            reader = csv.DictReader(f, fieldnames=['item_id', 'popularity'])
+            for row in reader:
+                item_id = row['item_id']
+                popularity = float(row['popularity'])
+                self.popularity_dict[item_id] = popularity
+
+    def get_popularity(self, item_id):
+        return self.popularity_dict.get(item_id, 0.0)
+
+    def get_context(self, user_id):
+
+        return None
 
 class ContextFactory:
     """
@@ -82,6 +107,6 @@ class ContextFactory:
 
 
 # Register the context classes created above
-context_specs = [("null_context", NullContext), ("csv_context", CSVContext)]
+context_specs = [("null_context", NullContext), ("csv_context", CSVContext), ("popularity", LoadPopularityData)]
 
 ContextFactory.register_context_classes(context_specs)

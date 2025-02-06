@@ -11,6 +11,7 @@ from collections import defaultdict
 import scruf
 from icecream import ic
 
+
 class UserArrivalData(ABC):
 
     @abstractmethod
@@ -47,7 +48,7 @@ class BulkLoadedUserData(UserArrivalData):
             reader = csv.reader(csvfile, skipinitialspace=True)
             for row in reader:
                 user_id = row[0]
-                if last_user_id != user_id: # On to the next user
+                if last_user_id != user_id:  # On to the next user
                     if last_user_id is not None:  # Not the first user
                         rlist = ResultList()
                         rlist.setup(current_user_collect)
@@ -100,3 +101,5 @@ class BulkLoadedUserData(UserArrivalData):
 
     def get_current_user(self):
         return self.arrival_sequence[self.current_user_index]
+
+

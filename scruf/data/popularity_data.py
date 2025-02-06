@@ -4,26 +4,26 @@ from scruf.util import PropertyMixin, InvalidContextClassError, UnregisteredCont
 import csv
 
 
-class Test(PropertyMixin, ABC):
 
-    def setup(self, input_props, names=None):
-        super().setup(input_props, names=names)
-
-    @abstractmethod
-    def get_test(self, user_id):
-        pass
-
-
-class NullTest(Test):
+class LoadPopularityData:
 
     def __init__(self):
-        super().__init__()
+        self.data_file = None
+        self.popularity_dict = {}
 
     def setup(self, config):
-        pass
+        # Get the file path from the config and ensure it exists
+        self.data_file = get_path_from_keys(['context', 'properties', 'popularity_data'], config, check_exists=True)
+        self._load_data()
 
-    def get_test(self, user_id):
-        return None
+    def _load_data(self):
+        # Read the CSV file and populate the popularity dictionary
+        with open(self.data_file, "r") as f:
+            reader = csv.DictReader(f, fieldnames=['item_id', 'popularity'])
+            for row in reader:
+                item_id = row['item_id']
+                popularity = float(row['popularity'])  # Convert popularity to float if needed
+                self.popularity_dict[item_id] = popularity
 
 
 class CSVTest(Test):
@@ -40,12 +40,11 @@ class CSVTest(Test):
                                        check_exists=True)
 
         with open(test_data, "r") as f:
-            reader = csv.DictReader(f, fieldnames=['user_id', 'item_id', 'rating'])
+            reader = csv.DictReader(f, fieldnames=['item_id', 'popularity'])
             for row in reader:
-                user_id = row['user_id']
                 item_id = row['item_id']
-                rating = float(row['rating'])
-                self.test_dict[user_id][item_id] = rating
+                popularity = row['popularity']
+                self.popularity_dict[item_id] = popularity
 
     def get_test(self, user_id):
         return self.test_dict[user_id]
@@ -80,6 +79,6 @@ class ContextFactory:
 
 
 # Register the context classes created above
-context_specs = [("null_context", NullContext), ("csv_context", CSVContext)]
+context_specs = [("null_context", NullContext), ("csv_context", CSVContext), ("popularity", LoadPopularityData)]
 
 ContextFactory.register_context_classes(context_specs)

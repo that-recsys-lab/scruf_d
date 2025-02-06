@@ -6,7 +6,7 @@ from scruf.agent import AgentCollection
 from scruf.allocation import AllocationMechanismFactory, AllocationMechanism
 from scruf.choice import ChoiceMechanismFactory, ChoiceMechanism
 from scruf.post import PostProcessorFactory, PostProcessor
-from scruf.data import ItemFeatureData, UserArrivalData, BulkLoadedUserData, Context, ContextFactory
+from scruf.data import ItemFeatureData, UserArrivalData, BulkLoadedUserData, Context, ContextFactory, LoadPopularityData
 from scruf.util import get_value_from_keys, is_valid_keys, check_key_lists, get_working_dir_path, get_path_from_keys
 from icecream import ic
 from tqdm import tqdm
@@ -31,7 +31,8 @@ class Scruf:
                 ctx_class = get_value_from_keys(['context', 'context_class'], config)
                 ctx = ContextFactory.create_context_class(ctx_class)
                 self.context: Context = ctx
-
+                self.popularity = ContextFactory.create_context_class("popularity")
+                self.popularity.setup(config)
                 # Mechanisms
                 amech_class = get_value_from_keys(['allocation', 'allocation_class'], config)
                 amech = AllocationMechanismFactory.create_allocation_mechanism(amech_class)
