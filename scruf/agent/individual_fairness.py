@@ -56,7 +56,7 @@ class GiniIndexFM(IndividualFairnessMetric):
                 else:
                     counts_dict[recommendation.item] = 1
         non_zero_counts = np.array(list(counts_dict.values()))
-        coverage = len(non_zero_counts)/2000
+        coverage = len(non_zero_counts)/n
         # zero_count = n - len(non_zero_counts)
         #
         # total_sum = non_zero_counts.sum()
