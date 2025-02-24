@@ -4,7 +4,9 @@ from abc import ABC, abstractmethod
 from scruf.agent import AgentCollection
 from scruf.util import BallotCollection, InvalidChoiceMechanismError, UnregisteredChoiceMechanismError, \
     ResultList, PropertyMixin
+from scruf.scruf_rl.compute_diff import compute_diff
 import scruf
+from icecream import ic
 
 class ChoiceMechanism(PropertyMixin,ABC):
     """
@@ -23,6 +25,11 @@ class ChoiceMechanism(PropertyMixin,ABC):
         bcoll, results = self.compute_choice(agents, agent_ballots, recommendations, list_size)
         scruf.Scruf.state.history.choice_input_history.add_item(bcoll)
         scruf.Scruf.state.history.choice_output_history.add_item(results)
+        # Compute fairness & RBO differences
+        # TODO: There should be boolean flags to determine whether to compute these differences
+        compute_diff(
+            {"fairness": [agent_ballots, results], "rbo": [recommendations, results]}
+        )
         return results
 
     def compute_agent_ballots(self, agents, allocation_probabilities, recommendations: ResultList):
@@ -89,8 +96,3 @@ class ChoiceMechanismFactory:
 mechanism_specs = [("null_choice", NullChoiceMechanism)]
 
 ChoiceMechanismFactory.register_choice_mechanisms(mechanism_specs)
-
-
-
-
-
