@@ -16,7 +16,6 @@ class WScoringChoiceMechanism(ChoiceMechanism):
     def setup(self, input_props, names=None):
         super().setup(input_props, names=self.configure_names(WScoringChoiceMechanism._PROPERTY_NAMES, names))
 
-
     def __str__(self):
         return f"WScoringChoiceMechanism: rec_weight = {self.get_property('recommender_weight')}"
 
@@ -41,6 +40,23 @@ class WScoringChoiceMechanism(ChoiceMechanism):
     def compute_choice(self, agents: AgentCollection, bcoll: BallotCollection, recommended_items: ResultList, list_size):
         rec_weight = float(self.get_property('recommender_weight'))
         bcoll.set_ballot('__rec', recommended_items, rec_weight)
+        user = recommended_items.get_user()
+        output = self.weighted_combine(user, bcoll, default_score_table=None)
+        output.trim(list_size)
+        return bcoll, output
+
+    def rl_compute_choice(
+        self,
+        agents: AgentCollection,
+        bcoll: BallotCollection,
+        recommended_items: ResultList,
+        list_size,
+        rec_weight,
+    ):
+        # print(" ====> RL Mechanism <==== ")
+        # rec_weight = float(self.get_property("recommender_weight"))
+        # print(f"rec_weight: {rec_weight}")
+        bcoll.set_ballot("__rec", recommended_items, rec_weight)
         user = recommended_items.get_user()
         output = self.weighted_combine(user, bcoll, default_score_table=None)
         output.trim(list_size)
