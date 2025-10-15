@@ -2,88 +2,79 @@
 # For format reference only -- may not actually work in any given SCRUF-D version / data set
 
 [location]
-path = "."
+path = "../../../post_processing/data/movies/"
 overwrite = "true"
 
 [data]
-rec_filename = "recommendations.csv"
-feature_filename = "item_features.csv"
+rec_filename = "recs_1m.csv"
+feature_filename = "items.csv"
 
 [output]
-filename = "history_file.json"
+filename = "movie_group"
+dnc = "true"
 
 [parameters]
-list_size = 2
-iterations = -1 # -1 means run through all the users
+list_size = 10
+iterations = -1
 initialize = "skip"
-history_window_size = 50
+history_window_size = 200
 
 [context]
 context_class = "csv_context"
 
-[context.properties]
-compatibility_file = "compat_data.csv"
-
-[feature]
-
-[feature.f1]
-name = "Feature 1"
-protected_feature = "feature1"
-protected_values = ["a", "b"]
-
-[feature.f2]
-name = "Feature 2"
-protected_feature = "feature2"
-protected_values = 1
-
-# Despite the label protected_feature, the absence of a protected values entry
-# means that this feature is not sensitive.
-[feature.f3]
-name = "Feature 3"
-protected_feature = "feature_not_sensitive"
-
-[agent]
-
-[agent.f1]
-name = "Feature 1 Agent"
-metric_class = "proportional_item"
-compatibility_class = "context_compatibility"
-preference_function_class = "zero_preference"
-
-[agent.f1.metric]
-feature = "Feature 1"
-proportion = 0.75
-
-[agent.f2]
-name = "Feature 2 Agent"
-metric_class = "proportional_item"
-compatibility_class = "context_compatibility"
-preference_function_class = "binary_preference"
-
-[agent.f2.metric]
-feature = "Feature 2"
-proportion = 0.5
-
-[agent.f2.preference]
-feature = "Feature 2"
-delta = 0.5
-
-[allocation]
-algorithm = "weighted_product_allocation"
-
-[allocation.properties]
-fairness_exponent = 1.0
-compatibility_exponent = 0.7
-
 [choice]
-algorithm = "fixed_utility"
-
-[choice.properties]
-delta = 0.5
-alpha = 0.2
+choice_class = "weighted_scoring"
 
 [post]
-postprocess_class = "default"
+postprocess_class = "null"
 
-[post.properties]
-filename="experiment_results.csv"
+[context.properties]
+compatibility_file = "compat_1m.csv"
+
+[feature.one]
+name = "non-en"
+protected_feature = "non-en"
+protected_values = [ 1,]
+
+[feature.two]
+name = "women_writer_director"
+protected_feature = "women_writer_director"
+protected_values = [ 1,]
+
+[agent.one]
+name = "non-en"
+metric_class = "proportional_item"
+compatibility_class = "context_compatibility"
+preference_function_class = "cascade_preference"
+
+[agent.two]
+name = "women_writer_director"
+metric_class = "proportional_item"
+compatibility_class = "context_compatibility"
+preference_function_class = "cascade_preference"
+
+[allocation]
+allocation_class = "weighted_product_allocation"
+
+[allocation.properties]
+
+
+[choice.properties]
+recommender_weight = 0.1
+
+
+[agent.one.metric]
+feature = "non-en"
+proportion = 0.07
+
+[agent.one.preference]
+delta = 3
+feature = "non-en"
+
+[agent.two.metric]
+feature = "women_writer_director"
+proportion = 0.30
+
+[agent.two.preference]
+delta = 0.5
+feature = "women_writer_director"
