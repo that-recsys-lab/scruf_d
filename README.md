@@ -55,6 +55,7 @@ feature_filename = "item_features.txt"
 
 [output]
 filename = "history_file.json"
+dnc = "true"
 
 [parameters]
 list_size = 10
@@ -63,7 +64,7 @@ initialize = "skip"
 history_window_size = 50
 
 [context]
-context_class = "null_context"
+context_class = "csv_context"
 
 [feature]
 
@@ -87,15 +88,18 @@ protected_values = [1]
 [agent.country]
 name = "Country"
 metric_class = "proportional_fair"
-compatibility = "entropy"
+compatibility_class = "entropy"
+preference_function_class = "cascade_preference"
 
 [agent.country.metric]
 feature = "Country"
+proportion = 0.07
 
 [agent.sector]
 name = "Sector"
 metric_class = "list_exposure"
-compatibility_class = "entropy"
+compatibility_class = "context_compatibility"
+preference_function_class = "cascade_preference"
 
 [agent.sector.metric]
 feature = "Sector"
@@ -104,21 +108,21 @@ feature = "Sector"
 name = "Loan Size"
 metric_class = "list_exposure"
 compatibility_class = "risk_aversion"
+preference_function_class = "cascade_preference"
 
 [agent.loan_size.metric]
 feature = "Loan Size"
 
 [allocation]
-algorithm = "weighted_product_allocation"
+allocation_class = "weighted_product_allocation"
 
 [allocation.properties]
 fairness_exponent = 1.0
 compatibility_exponent = 0.7
 
 [choice]
-algorithm = "fixed_utility"
+choice_class = "weighted_scoring"
 
 [choice.properties]
-delta = 0.5
-alpha = 0.2
+recommender_weight 0.1
 ```
