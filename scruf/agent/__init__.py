@@ -10,3 +10,4 @@ from .cascade_preference import CascadePreferenceFunction
 from .item_ranking_fairness import DisparateExposureFM, MeanReciprocalRankFM
 from .individual_fairness import IndividualFairnessMetric, GiniIndexFM
 from .individual_preference import IndividualPreferenceFunction, Individual_Norm, Individual_Binary, Individual_Exponential
+from .preference_function import OriginalRecs, ZeroPreference

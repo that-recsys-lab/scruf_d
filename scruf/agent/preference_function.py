@@ -20,6 +20,11 @@ class ZeroPreference(PreferenceFunction):
         rec_list.rescore_no_sort(lambda entry: 0.0)
         return rec_list
 
+class OriginalRecs(PreferenceFunction):
+    # Return original recommendations as agent preference
+    def compute_preferences(self, recommendations: ResultList) -> ResultList:
+        rec_list = copy.deepcopy(recommendations)
+        return rec_list
 
 class PreferenceFunctionFactory:
     """
@@ -49,6 +54,6 @@ class PreferenceFunctionFactory:
         return metric_class()
 
 
-pfunc_specs = [("zero_preference", ZeroPreference)]
+pfunc_specs = [("zero_preference", ZeroPreference), ("original_recs", OriginalRecs)]
 
 PreferenceFunctionFactory.register_preference_functions(pfunc_specs)
