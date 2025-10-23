@@ -63,6 +63,10 @@ class ScrufHistory:
 
         self._history_file = open(history_path, "xt")
 
+    def get_current_user(self):
+        current_user = scruf.Scruf.state.user_data.get_current_user()
+        return current_user
+
     def write_current_state(self):
         current_time = scruf.Scruf.state.user_data.current_user_index
         current_user = scruf.Scruf.state.user_data.get_current_user()
