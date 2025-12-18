@@ -24,6 +24,7 @@ class OriginalRecs(PreferenceFunction):
     # Return original recommendations as agent preference
     def compute_preferences(self, recommendations: ResultList) -> ResultList:
         rec_list = copy.deepcopy(recommendations)
+
         return rec_list
 
 class PreferenceFunctionFactory:
