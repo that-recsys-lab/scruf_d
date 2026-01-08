@@ -59,6 +59,22 @@ class Individual_Norm(IndividualPreferenceFunction):
         rec_list.rescore(individual_score)
         return rec_list
 
+class WeightedConsumer(IndividualPreferenceFunction):
+
+    # For every item in the list
+    #   check how often item is recommended
+    #   order list with the least recommended items recommended highest.
+    def compute_preferences(self, recommendations: ResultList) -> ResultList:
+        rec_list = copy.deepcopy(recommendations)
+        delta = self.get_property('delta')
+
+        def consumer_score(entry):
+            scaled = entry.score + delta
+            return scaled
+
+        rec_list.rescore(consumer_score)
+        return rec_list
+
 class Individual_Exponential(IndividualPreferenceFunction):
 
     # For every item in the list
@@ -126,6 +142,6 @@ class Individual_Binary(IndividualPreferenceFunction):
         rec_list.rescore(individual_score)
         return rec_list
 # Register the mechanisms created above
-pfunc_specs = [("individual_preference", IndividualPreferenceFunction),("ind_norm", Individual_Norm), ("ind_exponential", Individual_Exponential), ("ind_binary", Individual_Binary)]
+pfunc_specs = [("individual_preference", IndividualPreferenceFunction),("ind_norm", Individual_Norm), ("ind_exponential", Individual_Exponential), ("ind_binary", Individual_Binary), ("weighted_consumer", WeightedConsumer)]
 
 PreferenceFunctionFactory.register_preference_functions(pfunc_specs)

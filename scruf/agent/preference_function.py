@@ -22,6 +22,7 @@ class ZeroPreference(PreferenceFunction):
 
 class OriginalRecs(PreferenceFunction):
     # Return original recommendations as agent preference
+    _PROPERTY_NAMES = ['delta']
     def compute_preferences(self, recommendations: ResultList) -> ResultList:
         rec_list = copy.deepcopy(recommendations)
 
